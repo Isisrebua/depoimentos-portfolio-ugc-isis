@@ -354,6 +354,16 @@ function handleApi(req, res, urlPath) {
   return false;
 }
 
+// Rotas amigáveis pra compartilhar por WhatsApp/bio de rede social em vez
+// do nome cru do arquivo .html — servem o mesmo arquivo, só com um caminho
+// curto e fácil de digitar/lembrar.
+const CLEAN_ROUTES = {
+  '/avaliar': 'depoimento.html',
+  '/feedback': 'depoimento.html',
+  '/crm': 'banco-de-leads.html',
+  '/admin': 'banco-de-leads.html',
+};
+
 http.createServer((req, res) => {
   let urlPath = decodeURIComponent(req.url.split('?')[0]);
 
@@ -364,6 +374,7 @@ http.createServer((req, res) => {
   }
 
   if (urlPath === '/' || urlPath.endsWith('/')) urlPath += 'index.html';
+  else if (CLEAN_ROUTES[urlPath]) urlPath = '/' + CLEAN_ROUTES[urlPath];
   let filePath = path.join(root, urlPath);
   fs.readFile(filePath, (err, data) => {
     if (err) {
