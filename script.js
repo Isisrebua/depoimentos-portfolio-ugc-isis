@@ -557,7 +557,7 @@
      PROIBIDO aparecer no carregamento da página — nasce com display:none
      forçado via inline style (reforço, além do atributo [hidden] que o
      CSS já esconde) até um dos 3 gatilhos abaixo disparar:
-       1. 15s de navegação contínua na página.
+       1. 20s de navegação contínua na página.
        2. 60% de rolagem da página (scrollY / altura rolável ≥ 60%).
        3. Clique em qualquer elemento com [data-open-popup] no HTML.
      O gatilho de exit-intent (mouseleave no topo da janela) foi REMOVIDO
@@ -603,8 +603,8 @@
       if (e.key === "Escape" && !popup.hidden) closePopup();
     });
 
-    // --- gatilho 1: 15s de navegação contínua ---
-    var timerId = window.setTimeout(openPopup, 15000);
+    // --- gatilho 1: 20s de navegação contínua ---
+    var timerId = window.setTimeout(openPopup, 20000);
 
     // --- gatilho 2: 60% de rolagem da página ---
     function onScroll() {
