@@ -245,6 +245,40 @@ function sendJson(res, status, obj) {
   res.end(payload);
 }
 
+/* ============================================================================
+   SENHA DO CRM — protege o painel (banco-de-leads.html, rotas /crm e /admin)
+   e as rotas de API que só o CRM usa: listar TODOS os leads/depoimentos
+   (visão completa, com pendente/oculto) e aprovar/ocultar/mudar status.
+   Fica de fora: POST /api/leads e POST /api/depoimentos (formulários
+   públicos de captura precisam continuar abertos pra qualquer visitante) e
+   GET /api/depoimentos?status=aprovado (é o que o widget público do
+   index.html consome).
+   Autenticação HTTP Basic — o navegador mostra o prompt nativo de usuário/
+   senha sozinho ao acessar /crm; depois de digitar 1x, ele guarda a
+   credencial pra aquela aba/origem e já manda automaticamente nas chamadas
+   fetch() seguintes (mesma origem), sem precisar de tela de login própria
+   nem de cookie/sessão. Usuário pode ser qualquer texto — só a senha conta.
+   ========================================================================== */
+const CRM_PASSWORD = 'Lucyrebua2@';
+
+function hasCrmAuth(req) {
+  const header = req.headers['authorization'] || '';
+  if (!header.startsWith('Basic ')) return false;
+  const decoded = Buffer.from(header.slice(6), 'base64').toString('utf8');
+  const pass = decoded.slice(decoded.indexOf(':') + 1);
+  return pass === CRM_PASSWORD;
+}
+
+function requireCrmAuth(req, res) {
+  if (hasCrmAuth(req)) return true;
+  res.writeHead(401, {
+    'WWW-Authenticate': 'Basic realm="CRM Isis Rebua", charset="UTF-8"',
+    'Content-Type': 'text/plain; charset=utf-8',
+  });
+  res.end('Acesso restrito — senha do CRM necessária.');
+  return false;
+}
+
 function handleApi(req, res, urlPath) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PATCH, OPTIONS');
@@ -257,6 +291,7 @@ function handleApi(req, res, urlPath) {
   }
 
   if (urlPath === '/api/leads' && req.method === 'GET') {
+    if (!requireCrmAuth(req, res)) return true; // lista completa — só o CRM
     sendJson(res, 200, readLeads());
     return true;
   }
@@ -276,6 +311,7 @@ function handleApi(req, res, urlPath) {
 
   const statusMatch = urlPath.match(/^\/api\/leads\/([^/]+)\/status$/);
   if (statusMatch && req.method === 'PATCH') {
+    if (!requireCrmAuth(req, res)) return true;
     readJsonBody(req, function (err, data) {
       if (err || !data.status) { sendJson(res, 400, { error: 'Body precisa de { status }' }); return; }
       const leads = readLeads();
@@ -311,12 +347,12 @@ function handleApi(req, res, urlPath) {
   }
 
   if (urlPath === '/api/depoimentos' && req.method === 'GET') {
-    // ?status=aprovado — usado pelo widget público do index.html, que só
-    // pode ver depoimentos já aprovados. Sem o parâmetro, devolve todos
-    // (uso do painel /banco-de-leads.html, que precisa ver pendente/oculto
-    // também pra poder aprovar/reverter).
+    // ?status=aprovado — usado pelo widget público do index.html, fica
+    // aberto sem senha. Qualquer outra consulta (sem filtro, ou
+    // pendente/oculto) é visão do painel /crm — exige a senha do CRM.
     const query = new URL(req.url, 'http://localhost').searchParams;
     const statusFilter = query.get('status');
+    if (statusFilter !== 'aprovado' && !requireCrmAuth(req, res)) return true;
     const all = readDepoimentos();
     const filtered = statusFilter ? all.filter(function (d) { return d.status === statusFilter; }) : all;
     sendJson(res, 200, filtered);
@@ -338,6 +374,7 @@ function handleApi(req, res, urlPath) {
 
   const depoStatusMatch = urlPath.match(/^\/api\/depoimentos\/([^/]+)\/status$/);
   if (depoStatusMatch && req.method === 'PATCH') {
+    if (!requireCrmAuth(req, res)) return true;
     readJsonBody(req, function (err, data) {
       if (err || !data.status) { sendJson(res, 400, { error: 'Body precisa de { status }' }); return; }
       const items = readDepoimentos();
@@ -375,6 +412,12 @@ http.createServer((req, res) => {
 
   if (urlPath === '/' || urlPath.endsWith('/')) urlPath += 'index.html';
   else if (CLEAN_ROUTES[urlPath]) urlPath = '/' + CLEAN_ROUTES[urlPath];
+
+  // painel do CRM (direto ou via /crm, /admin) pede a senha antes de
+  // servir o HTML — sem isso o navegador nem chegaria a mostrar o prompt,
+  // já que a página abriria livre pra qualquer um com o link.
+  if (urlPath === '/banco-de-leads.html' && !requireCrmAuth(req, res)) return;
+
   let filePath = path.join(root, urlPath);
   fs.readFile(filePath, (err, data) => {
     if (err) {
