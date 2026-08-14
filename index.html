@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Isis Rebuá — Portfólio UGC</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<!-- Alternador de idioma. Troca TODO elemento com data-pt/data-en no texto
+     (FAQ, badges, pop-ups, botão do WhatsApp, prova social), o src/srcset
+     de toda <img class="section"> com data-img-pt/data-img-en, e o src de
+     qualquer <video> com data-src-pt/data-src-en preenchido (ver
+     script.js). As 17 imagens do Figma já têm o mecanismo de troca ligado,
+     mas hoje data-img-en aponta pro mesmo arquivo de data-img-pt — não
+     existe uma versão em inglês exportada dessas pranchetas ainda.
+
+     PRA ADICIONAR UM VÍDEO DE VERDADE num .video-slot: preencha
+     data-src-pt (e data-src-en, se for um arquivo diferente) com o
+     caminho do .mp4 — o script.js grava isso como o src real do
+     elemento. Todo <video> dentro de .video-slot já nasce com os
+     atributos autoplay+muted+loop+playsinline (áudio nativo do vídeo
+     fica mudo de propósito — sem isso o navegador bloqueia o autoplay).
+     Assim que o vídeo carrega, ele começa a tocar em loop sozinho, sem
+     precisar de clique — os 2 <video> dentro de .audio-slot (Feedbacks)
+     são a exceção proposital: são depoimentos gravados, feitos pra
+     tocar só quando a pessoa clica, então não têm autoplay/loop. -->
+
+<main class="page">
+
+  <img class="section" data-section-name="hero" data-imgset-pt="assets/portfolio/01-hero.png 1x, assets/portfolio/01-hero-2x.png 2x" data-imgset-en="assets/portfolio/01-hero.png 1x, assets/portfolio/01-hero-2x.png 2x" data-img-pt="assets/portfolio/01-hero.png" data-img-en="assets/portfolio/01-hero.png" srcset="assets/portfolio/01-hero.png 1x, assets/portfolio/01-hero-2x.png 2x" src="assets/portfolio/01-hero.png" width="1366" height="771" alt="Capa — Isis Rebuá, Portfólio UGC" fetchpriority="high">
+  <div class="section-seam section-seam--photo-cream" aria-hidden="true"></div>
+
+  <!-- A frase de destaque ("Focada em alcançar...") faz parte do PNG
+       achatado — não dá pra editar o pixel. Em vez disso, um retângulo
+       novo do mesmo verde-sálvia, no mesmo tamanho/posição exatos medidos
+       no Figma, cobre 100% a caixa antiga e mostra o texto corrigido por
+       cima (sem "dança"), com a mesma sombra suave do original. -->
+  <div class="section-wrap" data-section-name="sobre-mim">
+    <img class="section" data-imgset-pt="assets/portfolio/02-sobre-mim.png 1x, assets/portfolio/02-sobre-mim-2x.png 2x" data-imgset-en="assets/portfolio/02-sobre-mim.png 1x, assets/portfolio/02-sobre-mim-2x.png 2x" data-img-pt="assets/portfolio/02-sobre-mim.png" data-img-en="assets/portfolio/02-sobre-mim.png" srcset="assets/portfolio/02-sobre-mim.png 1x, assets/portfolio/02-sobre-mim-2x.png 2x" src="assets/portfolio/02-sobre-mim.png" width="1366" height="669" alt="Sobre mim" loading="lazy">
+    <p class="about-highlight-overlay" style="left:6.52%; top:80.87%; width:36.82%; height:9.27%;" data-pt="FOCADA EM ALCANÇAR MEUS SONHOS, HOJE ADMINISTRO UMA EMPRESA E VOLTO AOS ESTUDOS PARA FACULDADE!" data-en="FOCUSED ON REACHING MY DREAMS, TODAY I RUN A COMPANY AND I'M GOING BACK TO COLLEGE!">FOCADA EM ALCANÇAR MEUS SONHOS, HOJE ADMINISTRO UMA EMPRESA E VOLTO AOS ESTUDOS PARA FACULDADE!</p>
+  </div>
+
+  <!-- 03 — Como podemos trabalhar / Meus Nichos: lista vira navegação real -->
+  <div class="section-wrap" data-section-name="nichos-nav">
+    <img class="section" data-imgset-pt="assets/portfolio/03-como-trabalhar-nichos.png 1x, assets/portfolio/03-como-trabalhar-nichos-2x.png 2x" data-imgset-en="assets/portfolio/03-como-trabalhar-nichos.png 1x, assets/portfolio/03-como-trabalhar-nichos-2x.png 2x" data-img-pt="assets/portfolio/03-como-trabalhar-nichos.png" data-img-en="assets/portfolio/03-como-trabalhar-nichos.png" srcset="assets/portfolio/03-como-trabalhar-nichos.png 1x, assets/portfolio/03-como-trabalhar-nichos-2x.png 2x" src="assets/portfolio/03-como-trabalhar-nichos.png" width="1366" height="565" alt="Como podemos trabalhar e meus nichos" loading="lazy">
+    <a class="link-slot" style="left:71.38%; top:47.08%; width:21.96%; height:7.08%;" href="#nicho-app-tech" aria-label="Ir para App e Tech"></a>
+    <a class="link-slot" style="left:71.38%; top:56.11%; width:21.96%; height:7.08%;" href="#nicho-fitness" aria-label="Ir para Fitness e bem-estar"></a>
+    <a class="link-slot" style="left:71.38%; top:63.90%; width:21.96%; height:7.08%;" href="#nicho-moda" aria-label="Ir para Moda"></a>
+    <a class="link-slot" style="left:71.38%; top:72.75%; width:21.96%; height:7.08%;" href="#nicho-locais" aria-label="Ir para Locais e serviços"></a>
+    <a class="link-slot" style="left:71.38%; top:81.77%; width:21.96%; height:7.08%;" href="#nicho-beleza" aria-label="Ir para Beleza"></a>
+    <a class="link-slot" style="left:71.38%; top:88.32%; width:21.96%; height:7.08%;" href="#nicho-pet" aria-label="Ir para Pet"></a>
+    <!-- Esse botão fica por cima de um PNG achatado — "UGC Manager" (o
+         título acima dele) não é um <div> real, é pixel de imagem. Por
+         isso não dá pra usar display:flex/margin:auto de verdade pra
+         centralizar um em relação ao outro. Medi a coluna de texto
+         direto no PNG (Node/Jimp) e o centro dela é 53.8% da largura do
+         frame — não 50% (isso centralizaria em relação à IMAGEM toda,
+         não à coluna de texto, que fica deslocada pra direita). left
+         abaixo já usa esse valor medido + transform:translateX(-50%). -->
+    <a
+      class="glass-btn glow-btn"
+      style="left:53.8%; top:88.32%;"
+      href="https://wa.me/5512978136588?text=Oi%20Isis!%20Quero%20entender%20melhor%20o%20servi%C3%A7o%20de%20UGC%20Manager"
+      target="_blank" rel="noopener"
+      data-pt="Quer entender mais? Clique aqui" data-en="Want to know more? Click here"
+    ><span class="glow-btn__label">Quer entender mais? Clique aqui</span></a>
+  </div>
+
+  <!-- 04 — Marcas Trabalhadas. RECONSTRUÍDA em HTML/CSS real (a antiga
+       04-marcas-trabalhadas.png foi removida). Os 23 logos originais
+       foram recortados individualmente do PNG antigo com Node/Jimp — ver
+       crop-brands.js na raiz do projeto — usando as coordenadas exatas
+       de cada círculo no arquivo-fonte do Figma. Pra trocar/adicionar
+       uma marca no futuro: solte um novo <img> em assets/brands/, copie
+       um bloco <span class="brands-grid__badge"> abaixo e pronto — não
+       tem mais achatamento nenhum, é só uma lista de imagens. -->
+  <section class="brands-section" data-section-name="marcas">
+    <div class="brands-section__intro">
+      <h2 class="brands-section__title">
+        <span class="brands-section__title-word brands-section__title-word--1" data-pt="Marcas" data-en="Brands">Marcas</span>
+        <span class="brands-section__title-word brands-section__title-word--2" data-pt="Trabalhadas" data-en="Worked With">Trabalhadas</span>
+      </h2>
+      <p class="brands-section__lead" data-pt="Algumas marcas que já usam e tem resultados com o formato UGC" data-en="Some brands that already use UGC and are getting results with it">Algumas marcas que já usam e tem resultados com o formato UGC</p>
+      <p class="brands-section__highlight" data-pt="Mais visibilidade, mais estratégia, mais conversão!" data-en="More visibility, more strategy, more conversion!">Mais visibilidade, mais estratégia, mais conversão!</p>
+    </div>
+    <div class="brands-grid">
+      <span class="brands-grid__badge"><img src="assets/brands/creamy-skincare.png" srcset="assets/brands/creamy-skincare.png 1x, assets/brands/creamy-skincare-2x.png 2x" width="90" height="90" alt="Creamy Skincare" loading="lazy"></span>
+      <span class="brands-grid__badge"><img src="assets/brands/pantene.png" srcset="assets/brands/pantene.png 1x, assets/brands/pantene-2x.png 2x" width="90" height="90" alt="Pantene" loading="lazy"></span>
+      <span class="brands-grid__badge"><img src="assets/brands/garnier.png" srcset="assets/brands/garnier.png 1x, assets/brands/garnier-2x.png 2x" width="90" height="90" alt="Garnier" loading="lazy"></span>
+      <span class="brands-grid__badge"><img src="assets/brands/loreal-professionnel.png" srcset="assets/brands/loreal-professionnel.png 1x, assets/brands/loreal-professionnel-2x.png 2x" width="90" height="90" alt="L'Oréal Professionnel Paris" loading="lazy"></span>
+      <span class="brands-grid__badge"><img src="assets/brands/sal-grosso.png" srcset="assets/brands/sal-grosso.png 1x, assets/brands/sal-grosso-2x.png 2x" width="90" height="90" alt="Sal Grosso" loading="lazy"></span>
+      <span class="brands-grid__badge"><img src="assets/brands/ice-creamy.png" srcset="assets/brands/ice-creamy.png 1x, assets/brands/ice-creamy-2x.png 2x" width="90" height="90" alt="iCe Creamy" loading="lazy"></span>
+      <span class="brands-grid__badge"><img src="assets/brands/la-chapa-house.png" srcset="assets/brands/la-chapa-house.png 1x, assets/brands/la-chapa-house-2x.png 2x" width="90" height="90" alt="La Chapa House" loading="lazy"></span>
+      <span class="brands-grid__badge"><img src="assets/brands/gts-academia.png" srcset="assets/brands/gts-academia.png 1x, assets/brands/gts-academia-2x.png 2x" width="90" height="90" alt="GTS Academia" loading="lazy"></span>
+      <span class="brands-grid__badge"><img src="assets/brands/ij.png" srcset="assets/brands/ij.png 1x, assets/brands/ij-2x.png 2x" width="90" height="90" alt="ij" loading="lazy"></span>
+      <span class="brands-grid__badge"><img src="assets/brands/b-signature.png" srcset="assets/brands/b-signature.png 1x, assets/brands/b-signature-2x.png 2x" width="90" height="90" alt="B" loading="lazy"></span>
+      <span class="brands-grid__badge"><img src="assets/brands/ki-beirute.png" srcset="assets/brands/ki-beirute.png 1x, assets/brands/ki-beirute-2x.png 2x" width="90" height="90" alt="Ki-Beirute Esfiharia" loading="lazy"></span>
+      <span class="brands-grid__badge"><img src="assets/brands/solarium-ubatuba.png" srcset="assets/brands/solarium-ubatuba.png 1x, assets/brands/solarium-ubatuba-2x.png 2x" width="90" height="90" alt="Solarium Ubatuba" loading="lazy"></span>
+      <span class="brands-grid__badge"><img src="assets/brands/camilly-braga.png" srcset="assets/brands/camilly-braga.png 1x, assets/brands/camilly-braga-2x.png 2x" width="90" height="90" alt="Camilly Braga Nail Designer" loading="lazy"></span>
+      <span class="brands-grid__badge"><img src="assets/brands/akikomo.png" srcset="assets/brands/akikomo.png 1x, assets/brands/akikomo-2x.png 2x" width="90" height="90" alt="Akikomo Sushi Ubatuba" loading="lazy"></span>
+      <span class="brands-grid__badge"><img src="assets/brands/ohana-praiana.png" srcset="assets/brands/ohana-praiana.png 1x, assets/brands/ohana-praiana-2x.png 2x" width="90" height="90" alt="Ohana Praiana" loading="lazy"></span>
+      <span class="brands-grid__badge"><img src="assets/brands/litoral-pizzas.png" srcset="assets/brands/litoral-pizzas.png 1x, assets/brands/litoral-pizzas-2x.png 2x" width="90" height="90" alt="Litoral Pizzas e Esfihas" loading="lazy"></span>
+      <span class="brands-grid__badge"><img src="assets/brands/moon-wave.png" srcset="assets/brands/moon-wave.png 1x, assets/brands/moon-wave-2x.png 2x" width="90" height="90" alt="Marca parceira" loading="lazy"></span>
+      <span class="brands-grid__badge"><img src="assets/brands/de-boa-burguer.png" srcset="assets/brands/de-boa-burguer.png 1x, assets/brands/de-boa-burguer-2x.png 2x" width="90" height="90" alt="De Boa Burguer" loading="lazy"></span>
+      <span class="brands-grid__badge"><img src="assets/brands/amory.png" srcset="assets/brands/amory.png 1x, assets/brands/amory-2x.png 2x" width="90" height="90" alt="Amory Sorvetes Artesanais" loading="lazy"></span>
+      <span class="brands-grid__badge"><img src="assets/brands/mordidela.png" srcset="assets/brands/mordidela.png 1x, assets/brands/mordidela-2x.png 2x" width="90" height="90" alt="Mordidela Burger & Grill" loading="lazy"></span>
+      <span class="brands-grid__badge"><img src="assets/brands/use-prati.png" srcset="assets/brands/use-prati.png 1x, assets/brands/use-prati-2x.png 2x" width="90" height="90" alt="Use Prati" loading="lazy"></span>
+      <span class="brands-grid__badge"><img src="assets/brands/sushi-do-miranda.png" srcset="assets/brands/sushi-do-miranda.png 1x, assets/brands/sushi-do-miranda-2x.png 2x" width="90" height="90" alt="Sushi do Miranda" loading="lazy"></span>
+      <span class="brands-grid__badge"><img src="assets/brands/saint-germain.png" srcset="assets/brands/saint-germain.png 1x, assets/brands/saint-germain-2x.png 2x" width="90" height="90" alt="Saint Germain" loading="lazy"></span>
+      <span class="brands-grid__badge brands-grid__badge--contain"><img src="assets/ilike.jpg" alt="iLike Professional" loading="lazy"></span>
+    </div>
+  </section>
+
+  <!-- Prova social — HTML real (não imagem), 100% traduzível. Flutua
+       direto sobre o fundo da página (sem cartão/borda fechada por trás)
+       — ver .stats-banner__grid em styles.css. -->
+  <section class="stats-banner" data-section-name="prova-social" aria-label="Números e resultados">
+    <div class="stats-banner__grid">
+      <div class="stat">
+        <span class="stat__value" data-pt="+400 Mil" data-en="+400K">+400 Mil</span>
+        <span class="stat__label" data-pt="Visualizações Geradas" data-en="Views Generated">Visualizações Geradas</span>
+      </div>
+      <div class="stat">
+        <span class="stat__value" data-pt="+20" data-en="+20">+20</span>
+        <span class="stat__label" data-pt="Marcas Atendidas" data-en="Brands Served">Marcas Atendidas</span>
+      </div>
+      <div class="stat">
+        <span class="stat__value" data-pt="100%" data-en="100%">100%</span>
+        <span class="stat__label" data-pt="Gravado em 4K (iPhone 15 Pro Max)" data-en="Shot in 4K (iPhone 15 Pro Max)">Gravado em 4K (iPhone 15 Pro Max)</span>
+      </div>
+      <div class="stat">
+        <span class="stat__value" data-pt="Alta" data-en="High">Alta</span>
+        <span class="stat__label" data-pt="Taxa de Conversão em Ads" data-en="Ad Conversion Rate">Taxa de Conversão em Ads</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- 05 — Cases de Sucesso — 6 vídeos + selos de visualização reais -->
+  <div class="section-wrap" data-section-name="cases-de-sucesso">
+    <img class="section" data-imgset-pt="assets/portfolio/05-cases-de-sucesso.png 1x, assets/portfolio/05-cases-de-sucesso-2x.png 2x" data-imgset-en="assets/portfolio/05-cases-de-sucesso.png 1x, assets/portfolio/05-cases-de-sucesso-2x.png 2x" data-img-pt="assets/portfolio/05-cases-de-sucesso.png" data-img-en="assets/portfolio/05-cases-de-sucesso.png" srcset="assets/portfolio/05-cases-de-sucesso.png 1x, assets/portfolio/05-cases-de-sucesso-2x.png 2x" src="assets/portfolio/05-cases-de-sucesso.png" width="1366" height="646" alt="Cases de sucesso" loading="lazy">
+    <div class="video-slot" style="left:1.46%; top:30.34%; width:15.52%; height:50.31%;"><video playsinline loop preload="metadata" controlsList="nodownload nofullscreen noremoteplayback" disablePictureInPicture data-slot="case-1"></video></div>
+    <span class="metric-badge" style="left:1.46%; top:74.87%; width:15.52%; height:5.53%;" data-pt="▶ 100 mil" data-en="▶ 100K views">▶ 100 mil</span>
+    <div class="video-slot" style="left:17.79%; top:30.49%; width:15.45%; height:50.00%;"><video playsinline loop preload="metadata" controlsList="nodownload nofullscreen noremoteplayback" disablePictureInPicture data-slot="case-2"></video></div>
+    <span class="metric-badge" style="left:17.79%; top:74.74%; width:15.45%; height:5.50%;" data-pt="▶ 90 mil" data-en="▶ 90K views">▶ 90 mil</span>
+    <div class="video-slot" style="left:34.04%; top:30.34%; width:15.45%; height:50.00%;"><video playsinline loop preload="metadata" controlsList="nodownload nofullscreen noremoteplayback" disablePictureInPicture data-slot="case-3"></video></div>
+    <span class="metric-badge" style="left:34.04%; top:74.59%; width:15.45%; height:5.50%;" data-pt="▶ 232 mil" data-en="▶ 232K views">▶ 232 mil</span>
+    <div class="video-slot" style="left:50.51%; top:30.34%; width:15.37%; height:49.85%;"><video playsinline loop preload="metadata" controlsList="nodownload nofullscreen noremoteplayback" disablePictureInPicture data-slot="case-4"></video></div>
+    <span class="metric-badge" style="left:50.51%; top:74.45%; width:15.37%; height:5.48%;" data-pt="▶ 80 mil" data-en="▶ 80K views">▶ 80 mil</span>
+    <div class="video-slot" style="left:66.84%; top:30.34%; width:15.30%; height:49.69%;"><video playsinline loop preload="metadata" controlsList="nodownload nofullscreen noremoteplayback" disablePictureInPicture data-slot="case-5"></video></div>
+    <span class="metric-badge" style="left:66.84%; top:74.31%; width:15.30%; height:5.46%;" data-pt="▶ 75 mil" data-en="▶ 75K views">▶ 75 mil</span>
+    <div class="video-slot" style="left:83.16%; top:30.19%; width:15.30%; height:49.69%;"><video playsinline loop preload="metadata" controlsList="nodownload nofullscreen noremoteplayback" disablePictureInPicture data-slot="case-6"></video></div>
+    <span class="metric-badge" style="left:83.16%; top:74.16%; width:15.30%; height:5.46%;" data-pt="▶ 90 mil" data-en="▶ 90K views">▶ 90 mil</span>
+  </div>
+
+  <div class="section-seam section-seam--sage-cream" aria-hidden="true"></div>
+
+  <!-- 06 — App e Tech — 7 vídeos -->
+  <div class="section-wrap" data-section-name="nicho-app-tech" id="nicho-app-tech">
+    <img class="section" data-imgset-pt="assets/portfolio/06-app-e-tech.png 1x, assets/portfolio/06-app-e-tech-2x.png 2x" data-imgset-en="assets/portfolio/06-app-e-tech.png 1x, assets/portfolio/06-app-e-tech-2x.png 2x" data-img-pt="assets/portfolio/06-app-e-tech.png" data-img-en="assets/portfolio/06-app-e-tech.png" srcset="assets/portfolio/06-app-e-tech.png 1x, assets/portfolio/06-app-e-tech-2x.png 2x" src="assets/portfolio/06-app-e-tech.png" width="1366" height="988" alt="Nicho: App e Tech" loading="lazy">
+    <div class="video-slot" style="left:9.59%; top:15.18%; width:16.18%; height:34.31%;"><video playsinline autoplay muted loop preload="metadata" controlsList="nodownload nofullscreen noremoteplayback" disablePictureInPicture data-src-pt="" data-src-en="" data-slot="app-tech-1"><!-- src="videos/app-tech-1.mp4" --></video></div>
+    <div class="video-slot" style="left:30.97%; top:15.28%; width:16.18%; height:34.31%;"><video playsinline autoplay muted loop preload="metadata" controlsList="nodownload nofullscreen noremoteplayback" disablePictureInPicture data-src-pt="" data-src-en="" data-slot="app-tech-2"><!-- src="videos/app-tech-2.mp4" --></video></div>
+    <div class="video-slot" style="left:52.34%; top:15.69%; width:16.18%; height:34.31%;"><video playsinline autoplay muted loop preload="metadata" controlsList="nodownload nofullscreen noremoteplayback" disablePictureInPicture data-src-pt="" data-src-en="" data-slot="app-tech-3"><!-- src="videos/app-tech-3.mp4" --></video></div>
+    <div class="video-slot" style="left:73.79%; top:15.69%; width:16.18%; height:34.31%;"><video playsinline autoplay muted loop preload="metadata" controlsList="nodownload nofullscreen noremoteplayback" disablePictureInPicture data-src-pt="" data-src-en="" data-slot="app-tech-4"><!-- src="videos/app-tech-4.mp4" --></video></div>
+    <div class="video-slot" style="left:18.59%; top:57.69%; width:16.03%; height:34.01%;"><video playsinline autoplay muted loop preload="metadata" controlsList="nodownload nofullscreen noremoteplayback" disablePictureInPicture data-src-pt="" data-src-en="" data-slot="app-tech-5"><!-- src="videos/app-tech-5.mp4" --></video></div>
+    <div class="video-slot" style="left:41.36%; top:56.88%; width:16.03%; height:34.01%;"><video playsinline autoplay muted loop preload="metadata" controlsList="nodownload nofullscreen noremoteplayback" disablePictureInPicture data-src-pt="" data-src-en="" data-slot="app-tech-6"><!-- src="videos/app-tech-6.mp4" --></video></div>
+    <div class="video-slot" style="left:65.01%; top:56.88%; width:16.03%; height:34.01%;"><video playsinline autoplay muted loop preload="metadata" controlsList="nodownload nofullscreen noremoteplayback" disablePictureInPicture data-src-pt="" data-src-en="" data-slot="app-tech-7"><!-- src="videos/app-tech-7.mp4" --></video></div>
+  </div>
+
+  <!-- 07 — Fitness e bem-estar — 5 vídeos -->
+  <div class="section-wrap" data-section-name="nicho-fitness" id="nicho-fitness">
+    <img class="section" data-imgset-pt="assets/portfolio/07-fitness-bem-estar.png 1x, assets/portfolio/07-fitness-bem-estar-2x.png 2x" data-imgset-en="assets/portfolio/07-fitness-bem-estar.png 1x, assets/portfolio/07-fitness-bem-estar-2x.png 2x" data-img-pt="assets/portfolio/07-fitness-bem-estar.png" data-img-en="assets/portfolio/07-fitness-bem-estar.png" srcset="assets/portfolio/07-fitness-bem-estar.png 1x, assets/portfolio/07-fitness-bem-estar-2x.png 2x" src="assets/portfolio/07-fitness-bem-estar.png" width="1366" height="598" alt="Nicho: Fitness e bem-estar" loading="lazy">
+    <div class="video-slot" style="left:3.15%; top:25.59%; width:16.11%; height:56.35%;"><video playsinline autoplay muted loop preload="metadata" controlsList="nodownload nofullscreen noremoteplayback" disablePictureInPicture data-src-pt="" data-src-en="" data-slot="fitness-1"><!-- src="videos/fitness-1.mp4" --></video></div>
+    <div class="video-slot" style="left:21.38%; top:25.59%; width:15.96%; height:55.85%;"><video playsinline autoplay muted loop preload="metadata" controlsList="nodownload nofullscreen noremoteplayback" disablePictureInPicture data-src-pt="" data-src-en="" data-slot="fitness-2"><!-- src="videos/fitness-2.mp4" --></video></div>
+    <div class="video-slot" style="left:39.46%; top:25.59%; width:15.96%; height:55.85%;"><video playsinline autoplay muted loop preload="metadata" controlsList="nodownload nofullscreen noremoteplayback" disablePictureInPicture data-src-pt="" data-src-en="" data-slot="fitness-3"><!-- src="videos/fitness-3.mp4" --></video></div>
+    <div class="video-slot" style="left:57.98%; top:26.09%; width:15.81%; height:55.35%;"><video playsinline autoplay muted loop preload="metadata" controlsList="nodownload nofullscreen noremoteplayback" disablePictureInPicture data-src-pt="" data-src-en="" data-slot="fitness-4"><!-- src="videos/fitness-4.mp4" --></video></div>
+    <div class="video-slot" style="left:76.35%; top:26.09%; width:15.81%; height:55.35%;"><video playsinline autoplay muted loop preload="metadata" controlsList="nodownload nofullscreen noremoteplayback" disablePictureInPicture data-src-pt="" data-src-en="" data-slot="fitness-5"><!-- src="videos/fitness-5.mp4" --></video></div>
+  </div>
+
+  <!-- 08 — Moda — 6 vídeos -->
+  <div class="section-wrap" data-section-name="nicho-moda" id="nicho-moda">
+    <img class="section" data-imgset-pt="assets/portfolio/08-moda.png 1x, assets/portfolio/08-moda-2x.png 2x" data-imgset-en="assets/portfolio/08-moda.png 1x, assets/portfolio/08-moda-2x.png 2x" data-img-pt="assets/portfolio/08-moda.png" data-img-en="assets/portfolio/08-moda.png" srcset="assets/portfolio/08-moda.png 1x, assets/portfolio/08-moda-2x.png 2x" src="assets/portfolio/08-moda.png" width="1366" height="945" alt="Nicho: Moda" loading="lazy">
+    <div class="video-slot" style="left:17.86%; top:14.29%; width:16.69%; height:36.93%;"><video playsinline autoplay muted loop preload="metadata" controlsList="nodownload nofullscreen noremoteplayback" disablePictureInPicture data-src-pt="" data-src-en="" data-slot="moda-1"><!-- src="videos/moda-1.mp4" --></video></div>
+    <div class="video-slot" style="left:41.14%; top:14.71%; width:16.54%; height:36.51%;"><video playsinline autoplay muted loop preload="metadata" controlsList="nodownload nofullscreen noremoteplayback" disablePictureInPicture data-src-pt="" data-src-en="" data-slot="moda-2"><!-- src="videos/moda-2.mp4" --></video></div>
+    <div class="video-slot" style="left:66.03%; top:14.29%; width:16.47%; height:36.40%;"><video playsinline autoplay muted loop preload="metadata" controlsList="nodownload nofullscreen noremoteplayback" disablePictureInPicture data-src-pt="" data-src-en="" data-slot="moda-3"><!-- src="videos/moda-3.mp4" --></video></div>
+    <div class="video-slot" style="left:26.57%; top:57.46%; width:15.59%; height:34.50%;"><video playsinline autoplay muted loop preload="metadata" controlsList="nodownload nofullscreen noremoteplayback" disablePictureInPicture data-src-pt="" data-src-en="" data-slot="moda-4"><!-- src="videos/moda-4.mp4" --></video></div>
+    <div class="video-slot" style="left:48.10%; top:58.31%; width:15.45%; height:34.29%;"><video playsinline autoplay muted loop preload="metadata" controlsList="nodownload nofullscreen noremoteplayback" disablePictureInPicture data-src-pt="" data-src-en="" data-slot="moda-5"><!-- src="videos/moda-5.mp4" --></video></div>
+    <div class="video-slot" style="left:69.91%; top:58.31%; width:15.45%; height:34.29%;"><video playsinline autoplay muted loop preload="metadata" controlsList="nodownload nofullscreen noremoteplayback" disablePictureInPicture data-src-pt="" data-src-en="" data-slot="moda-6"><!-- src="videos/moda-6.mp4" --></video></div>
+  </div>
+
+  <!-- 09 — Locais e serviços — 5 vídeos -->
+  <div class="section-wrap" data-section-name="nicho-locais" id="nicho-locais">
+    <img class="section" data-imgset-pt="assets/portfolio/09-locais-servicos.png 1x, assets/portfolio/09-locais-servicos-2x.png 2x" data-imgset-en="assets/portfolio/09-locais-servicos.png 1x, assets/portfolio/09-locais-servicos-2x.png 2x" data-img-pt="assets/portfolio/09-locais-servicos.png" data-img-en="assets/portfolio/09-locais-servicos.png" srcset="assets/portfolio/09-locais-servicos.png 1x, assets/portfolio/09-locais-servicos-2x.png 2x" src="assets/portfolio/09-locais-servicos.png" width="1366" height="598" alt="Nicho: Locais e serviços" loading="lazy">
+    <div class="video-slot" style="left:4.98%; top:28.76%; width:16.33%; height:57.02%;"><video playsinline autoplay muted loop preload="metadata" controlsList="nodownload nofullscreen noremoteplayback" disablePictureInPicture data-src-pt="" data-src-en="" data-slot="locais-1"><!-- src="videos/locais-1.mp4" --></video></div>
+    <div class="video-slot" style="left:24.08%; top:29.10%; width:16.25%; height:56.69%;"><video playsinline autoplay muted loop preload="metadata" controlsList="nodownload nofullscreen noremoteplayback" disablePictureInPicture data-src-pt="" data-src-en="" data-slot="locais-2"><!-- src="videos/locais-2.mp4" --></video></div>
+    <div class="video-slot" style="left:43.27%; top:29.10%; width:16.33%; height:57.02%;"><video playsinline autoplay muted loop preload="metadata" controlsList="nodownload nofullscreen noremoteplayback" disablePictureInPicture data-src-pt="" data-src-en="" data-slot="locais-3"><!-- src="videos/locais-3.mp4" --></video></div>
+    <div class="video-slot" style="left:61.86%; top:29.10%; width:16.54%; height:57.86%;"><video playsinline autoplay muted loop preload="metadata" controlsList="nodownload nofullscreen noremoteplayback" disablePictureInPicture data-src-pt="" data-src-en="" data-slot="locais-4"><!-- src="videos/locais-4.mp4" --></video></div>
+    <div class="video-slot" style="left:80.60%; top:29.10%; width:16.54%; height:57.86%;"><video playsinline autoplay muted loop preload="metadata" controlsList="nodownload nofullscreen noremoteplayback" disablePictureInPicture data-src-pt="" data-src-en="" data-slot="locais-5"><!-- src="videos/locais-5.mp4" --></video></div>
+  </div>
+
+  <!-- 10 — Beleza — 4 vídeos -->
+  <div class="section-wrap" data-section-name="nicho-beleza" id="nicho-beleza">
+    <img class="section" data-imgset-pt="assets/portfolio/10-beleza.png 1x, assets/portfolio/10-beleza-2x.png 2x" data-imgset-en="assets/portfolio/10-beleza.png 1x, assets/portfolio/10-beleza-2x.png 2x" data-img-pt="assets/portfolio/10-beleza.png" data-img-en="assets/portfolio/10-beleza.png" srcset="assets/portfolio/10-beleza.png 1x, assets/portfolio/10-beleza-2x.png 2x" src="assets/portfolio/10-beleza.png" width="1366" height="507" alt="Nicho: Beleza" loading="lazy">
+    <div class="video-slot" style="left:19.03%; top:26.43%; width:13.98%; height:57.59%;"><video playsinline autoplay muted loop preload="metadata" controlsList="nodownload nofullscreen noremoteplayback" disablePictureInPicture data-src-pt="" data-src-en="" data-slot="beleza-1"><!-- src="videos/beleza-1.mp4" --></video></div>
+    <div class="video-slot" style="left:37.77%; top:25.05%; width:14.28%; height:58.78%;"><video playsinline autoplay muted loop preload="metadata" controlsList="nodownload nofullscreen noremoteplayback" disablePictureInPicture data-src-pt="" data-src-en="" data-slot="beleza-2"><!-- src="videos/beleza-2.mp4" --></video></div>
+    <div class="video-slot" style="left:55.71%; top:25.05%; width:14.06%; height:58.19%;"><video playsinline autoplay muted loop preload="metadata" controlsList="nodownload nofullscreen noremoteplayback" disablePictureInPicture data-src-pt="" data-src-en="" data-slot="beleza-3"><!-- src="videos/beleza-3.mp4" --></video></div>
+    <div class="video-slot" style="left:74.01%; top:25.05%; width:14.28%; height:58.78%;"><video playsinline autoplay muted loop preload="metadata" controlsList="nodownload nofullscreen noremoteplayback" disablePictureInPicture data-src-pt="" data-src-en="" data-slot="beleza-4"><!-- src="videos/beleza-4.mp4" --></video></div>
+  </div>
+
+  <!-- 11 — Pet — 4 vídeos -->
+  <div class="section-wrap" data-section-name="nicho-pet" id="nicho-pet">
+    <img class="section" data-imgset-pt="assets/portfolio/11-pet.png 1x, assets/portfolio/11-pet-2x.png 2x" data-imgset-en="assets/portfolio/11-pet.png 1x, assets/portfolio/11-pet-2x.png 2x" data-img-pt="assets/portfolio/11-pet.png" data-img-en="assets/portfolio/11-pet.png" srcset="assets/portfolio/11-pet.png 1x, assets/portfolio/11-pet-2x.png 2x" src="assets/portfolio/11-pet.png" width="1366" height="507" alt="Nicho: Pet" loading="lazy">
+    <div class="video-slot" style="left:16.40%; top:28.01%; width:13.98%; height:57.59%;"><video playsinline autoplay muted loop preload="metadata" controlsList="nodownload nofullscreen noremoteplayback" disablePictureInPicture data-src-pt="" data-src-en="" data-slot="pet-1"><!-- src="videos/pet-1.mp4" --></video></div>
+    <div class="video-slot" style="left:35.14%; top:26.63%; width:14.28%; height:58.78%;"><video playsinline autoplay muted loop preload="metadata" controlsList="nodownload nofullscreen noremoteplayback" disablePictureInPicture data-src-pt="" data-src-en="" data-slot="pet-2"><!-- src="videos/pet-2.mp4" --></video></div>
+    <div class="video-slot" style="left:53.15%; top:26.63%; width:14.06%; height:58.19%;"><video playsinline autoplay muted loop preload="metadata" controlsList="nodownload nofullscreen noremoteplayback" disablePictureInPicture data-src-pt="" data-src-en="" data-slot="pet-3"><!-- src="videos/pet-3.mp4" --></video></div>
+    <div class="video-slot" style="left:71.38%; top:26.63%; width:14.28%; height:58.78%;"><video playsinline autoplay muted loop preload="metadata" controlsList="nodownload nofullscreen noremoteplayback" disablePictureInPicture data-src-pt="" data-src-en="" data-slot="pet-4"><!-- src="videos/pet-4.mp4" --></video></div>
+  </div>
+
+  <!-- Galeria de fotos — RECONSTRUÍDA em HTML real (a antiga
+       12-galeria-fotos.png, um grid inteiro achatado numa imagem só, foi
+       removida). Os 12 blocos de foto foram recortados individualmente
+       via detecção automática de blobs (scan de pixels "não-fundo" +
+       union-find, ver detect-gallery.js/crop-gallery.js na raiz do
+       projeto) direto da imagem antiga. Isso é o que permite cada foto
+       ter sua PRÓPRIA animação de entrada (slide da esquerda, em
+       cascata) em vez de a imagem inteira entrar de uma vez só. -->
+  <div class="photo-gallery" data-section-name="galeria-fotos" aria-label="Galeria de fotos dos bastidores">
+    <img class="gallery-photo" style="left:3.07%; top:4.37%; width:15.96%; height:52.44%;" src="assets/gallery/photo-01.jpg" srcset="assets/gallery/photo-01.jpg 1x, assets/gallery/photo-01-2x.jpg 2x" alt="Bastidor de gravação — retocando o batom no espelho" loading="lazy">
+    <img class="gallery-photo" style="left:20.20%; top:10.76%; width:14.93%; height:36.97%;" src="assets/gallery/photo-02.jpg" srcset="assets/gallery/photo-02.jpg 1x, assets/gallery/photo-02-2x.jpg 2x" alt="Bastidor de gravação — café da manhã" loading="lazy">
+    <img class="gallery-photo" style="left:39.09%; top:5.71%; width:11.42%; height:41.34%;" src="assets/gallery/photo-03.jpg" srcset="assets/gallery/photo-03.jpg 1x, assets/gallery/photo-03-2x.jpg 2x" alt="Bastidor de gravação — detalhe de joia" loading="lazy">
+    <img class="gallery-photo" style="left:54.47%; top:15.80%; width:13.32%; height:35.29%;" src="assets/gallery/photo-04.jpg" srcset="assets/gallery/photo-04.jpg 1x, assets/gallery/photo-04-2x.jpg 2x" alt="Bastidor de gravação — divulgação de produto" loading="lazy">
+    <img class="gallery-photo" style="left:70.28%; top:10.08%; width:13.47%; height:32.61%;" src="assets/gallery/photo-05.jpg" srcset="assets/gallery/photo-05.jpg 1x, assets/gallery/photo-05-2x.jpg 2x" alt="Bastidor de gravação — modelador de cachos" loading="lazy">
+    <img class="gallery-photo" style="left:84.92%; top:4.37%; width:13.76%; height:49.75%;" src="assets/gallery/photo-06.jpg" srcset="assets/gallery/photo-06.jpg 1x, assets/gallery/photo-06-2x.jpg 2x" alt="Bastidor de gravação — look do dia" loading="lazy">
+    <img class="gallery-photo" style="left:3.81%; top:59.50%; width:13.47%; height:32.27%;" src="assets/gallery/photo-07.jpg" srcset="assets/gallery/photo-07.jpg 1x, assets/gallery/photo-07-2x.jpg 2x" alt="Bastidor de gravação — pote de creme" loading="lazy">
+    <img class="gallery-photo" style="left:20.06%; top:55.80%; width:15.37%; height:37.98%;" src="assets/gallery/photo-08.jpg" srcset="assets/gallery/photo-08.jpg 1x, assets/gallery/photo-08-2x.jpg 2x" alt="Bastidor de gravação — acessórios" loading="lazy">
+    <img class="gallery-photo" style="left:37.19%; top:50.08%; width:14.35%; height:34.62%;" src="assets/gallery/photo-09.jpg" srcset="assets/gallery/photo-09.jpg 1x, assets/gallery/photo-09-2x.jpg 2x" alt="Bastidor de gravação — sobremesa" loading="lazy">
+    <img class="gallery-photo" style="left:53.59%; top:55.80%; width:14.35%; height:37.98%;" src="assets/gallery/photo-10.jpg" srcset="assets/gallery/photo-10.jpg 1x, assets/gallery/photo-10-2x.jpg 2x" alt="Bastidor de gravação — unboxing de produtos" loading="lazy">
+    <img class="gallery-photo" style="left:69.69%; top:49.08%; width:13.76%; height:34.96%;" src="assets/gallery/photo-11.jpg" srcset="assets/gallery/photo-11.jpg 1x, assets/gallery/photo-11-2x.jpg 2x" alt="Bastidor de gravação — piscina e cachoeira" loading="lazy">
+    <img class="gallery-photo" style="left:84.92%; top:57.14%; width:13.32%; height:32.27%;" src="assets/gallery/photo-12.jpg" srcset="assets/gallery/photo-12.jpg 1x, assets/gallery/photo-12-2x.jpg 2x" alt="Bastidor de gravação — divulgação de cosmético" loading="lazy">
+  </div>
+
+  <div class="section-seam section-seam--cream-gray" aria-hidden="true"></div>
+
+  <!-- 13 — Feedbacks — o título ("últimos feedbacks das marcas
+       parceiras") continua sendo a arte original do Figma, intocado, no
+       canto superior direito. Os prints estáticos de conversa do
+       WhatsApp e os 2 áudios simulados foram apagados da imagem (ver
+       clean-feedbacks.js na raiz do projeto) — essa área vazia à
+       esquerda do título agora é onde o widget de depoimentos (esteira
+       horizontal contínua, estilo marquee) entra por cima, como overlay
+       real (mesmo sistema de .video-slot/.link-slot usado no resto do
+       site — nunca redesenha nada da arte, só ocupa espaço que já
+       estava vazio). Populado via fetch("/api/depoimentos?status=
+       aprovado") em initTestimonials() (script.js); fica hidden
+       enquanto não houver nenhum aprovado. Sistema de coleta:
+       depoimento.html (formulário público) → aba "Depoimentos" do
+       banco-de-leads.html (aprovar). -->
+  <div class="section-wrap" data-section-name="feedbacks">
+    <img class="section" data-imgset-pt="assets/portfolio/13-feedbacks.png 1x, assets/portfolio/13-feedbacks-2x.png 2x" data-imgset-en="assets/portfolio/13-feedbacks.png 1x, assets/portfolio/13-feedbacks-2x.png 2x" data-img-pt="assets/portfolio/13-feedbacks.png" data-img-en="assets/portfolio/13-feedbacks.png" srcset="assets/portfolio/13-feedbacks.png 1x, assets/portfolio/13-feedbacks-2x.png 2x" src="assets/portfolio/13-feedbacks.png" width="1366" height="448" alt="Últimos feedbacks das marcas parceiras" loading="lazy">
+    <div class="testimonials-marquee" id="testimonials-marquee" style="left:2%; top:10%; width:60%; height:80%;" hidden>
+      <div class="testimonials-marquee__track" id="testimonials-track"></div>
+    </div>
+  </div>
+
+  <div class="section-seam section-seam--gray-cream" aria-hidden="true"></div>
+
+  <!-- "Gestão de Campanhas" (última linha da tabela de preços) ganha um
+       botão de vidro de verdade. O texto achatado antigo "Solicite
+       orçalamento" (pequeno, quebrado em 2 linhas, sem estilo) foi
+       APAGADO da imagem — pintado por cima com a cor de fundo exata da
+       tabela (#eeeeee, via Node/Jimp) — porque com vidro bem transparente
+       (rgba(255,255,255,.12)) o texto velho apareceria por baixo do novo
+       e ficaria ilegível. Só "left"/"top" no style (a posição de onde o
+       botão começa) — SEM "width"/"height" fixo: o botão precisa caber
+       "Solicite orçamento" inteiro em qualquer largura de tela, e como
+       toda a prancheta encolhe fluida com a viewport (.section{
+       width:100%}), uma altura em % ficava pequena demais em telas
+       estreitas e cortava o texto (overflow:hidden do .glow-btn cortava
+       junto). Com width/height automáticos (só padding + texto), o
+       botão sempre cabe o texto inteiro, do tamanho que for. -->
+
+
+  <div class="section-wrap" data-section-name="mao-na-massa">
+    <img class="section" data-imgset-pt="assets/portfolio/14-mao-na-massa.png 1x, assets/portfolio/14-mao-na-massa-2x.png 2x" data-imgset-en="assets/portfolio/14-mao-na-massa.png 1x, assets/portfolio/14-mao-na-massa-2x.png 2x" data-img-pt="assets/portfolio/14-mao-na-massa.png" data-img-en="assets/portfolio/14-mao-na-massa.png" srcset="assets/portfolio/14-mao-na-massa.png 1x, assets/portfolio/14-mao-na-massa-2x.png 2x" src="assets/portfolio/14-mao-na-massa.png" width="1366" height="891" alt="Mão na massa — investimento avulso" loading="lazy">
+    <a
+      class="price-cta glow-btn"
+      style="left:71.16%; top:83.39%;"
+      href="https://wa.me/5512978136588?text=Oi%20Isis!%20Quero%20solicitar%20um%20or%C3%A7amento%20de%20Gest%C3%A3o%20de%20Campanhas%20%3A%29"
+      target="_blank" rel="noopener"
+      data-pt="Solicite orçamento" data-en="Request a quote"
+    ><span class="glow-btn__label">Solicite orçamento</span></a>
+  </div>
+
+  <div class="section-seam section-seam--cream-sage" aria-hidden="true"></div>
+
+  <div class="section-wrap" data-section-name="pacotes">
+    <img class="section" data-imgset-pt="assets/portfolio/15-pacotes.png 1x, assets/portfolio/15-pacotes-2x.png 2x" data-imgset-en="assets/portfolio/15-pacotes.png 1x, assets/portfolio/15-pacotes-2x.png 2x" data-img-pt="assets/portfolio/15-pacotes.png" data-img-en="assets/portfolio/15-pacotes.png" srcset="assets/portfolio/15-pacotes.png 1x, assets/portfolio/15-pacotes-2x.png 2x" src="assets/portfolio/15-pacotes.png" width="1366" height="672" alt="Pacotes com uso em Ads" loading="lazy">
+  </div>
+  <!-- 16 — Combo Funil de Vendas — 3 vídeos verticais (9:16) -->
+  <div class="section-wrap" data-section-name="combo-funil">
+    <img class="section" data-imgset-pt="assets/portfolio/16-combo-funil.png 1x, assets/portfolio/16-combo-funil-2x.png 2x" data-imgset-en="assets/portfolio/16-combo-funil.png 1x, assets/portfolio/16-combo-funil-2x.png 2x" data-img-pt="assets/portfolio/16-combo-funil.png" data-img-en="assets/portfolio/16-combo-funil.png" srcset="assets/portfolio/16-combo-funil.png 1x, assets/portfolio/16-combo-funil-2x.png 2x" src="assets/portfolio/16-combo-funil.png" width="1366" height="672" alt="Combo funil de vendas" loading="lazy">
+    <div class="video-slot" style="left:8.35%; top:28.72%; width:14.86%; height:46.13%;"><video playsinline autoplay muted loop preload="metadata" controlsList="nodownload nofullscreen noremoteplayback" disablePictureInPicture data-src-pt="" data-src-en="" data-slot="funil-1"><!-- src="videos/funil-1.mp4" --></video></div>
+    <div class="video-slot" style="left:26.50%; top:28.72%; width:14.86%; height:46.13%;"><video playsinline autoplay muted loop preload="metadata" controlsList="nodownload nofullscreen noremoteplayback" disablePictureInPicture data-src-pt="" data-src-en="" data-slot="funil-2"><!-- src="videos/funil-2.mp4" --></video></div>
+    <div class="video-slot" style="left:44.58%; top:28.72%; width:14.86%; height:46.13%;"><video playsinline autoplay muted loop preload="metadata" controlsList="nodownload nofullscreen noremoteplayback" disablePictureInPicture data-src-pt="" data-src-en="" data-slot="funil-3"><!-- src="videos/funil-3.mp4" --></video></div>
+  </div>
+  <!-- FAQ — reescrita B2B, 4 categorias / 7 perguntas, sanfona (1 aberta
+       por vez) e tradução completa via data-pt/data-en -->
+  <section class="faq" data-section-name="faq" id="faq" aria-label="Perguntas frequentes">
+    <div class="faq__container">
+      <h2 class="faq__title" data-pt="Perguntas Frequentes" data-en="Frequently Asked Questions">Perguntas Frequentes</h2>
+
+      <h3 class="faq__category" data-pt="Custo, ROI &amp; Retorno" data-en="Cost, ROI &amp; Return">Custo, ROI &amp; Retorno</h3>
+
+      <div class="faq__item">
+        <button type="button" class="faq__question" aria-expanded="false" aria-controls="faq-a1" id="faq-q1">
+          <span data-pt="O conteúdo UGC realmente traz resultados para anúncios pagos ou é só estética?" data-en="Does UGC content actually drive results for paid ads, or is it just aesthetics?">O conteúdo UGC realmente traz resultados para anúncios pagos ou é só estética?</span>
+          <svg class="faq__chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+        </button>
+        <div class="faq__answer" id="faq-a1" role="region" aria-labelledby="faq-q1">
+          <p data-pt="Sim! Vídeos UGC geram identificação imediata porque não parecem comerciais tradicionais e chatos. Meus criativos são estruturados com ganchos (hooks) fortes nos primeiros 3 segundos, narrativa de vendas fluida e chamadas para ação (CTAs) claras, focadas em aumentar a retenção e reduzir o Custo por Clique (CPC) das suas campanhas em tráfego pago." data-en="Yes! UGC videos create instant identification because they don't look like traditional, boring ads. My creatives are structured with strong hooks in the first 3 seconds, a smooth sales narrative, and clear calls to action (CTAs), focused on increasing retention and lowering the Cost per Click (CPC) of your paid traffic campaigns.">Sim! Vídeos UGC geram identificação imediata porque não parecem comerciais tradicionais e chatos. Meus criativos são estruturados com ganchos (hooks) fortes nos primeiros 3 segundos, narrativa de vendas fluida e chamadas para ação (CTAs) claras, focadas em aumentar a retenção e reduzir o Custo por Clique (CPC) das suas campanhas em tráfego pago.</p>
+        </div>
+      </div>
+
+      <div class="faq__item">
+        <button type="button" class="faq__question" aria-expanded="false" aria-controls="faq-a2" id="faq-q2">
+          <span data-pt="Por que eu deveria investir no seu valor se posso tentar permuta com influenciadores?" data-en="Why should I invest in your rate when I could try bartering with influencers instead?">Por que eu deveria investir no seu valor se posso tentar permuta com influenciadores?</span>
+          <svg class="faq__chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+        </button>
+        <div class="faq__answer" id="faq-a2" role="region" aria-labelledby="faq-q2">
+          <p data-pt="Influenciadores cobram pelo alcance orgânico da audiência deles. Eu vendo a produção de um ativo de marketing de alta conversão gravado em 4K, com direitos de uso liberados para o seu Gerenciador de Anúncios (Meta Business/TikTok Ads). Você não depende de algoritmo orgânico; você recebe um vídeo profissional focado em vendas para rodar direto para o seu público-alvo, mantendo controle total da veiculação." data-en="Influencers charge for their audience's organic reach. I sell the production of a high-conversion marketing asset shot in 4K, with usage rights cleared for your Ads Manager (Meta Business/TikTok Ads). You don't depend on organic algorithms; you get a professional, sales-focused video to run straight to your target audience, keeping full control over the media placement.">Influenciadores cobram pelo alcance orgânico da audiência deles. Eu vendo a produção de um ativo de marketing de alta conversão gravado em 4K, com direitos de uso liberados para o seu Gerenciador de Anúncios (Meta Business/TikTok Ads). Você não depende de algoritmo orgânico; você recebe um vídeo profissional focado em vendas para rodar direto para o seu público-alvo, mantendo controle total da veiculação.</p>
+        </div>
+      </div>
+
+      <h3 class="faq__category" data-pt="Segurança Jurídica &amp; Direitos Autorais" data-en="Legal Security &amp; Copyright">Segurança Jurídica &amp; Direitos Autorais</h3>
+
+      <div class="faq__item">
+        <button type="button" class="faq__question" aria-expanded="false" aria-controls="faq-a3" id="faq-q3">
+          <span data-pt="Como funcionam os direitos de uso de imagem e voz para Anúncios (Ads)?" data-en="How do image and voice usage rights work for Ads?">Como funcionam os direitos de uso de imagem e voz para Anúncios (Ads)?</span>
+          <svg class="faq__chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+        </button>
+        <div class="faq__answer" id="faq-a3" role="region" aria-labelledby="faq-q3">
+          <p data-pt="Todos os meus pacotes padrão já incluem os direitos formais de uso de imagem, voz e som para tráfego pago pelo período contratado (30, 60 ou 90 dias). Caso sua campanha performe acima da média e você queira estender o prazo, ofereço a renovação contratual de forma simples e transparente, sem surpresas." data-en="All of my standard packages already include the formal rights to use image, voice, and sound for paid traffic for the contracted period (30, 60, or 90 days). If your campaign performs above average and you want to extend the term, I offer a simple, transparent contract renewal — no surprises.">Todos os meus pacotes padrão já incluem os direitos formais de uso de imagem, voz e som para tráfego pago pelo período contratado (30, 60 ou 90 dias). Caso sua campanha performe acima da média e você queira estender o prazo, ofereço a renovação contratual de forma simples e transparente, sem surpresas.</p>
+        </div>
+      </div>
+
+      <div class="faq__item">
+        <button type="button" class="faq__question" aria-expanded="false" aria-controls="faq-a4" id="faq-q4">
+          <span data-pt="Você emite Nota Fiscal e trabalha com contrato formal?" data-en="Do you issue invoices and work with a formal contract?">Você emite Nota Fiscal e trabalha com contrato formal?</span>
+          <svg class="faq__chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+        </button>
+        <div class="faq__answer" id="faq-a4" role="region" aria-labelledby="faq-q4">
+          <p data-pt="Sim! Opero de forma 100% profissional e B2B. Possuo CNPJ ativo, emito Nota Fiscal para todas as contratações e forneço um contrato de prestação de serviços padrão para garantir a total segurança jurídica de ambas as partes." data-en="Yes! I operate 100% professionally and B2B. I have an active business registration, issue an invoice for every engagement, and provide a standard service agreement to guarantee full legal security for both parties.">Sim! Opero de forma 100% profissional e B2B. Possuo CNPJ ativo, emito Nota Fiscal para todas as contratações e forneço um contrato de prestação de serviços padrão para garantir a total segurança jurídica de ambas as partes.</p>
+        </div>
+      </div>
+
+      <h3 class="faq__category" data-pt="Processo, Prazos &amp; Confiança" data-en="Process, Timeline &amp; Trust">Processo, Prazos &amp; Confiança</h3>
+
+      <div class="faq__item">
+        <button type="button" class="faq__question" aria-expanded="false" aria-controls="faq-a5" id="faq-q5">
+          <span data-pt="Qual é o prazo de entrega e como funciona o acompanhamento do produto?" data-en="What's the delivery timeline, and how does product tracking work?">Qual é o prazo de entrega e como funciona o acompanhamento do produto?</span>
+          <svg class="faq__chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+        </button>
+        <div class="faq__answer" id="faq-a5" role="region" aria-labelledby="faq-q5">
+          <p data-pt="Meu prazo padrão é de 3 a 5 dias úteis a partir do momento em que o produto físico chega. O rastreamento do produto é monitorado por mim e eu aviso você assim que o pacote for entregue para iniciarmos a contagem da produção." data-en="My standard turnaround is 3 to 5 business days from the moment the physical product arrives. I track the shipment myself and let you know as soon as the package is delivered, which is when the production countdown starts.">Meu prazo padrão é de 3 a 5 dias úteis a partir do momento em que o produto físico chega. O rastreamento do produto é monitorado por mim e eu aviso você assim que o pacote for entregue para iniciarmos a contagem da produção.</p>
+        </div>
+      </div>
+
+      <div class="faq__item">
+        <button type="button" class="faq__question" aria-expanded="false" aria-controls="faq-a6" id="faq-q6">
+          <span data-pt="Como você garante que o vídeo vai seguir a identidade exata da minha marca?" data-en="How do you make sure the video matches my brand's exact identity?">Como você garante que o vídeo vai seguir a identidade exata da minha marca?</span>
+          <svg class="faq__chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+        </button>
+        <div class="faq__answer" id="faq-a6" role="region" aria-labelledby="faq-q6">
+          <p data-pt="Trabalho com um processo rigoroso de alinhamento prévio. Antes de gravar, envio o roteiro/briefing para a sua aprovação, assegurando que o cenário, o tom de voz e o figurino estejam alinhados com o seu posicionamento. Você tem direito a alterações gratuitas caso algo saia do combinado." data-en="I work with a rigorous upfront alignment process. Before filming, I send the script/briefing for your approval, making sure the setting, tone of voice, and wardrobe match your positioning. You're entitled to free changes if anything comes out different from what was agreed.">Trabalho com um processo rigoroso de alinhamento prévio. Antes de gravar, envio o roteiro/briefing para a sua aprovação, assegurando que o cenário, o tom de voz e o figurino estejam alinhados com o seu posicionamento. Você tem direito a alterações gratuitas caso algo saia do combinado.</p>
+        </div>
+      </div>
+
+      <h3 class="faq__category" data-pt="Escala &amp; Gestão de Criadores (Serviço Especial)" data-en="Scale &amp; Creator Management (Special Service)">Escala &amp; Gestão de Criadores (Serviço Especial)</h3>
+
+      <div class="faq__item">
+        <button type="button" class="faq__question" aria-expanded="false" aria-controls="faq-a7" id="faq-q7">
+          <span data-pt="Como vou escalar minhas campanhas de UGC sem gastar todo o meu tempo gerenciando criadores?" data-en="How do I scale my UGC campaigns without spending all my time managing creators?">Como vou escalar minhas campanhas de UGC sem gastar todo o meu tempo gerenciando criadores?</span>
+          <svg class="faq__chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+        </button>
+        <div class="faq__answer" id="faq-a7" role="region" aria-labelledby="faq-q7">
+          <p data-pt="Gerenciar vários criadores diferentes exige falar com cada um no WhatsApp, controlar envios e cobrar prazos. Para marcas que precisam de volume e escala, ofereço o serviço de Gestão Completa de UGC: cuido da curadoria, contratação, roteirização, direcionamento e entrega dos ativos prontos para o seu time de tráfego." data-en="Managing several different creators means talking to each one on WhatsApp, tracking shipments, and chasing deadlines. For brands that need volume and scale, I offer Full UGC Management: I handle curation, hiring, scripting, direction, and delivery of assets ready for your traffic team.">Gerenciar vários criadores diferentes exige falar com cada um no WhatsApp, controlar envios e cobrar prazos. Para marcas que precisam de volume e escala, ofereço o serviço de Gestão Completa de UGC: cuido da curadoria, contratação, roteirização, direcionamento e entrega dos ativos prontos para o seu time de tráfego.</p>
+          <div class="faq__cta-row">
+            <a
+              class="faq__cta"
+              href="https://wa.me/5512978136588?text=Oi%20Isis!%20Quero%20saber%20mais%20sobre%20o%20servi%C3%A7o%20de%20Gest%C3%A3o%20de%20Criadores%20UGC%20%3A%29"
+              target="_blank" rel="noopener"
+              data-pt="👉 Falar sobre Gestão de Criadores no WhatsApp" data-en="👉 Chat about Creator Management on WhatsApp"
+            >👉 Falar sobre Gestão de Criadores no WhatsApp</a>
+            <a
+              class="faq__cta faq__cta--secondary"
+              href="https://wa.me/5512978136588?text=Oi%20Isis!%20Antes%20de%20decidir%2C%20quero%20entender%20melhor%20como%20funciona%20a%20Gest%C3%A3o%20de%20Criadores%20UGC"
+              target="_blank" rel="noopener"
+              data-pt="Quer entender mais? Clique aqui" data-en="Want to know more? Click here"
+            >Quer entender mais? Clique aqui</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 16b — Seção fixa de encerramento, HTML real, com o mesmo formulário
+       do pop-up de leads (ver #popup-lead). initLeadForm() no script.js
+       trata os dois formulários com a mesma função — troque textos/labels
+       aqui e no popup junto se precisar manter os dois em sincronia. -->
+  <section class="final-cta" data-section-name="final-cta" aria-label="Peça uma proposta">
+    <div class="final-cta__container">
+      <div class="final-cta__intro">
+        <h2 data-pt="Pronto para transformar a presença da sua marca?" data-en="Ready to transform your brand's presence?">Pronto para transformar a presença da sua marca?</h2>
+        <p data-pt="Peça sua proposta personalizada" data-en="Request your personalized proposal">Peça sua proposta personalizada</p>
+      </div>
+
+      <form class="lead-form final-cta__form" id="final-cta-form">
+        <div class="lead-form__field">
+          <label for="finalcta-name" data-pt="Nome completo" data-en="Full name">Nome completo</label>
+          <input type="text" id="finalcta-name" name="name" required autocomplete="name">
+        </div>
+        <div class="lead-form__field">
+          <label for="finalcta-company" data-pt="Nome da empresa / marca" data-en="Company / brand name">Nome da empresa / marca</label>
+          <input type="text" id="finalcta-company" name="company" required autocomplete="organization">
+        </div>
+        <div class="lead-form__field">
+          <label for="finalcta-instagram" data-pt="Instagram da marca (@)" data-en="Brand's Instagram (@)">Instagram da marca (@)</label>
+          <input type="text" id="finalcta-instagram" name="instagram" autocomplete="off" placeholder="@suamarca">
+        </div>
+        <div class="lead-form__field">
+          <label for="finalcta-email" data-pt="E-mail corporativo" data-en="Corporate email">E-mail corporativo</label>
+          <input type="email" id="finalcta-email" name="email" required autocomplete="email">
+        </div>
+        <div class="lead-form__field">
+          <label for="finalcta-whatsapp" data-pt="WhatsApp com DDD" data-en="WhatsApp (with area code)">WhatsApp com DDD</label>
+          <input type="tel" id="finalcta-whatsapp" name="whatsapp" required autocomplete="tel" placeholder="(12) 90000-0000">
+        </div>
+        <div class="lead-form__field">
+          <label for="finalcta-usage" data-pt="Já utilizou conteúdo UGC na sua marca?" data-en="Has your brand used UGC content before?">Já utilizou conteúdo UGC na sua marca?</label>
+          <select id="finalcta-usage" name="usage" required>
+            <option value="" disabled selected data-pt="Selecione uma opção" data-en="Select an option">Selecione uma opção</option>
+            <option value="sim-ads" data-pt="Sim, já rodamos Ads" data-en="Yes, we've run Ads before">Sim, já rodamos Ads</option>
+            <option value="primeira-vez" data-pt="Não, será nossa primeira vez" data-en="No, this will be our first time">Não, será nossa primeira vez</option>
+            <option value="gestao-completa" data-pt="Queremos contratar Gestão Completa" data-en="We want to hire Full Management">Queremos contratar Gestão Completa</option>
+          </select>
+        </div>
+        <div class="lead-form__field lead-form__field--full">
+          <label for="finalcta-goal" data-pt="Qual é o objetivo principal das suas campanhas?" data-en="What's the main goal of your campaigns?">Qual é o objetivo principal das suas campanhas?</label>
+          <select id="finalcta-goal" name="goal" required>
+            <option value="" disabled selected data-pt="Selecione uma opção" data-en="Select an option">Selecione uma opção</option>
+            <option value="cpc" data-pt="Diminuir o Custo por Clique (CPC)" data-en="Lower Cost per Click (CPC)">Diminuir o Custo por Clique (CPC)</option>
+            <option value="conversao" data-pt="Aumentar Conversão em Ads" data-en="Increase Ad Conversion">Aumentar Conversão em Ads</option>
+            <option value="prova-social" data-pt="Criativos para Feed/Prova Social" data-en="Creatives for Feed/Social Proof">Criativos para Feed/Prova Social</option>
+            <option value="gestao-completa" data-pt="Gestão Completa de UGC" data-en="Full UGC Management">Gestão Completa de UGC</option>
+          </select>
+        </div>
+
+        <button type="submit" class="lead-form__submit" data-pt="Quero Receber uma Proposta Personalizada 🚀" data-en="I Want a Personalized Proposal 🚀">Quero Receber uma Proposta Personalizada 🚀</button>
+      </form>
+
+      <div class="lead-form__success final-cta__success" hidden>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
+        <p data-pt="Logo mais entro em contato com uma proposta incrível para a sua marca! 🚀" data-en="I'll be in touch soon with an amazing proposal for your brand! 🚀">Logo mais entro em contato com uma proposta incrível para a sua marca! 🚀</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 17 — Rodapé: título e caixa "Entre em contato" são a arte 100%
+       original do Figma, sem nenhum elemento HTML/CSS por cima —
+       decisão final: nada de fita/título/caixa/link reconstruído aqui.
+       O e-mail já é acessível pelo ícone de contato abaixo. -->
+  <div class="section-wrap" data-section-name="contato" id="contato">
+    <img class="section" data-imgset-pt="assets/portfolio/17-footer-contato.png 1x, assets/portfolio/17-footer-contato-2x.png 2x" data-imgset-en="assets/portfolio/17-footer-contato.png 1x, assets/portfolio/17-footer-contato-2x.png 2x" data-img-pt="assets/portfolio/17-footer-contato.png" data-img-en="assets/portfolio/17-footer-contato.png" srcset="assets/portfolio/17-footer-contato.png 1x, assets/portfolio/17-footer-contato-2x.png 2x" src="assets/portfolio/17-footer-contato.png" width="1366" height="258" alt="Vamos trabalhar juntos — contato" loading="lazy">
+    <a class="link-slot" style="left:66.25%; top:4.65%; width:10.62%; height:27.91%;" href="https://instagram.com/isisrebua" target="_blank" rel="noopener" aria-label="Instagram @isisrebua"></a>
+    <a class="link-slot" style="left:66.25%; top:32.95%; width:11.35%; height:29.07%;" href="tel:+5512978136588" aria-label="Ligar para 12 978136588"></a>
+    <a class="link-slot" style="left:64.06%; top:62.02%; width:16.10%; height:27.13%;" href="mailto:isisrebuaugc@gmail.com" aria-label="Enviar e-mail para isisrebuaugc@gmail.com"></a>
+  </div>
+
+</main>
+
+<a
+  class="whatsapp-float"
+  href="https://wa.me/5512978136588?text=Oi%20Isis!%20Vim%20pelo%20seu%20portf%C3%B3lio%20UGC%20e%20queria%20saber%20mais%20sobre%20os%20pacotes%20%3A%29"
+  target="_blank"
+  rel="noopener"
+  aria-label="Falar no WhatsApp"
+>
+  <svg viewBox="0 0 32 32" fill="currentColor" aria-hidden="true"><path d="M16.02 3C9.4 3 4 8.36 4 15c0 2.36.66 4.56 1.8 6.44L4 29l7.76-1.75A11.9 11.9 0 0 0 16.02 27C22.64 27 28 21.64 28 15S22.64 3 16.02 3Zm0 21.6c-1.98 0-3.83-.55-5.4-1.5l-.39-.23-4.6 1.04 1.02-4.48-.25-.4A9.55 9.55 0 0 1 6.4 15c0-5.3 4.32-9.6 9.62-9.6 5.3 0 9.6 4.3 9.6 9.6 0 5.3-4.3 9.6-9.6 9.6Zm5.27-7.19c-.29-.15-1.7-.84-1.96-.93-.26-.1-.46-.15-.65.14-.19.29-.75.93-.92 1.13-.17.19-.34.22-.63.07-.29-.14-1.22-.45-2.32-1.43-.86-.76-1.44-1.71-1.61-2-.17-.29-.02-.45.13-.6.13-.13.29-.34.43-.51.14-.17.19-.29.29-.48.1-.19.05-.36-.02-.5-.07-.15-.65-1.57-.9-2.15-.24-.57-.48-.5-.65-.5-.17 0-.36-.02-.55-.02-.19 0-.5.07-.77.36-.26.29-1 .98-1 2.4 0 1.41 1.03 2.78 1.17 2.97.14.19 2.03 3.1 4.92 4.34.69.3 1.22.48 1.64.61.69.22 1.31.19 1.81.11.55-.08 1.7-.7 1.94-1.37.24-.67.24-1.25.17-1.37-.07-.12-.26-.19-.55-.34Z"/></svg>
+  <span data-pt="Falar no WhatsApp" data-en="Chat on WhatsApp">Falar no WhatsApp</span>
+</a>
+
+<!-- Pop-up de captura de leads. Gatilho: rolar 60% da página OU exit-intent
+     (o que vier primeiro, em qualquer dispositivo — ver initLeadPopup no
+     script.js). Aparece 1x por sessão — a flag no sessionStorage é gravada
+     assim que o pop-up abre, então fechar por qualquer caminho (X, clique
+     fora, ESC ou enviar o formulário) nunca faz ele voltar a aparecer na
+     mesma sessão. -->
+<div class="popup-overlay" id="popup-lead" hidden>
+  <div class="popup-card popup-card--lead" role="dialog" aria-modal="true" aria-labelledby="popup-lead-title">
+    <button type="button" class="popup-close" data-popup-close aria-label="Fechar">&times;</button>
+
+    <div class="lead-form__intro">
+      <h3 id="popup-lead-title" data-pt="Gostou do portfólio? Vamos criar algo incrível para a sua marca!" data-en="Liked the portfolio? Let's create something amazing for your brand!">Gostou do portfólio? Vamos criar algo incrível para a sua marca!</h3>
+      <p data-pt="Preencha abaixo que entro em contato direto com você com uma proposta personalizada:" data-en="Fill in the form below and I'll reach out to you directly with a personalized proposal:">Preencha abaixo que entro em contato direto com você com uma proposta personalizada:</p>
+    </div>
+
+    <form class="lead-form" id="lead-form">
+      <div class="lead-form__field">
+        <label for="lead-name" data-pt="Nome completo" data-en="Full name">Nome completo</label>
+        <input type="text" id="lead-name" name="name" required autocomplete="name">
+      </div>
+      <div class="lead-form__field">
+        <label for="lead-company" data-pt="Nome da empresa / marca" data-en="Company / brand name">Nome da empresa / marca</label>
+        <input type="text" id="lead-company" name="company" required autocomplete="organization">
+      </div>
+      <div class="lead-form__field">
+        <label for="lead-instagram" data-pt="Instagram da marca (@)" data-en="Brand's Instagram (@)">Instagram da marca (@)</label>
+        <input type="text" id="lead-instagram" name="instagram" autocomplete="off" placeholder="@suamarca">
+      </div>
+      <div class="lead-form__field">
+        <label for="lead-email" data-pt="E-mail corporativo" data-en="Corporate email">E-mail corporativo</label>
+        <input type="email" id="lead-email" name="email" required autocomplete="email">
+      </div>
+      <div class="lead-form__field">
+        <label for="lead-whatsapp" data-pt="WhatsApp com DDD" data-en="WhatsApp (with area code)">WhatsApp com DDD</label>
+        <input type="tel" id="lead-whatsapp" name="whatsapp" required autocomplete="tel" placeholder="(12) 90000-0000">
+      </div>
+      <div class="lead-form__field">
+        <label for="lead-usage" data-pt="Já utilizou conteúdo UGC na sua marca?" data-en="Has your brand used UGC content before?">Já utilizou conteúdo UGC na sua marca?</label>
+        <select id="lead-usage" name="usage" required>
+          <option value="" disabled selected data-pt="Selecione uma opção" data-en="Select an option">Selecione uma opção</option>
+          <option value="sim-ads" data-pt="Sim, já rodamos Ads" data-en="Yes, we've run Ads before">Sim, já rodamos Ads</option>
+          <option value="primeira-vez" data-pt="Não, será nossa primeira vez" data-en="No, this will be our first time">Não, será nossa primeira vez</option>
+          <option value="gestao-completa" data-pt="Queremos contratar Gestão Completa" data-en="We want to hire Full Management">Queremos contratar Gestão Completa</option>
+        </select>
+      </div>
+      <div class="lead-form__field">
+        <label for="lead-message" data-pt="Conte um pouco sobre a sua ideia ou necessidade" data-en="Tell me a bit about your idea or need">Conte um pouco sobre a sua ideia ou necessidade</label>
+        <textarea id="lead-message" name="message" rows="2"></textarea>
+      </div>
+
+      <button type="submit" class="lead-form__submit" data-pt="Quero Receber uma Proposta Personalizada 🚀" data-en="I Want a Personalized Proposal 🚀">Quero Receber uma Proposta Personalizada 🚀</button>
+    </form>
+
+    <div class="lead-form__success" hidden>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
+      <p data-pt="Logo mais entro em contato com uma proposta incrível para a sua marca! 🚀" data-en="I'll be in touch soon with an amazing proposal for your brand! 🚀">Logo mais entro em contato com uma proposta incrível para a sua marca! 🚀</p>
+    </div>
+  </div>
+</div>
+
+
+<script src="script.js"></script>
+
+</body>
+</html>

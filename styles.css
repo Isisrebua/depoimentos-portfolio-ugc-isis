@@ -1,0 +1,1080 @@
+/* ==========================================================================
+   ISIS REBUÁ — PORTFÓLIO UGC
+   As 17 pranchetas exportadas do Figma como PNG (1x + 2x/retina), empilhadas
+   1:1 e esticadas a 100% da largura da tela (sem faixa creme sobrando nas
+   laterais em monitores grandes). Três camadas de interatividade real por
+   cima das imagens estáticas:
+     - .link-slot    → links invisíveis sobre botões/textos do PNG
+     - .video-slot   → containers <video> vazios (9:16) sobre as antigas
+                       miniaturas de vídeo, prontos para receber um .mp4
+     - .audio-slot   → containers <video> para as gravações de tela que
+                       substituem os áudios simulados de WhatsApp
+     - .metric-badge → selo "▶ XX mil" recriado em texto real, sempre por
+                       cima do vídeo (nunca é coberto por ele)
+   ========================================================================== */
+
+*, *::before, *::after{ box-sizing: border-box; }
+
+html{ scroll-behavior: smooth; }
+
+/* Full-bleed de propósito: sem max-width, cada prancheta estica até a
+   borda da tela em qualquer largura de monitor (em telas acima de
+   1366px a arte fica ampliada além da resolução nativa do PNG — é o
+   trade-off aceito em troca de não sobrar faixa de cor nas laterais).
+   Fundo do body/html no mesmo sálvia das seções pra não sobrar nenhuma
+   faixa de cor diferente visível em nenhum momento (scroll, resize). */
+html, body{
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  overflow-x: hidden;
+  background-color: #bfcfcc;
+}
+
+.page{
+  width: 100%;
+  background: #bfcfcc;
+}
+
+/* cada prancheta é uma imagem de largura total, sem espaço entre elas —
+   a emenda de uma seção pra outra é feita pelo próprio fundo pintado
+   dentro do PNG. srcset entrega o arquivo 2x em telas retina/alta
+   densidade. height:auto preserva a proporção nativa do PNG mesmo
+   esticando a largura (object-fit:fill é redundante aqui já que não há
+   altura fixa pra "preencher" — mantido só por clareza/compatibilidade). */
+.section{
+  display: block;
+  width: 100%;
+  height: auto;
+  margin: 0;
+  padding: 0;
+  object-fit: fill;
+}
+
+/* wrapper usado nas pranchetas que recebem overlays (links, vídeos, selos) */
+.section-wrap{
+  position: relative;
+  display: block;
+  width: 100%;
+  margin: 0;
+  line-height: 0; /* elimina o espaço fantasma abaixo da <img> inline */
+}
+
+/* ---------- Links reais sobre a imagem (botão de contato, ícones, nav) --- */
+.link-slot{
+  position: absolute;
+  display: block;
+  border-radius: 6px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: background-color .18s ease, box-shadow .18s ease;
+}
+.link-slot:hover,
+.link-slot:focus-visible{
+  background: rgba(255,255,255,.16);
+  box-shadow: inset 0 0 0 2px rgba(255,255,255,.55);
+}
+.link-slot:active{ background: rgba(255,255,255,.28); }
+.link-slot:focus-visible{ outline: none; }
+
+/* ---------- Containers de vídeo (nichos, cases, funil) --------------------
+   Cada .video-slot usa left/top/width/height (em %) medidos direto do
+   frame do Figma para cobrir 100% da área do card antigo — de propósito,
+   NÃO fixamos aspect-ratio aqui. Forçar 9:16 puro deixava o container mais
+   estreito que a foto original por baixo, e a foto vazava nas bordas. A
+   proporção real de cada card (perto de 2:3) já vem certa no width/height
+   inline de cada slot no HTML. */
+.video-slot{
+  position: absolute;
+  border-radius: 14px;
+  overflow: hidden;
+  background: #232323;
+  box-shadow: 0 10px 24px -14px rgba(0,0,0,.5);
+  transition: transform .3s ease, box-shadow .3s ease;
+}
+
+.video-slot video,
+.audio-slot video{
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+  background: transparent;
+}
+/* Cases de Sucesso — vídeos carregados dinamicamente da pasta videos/
+   (ver initCasesVideos em script.js); reforço explícito pedido: cover +
+   cantos arredondados direto no <video>, além do que .video-slot já dá. */
+[data-section-name="cases-de-sucesso"] .video-slot video{
+  object-fit: cover;
+  border-radius: 12px;
+}
+
+/* Player de vídeo limpo — reforça o controlsList="nodownload nofullscreen
+   noremoteplayback" (script.js) escondendo via CSS o botão de tela cheia
+   e o menu de "3 pontinhos" dos controles nativos do Chrome/Edge/Safari.
+   São pseudo-elementos não padronizados (só existem no WebKit/Blink);
+   navegadores que não os reconhecem simplesmente ignoram a regra, sem
+   quebrar nada — Firefox continua com os controles nativos completos. */
+video::-webkit-media-controls-fullscreen-button,
+video::-webkit-media-controls-overflow-button,
+video::-internal-media-controls-overflow-button{
+  display: none !important;
+}
+
+/* ---------- Containers de áudio → gravação de tela (Feedbacks) ------------ */
+.audio-slot{
+  position: absolute;
+  border-radius: 14px;
+  overflow: hidden;
+  background: #232323;
+  box-shadow: 0 6px 16px -10px rgba(0,0,0,.45);
+  transition: transform .3s ease, box-shadow .3s ease;
+}
+
+/* leve zoom + sombra no hover/foco, nos dois tipos de container de mídia.
+   translateY sobe o card, scale dá o zoom — o transform-origin fica no
+   centro por padrão, então o card cresce simetricamente sem "puxar" pro
+   canto. Some do teclado também (focus-within, quando o <video> ganha foco
+   pelos controles nativos). */
+.video-slot:hover, .video-slot:focus-within,
+.audio-slot:hover, .audio-slot:focus-within{
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 20px 36px -14px rgba(0,0,0,.6), 0 0 0 2px rgba(255,255,255,.5);
+  z-index: 3;
+}
+
+/* ---------- Estado vazio (sem src ainda) ----------------------------------
+   Um <video controls> sem src/poster renderiza uma barra de controles
+   quebrada (cinza, 0:00/0:00, botão de play morto). Em vez disso: nenhum
+   `controls` é escrito no HTML por padrão — só aparece via o script no fim
+   da página, e só quando o elemento realmente tem um src. Até lá, mostramos
+   um ícone de play discreto e limpo. */
+.video-slot::after, .audio-slot::after{
+  content: "";
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: 46px;
+  height: 46px;
+  border: 2px solid rgba(255,255,255,.55);
+  border-radius: 50%;
+  pointer-events: none;
+}
+/* triângulo de play desenhado com clip-path, centralizado dentro do círculo */
+.video-slot::before, .audio-slot::before{
+  content: "";
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: 14px;
+  height: 16px;
+  background: rgba(255,255,255,.85);
+  clip-path: polygon(0 0, 100% 50%, 0 100%);
+  transform: translateX(2px);
+  pointer-events: none;
+}
+.video-slot.has-src::after, .audio-slot.has-src::after,
+.video-slot.has-src::before, .audio-slot.has-src::before{
+  display: none;
+}
+
+/* ---------- Botão "Solicite orçamento" (Gestão de Campanhas) --------------
+   Container transparente — o miolo esbranquiçado vem do ::after do
+   .glow-btn (ver mais abaixo), não de um background aqui. Isso só é
+   seguro porque o texto achatado antigo "Solicite orçalamento" foi
+   APAGADO da imagem (ver comentário no index.html). */
+.price-cta{
+  position: absolute;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 24px;
+  border-radius: 50px;
+  background: transparent;
+  text-decoration: none;
+  white-space: nowrap; /* "Solicite orçamento" nunca quebra/corta — largura é automática */
+  font-family: "Poppins", "Segoe UI", sans-serif;
+  font-size: clamp(.7rem, 1.05vw, .85rem);
+  transition: transform .2s ease;
+}
+.price-cta:hover, .price-cta:focus-visible{
+  transform: translateY(-2px);
+}
+
+/* ---------- Selo de métricas (Cases de Sucesso) — sempre acima do vídeo -- */
+.metric-badge{
+  position: absolute;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  color: #fff;
+  font-family: "Poppins", "Segoe UI", sans-serif;
+  font-weight: 600;
+  font-size: clamp(.68rem, 1.1vw, .85rem);
+  text-shadow: 0 1px 6px rgba(0,0,0,.8);
+  pointer-events: none;
+  padding-inline: 4px;
+}
+
+/* ---------- Galeria de fotos — reconstrução 100% HTML/CSS -----------------
+   Antes era 1 PNG achatado com as 12 fotos coladas juntas (grid inteiro
+   numa imagem só) — impossível animar cada foto separadamente. Agora
+   cada foto é um <img> real, recortado individualmente (ver comentário
+   no index.html) e posicionado com left/top/width/height em % — mesmo
+   sistema de overlay usado em .video-slot/.link-slot no resto do site.
+   .photo-gallery mantém a proporção do grid original via aspect-ratio,
+   sem precisar de altura fixa em px. */
+.photo-gallery{
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1366 / 595;
+  background: #eeeeee;
+  overflow: hidden;
+}
+.gallery-photo{
+  position: absolute;
+  object-fit: cover;
+  border-radius: 6px;
+  box-shadow: 0 8px 18px -10px rgba(0,0,0,.35);
+  opacity: 0;
+  transform: translateX(-40px);
+  transition: opacity .6s ease, transform .6s ease;
+}
+.gallery-photo--visible{ opacity: 1; transform: translateX(0); }
+
+/* ---------- Marcas Trabalhadas — reconstrução 100% HTML/CSS ---------------
+   Antes isso era um PNG achatado (título + 23 logos + texto, tudo numa
+   imagem só) — impossível de traduzir e impossível de encaixar um 24º
+   logo sem colidir com o texto. Agora título, parágrafo e os 24 logos
+   (23 originais + iLike) são elementos reais. Os 23 logos originais
+   foram recortados um a um do PNG antigo com um script Node/Jimp
+   (ver crop-brands.js) usando as coordenadas exatas dos círculos no
+   arquivo-fonte do Figma — cada recorte já é o círculo pronto (fundo +
+   logo), então o <img> só precisa de object-fit:cover; a borda
+   arredondada do .brands-grid__badge corta os 4 cantinhos do quadrado.
+   O logo da iLike (assets/ilike.jpg) não passou por esse recorte — é um
+   arquivo à parte, por isso usa object-fit:contain (modificador
+   --contain) pra não esticar/cortar errado. */
+.brands-section{
+  width: 100%;
+  /* funde com a imagem de cima (#eeeeee) e com o stats-banner logo
+     abaixo (#ECEBE6) nas bordas, em vez de cortar seco pro sálvia
+     (#bfcfcc, cor real amostrada do PNG original) — faixa de mistura
+     bem larga (120px) pra garantir que a emenda fique 100%
+     imperceptível, mesmo que a cor exata do pixel vizinho não bata
+     100% com a amostra usada aqui. */
+  background: linear-gradient(to bottom,
+    #eeeeee 0,
+    #bfcfcc 120px,
+    #bfcfcc calc(100% - 120px),
+    #ECEBE6 100%
+  );
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 28px;
+  padding: 32px 32px;
+}
+.brands-section__intro{
+  flex: 1 1 300px;
+  max-width: 380px;
+}
+.brands-section__title{
+  margin: 0 0 18px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  font-family: "Baloo 2", "Poppins", sans-serif;
+  font-weight: 800;
+  font-size: clamp(1.5rem, 3vw, 2.1rem);
+  text-transform: uppercase;
+  line-height: 1.1;
+}
+.brands-section__title-word{
+  padding: .18em .5em;
+  border-radius: 6px;
+}
+.brands-section__title-word--1{
+  background: #fff;
+  color: #a64604;
+  transform: rotate(-2deg);
+}
+.brands-section__title-word--2{
+  background: #a64604;
+  color: #fff;
+  transform: rotate(1deg);
+  margin-left: .3em;
+}
+.brands-section__lead{
+  margin: 0 0 10px;
+  font-family: "Poppins", "Segoe UI", sans-serif;
+  font-size: .98rem;
+  color: #333;
+  line-height: 1.5;
+}
+.brands-section__highlight{
+  margin: 0;
+  font-family: "Poppins", "Segoe UI", sans-serif;
+  font-weight: 700;
+  font-size: 1.02rem;
+  color: #222;
+  line-height: 1.5;
+}
+.brands-grid{
+  flex: 2 1 620px;
+  max-width: 900px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 14px;
+}
+.brands-grid__badge{
+  width: min(90px, 8vw);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 6px 16px -8px rgba(0,0,0,.35);
+  overflow: hidden;
+  flex: none;
+  transition: all .3s ease;
+}
+/* o círculo tem overflow:hidden, então o zoom do <img> fica contido
+   dentro dele — a bolinha em si só ganha um brilho/sombra suave. */
+.brands-grid__badge:hover{
+  box-shadow: 0 10px 22px -6px rgba(0,0,0,.4), 0 0 0 4px rgba(255,255,255,.55);
+  transform: translateY(-2px);
+}
+.brands-grid__badge img{
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: all .3s ease;
+}
+.brands-grid__badge:hover img{ transform: scale(1.12); }
+.brands-grid__badge--contain img{
+  width: 64%;
+  height: 64%;
+  object-fit: contain;
+}
+.brands-grid__badge--contain:hover img{ transform: scale(1.12); }
+@media (max-width: 720px){
+  .brands-section{ padding: 40px 20px; gap: 24px; }
+  .brands-section__intro{ text-align: center; align-items: center; }
+  .brands-section__title{ align-items: center; }
+}
+
+/* ---------- Emendas entre pranchetas de cor sólida -------------------------
+   Alguns pares de imagem ficam colados direto um no outro (sem nenhuma
+   seção HTML de transição no meio, como o brands-section/stats-banner
+   fazem em outros pontos do site) e a cor de fundo achatada de uma não
+   bate com a da seguinte (sálvia/creme/cinza) — isso cria uma linha de
+   corte visível. Esse <div> fica FORA do fluxo de altura (margin-top e
+   margin-bottom negativos e simétricos = contribuição líquida de altura
+   zero) e usa position:relative + z-index positivo pra pintar por cima
+   dos últimos/primeiros pixels de cada imagem vizinha com um gradient
+   entre as duas cores, sem empurrar o resto da página. */
+.section-seam{
+  position: relative;
+  z-index: 1;
+  height: 64px;
+  margin-top: -32px;
+  margin-bottom: -32px;
+  pointer-events: none;
+}
+.section-seam--sage-cream{ background: linear-gradient(to bottom, #bfcfcc, #f2f2f2); }
+.section-seam--cream-gray{ background: linear-gradient(to bottom, #eeeeee, #d9d9d9); }
+.section-seam--gray-cream{ background: linear-gradient(to bottom, #d9d9d9, #eeeeee); }
+.section-seam--cream-sage{ background: linear-gradient(to bottom, #eeeeee, #bfcfcc); }
+/* Caso especial: capa (foto de verdade, sem cor de fundo achatada) pra
+   sobre-mim (#f2f2f2). Em vez de gradient sólido de cor a cor (que
+   pintaria uma faixa opaca "flutuando" sobre a foto), começa transparente
+   e termina na cor do creme — a foto esmaece suavemente até o fundo da
+   próxima seção, como um vinheta de rodapé. */
+.section-seam--photo-cream{
+  height: 110px;
+  margin-top: -110px;
+  margin-bottom: 0;
+  background: linear-gradient(to bottom, rgba(242,242,242,0) 0%, #f2f2f2 100%);
+}
+
+/* ---------- Overlay de texto — "Sobre mim" (frase corrigida) --------------
+   Cobre 100% a caixa de destaque original do PNG (mesma cor, posição e
+   tamanho exatos medidos no Figma) e mostra o texto sem a palavra "dança". */
+.about-highlight-overlay{
+  position: absolute;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  background: #98ab80;
+  color: #fff;
+  border-radius: 4px;
+  box-shadow: 0 10px 22px -14px rgba(0,0,0,.45);
+  font-family: "Poppins", "Segoe UI", sans-serif;
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: clamp(.62rem, 1.15vw, .82rem);
+  line-height: 1.35;
+  padding: .6em 1em;
+}
+
+/* ---------- .glow-btn — Border Beam (pista de LED na borda) ---------------
+   ::before é um quadrado bem maior que o próprio botão (inset:-100%,
+   3x o tamanho) girando via transform:rotate() — o overflow:hidden do
+   botão recorta esse quadrado gigante exatamente no contorno arredondado,
+   então não importa o ângulo, o quadrado sempre cobre a borda inteira
+   (nunca "vaza" gap nos cantos). ::after cobre o miolo quase todo com um
+   branco quase opaco (z-index:1), deixando só um anel fino de luz visível
+   na beirada. O texto vive numa <span class="glow-btn__label"> própria
+   (position:relative + z-index:2) — sem essa span o texto ficaria
+   escondido atrás do ::after, porque texto puro (não-posicionado) pinta
+   ANTES de qualquer elemento com z-index positivo.
+   IMPORTANTE: esta classe de propósito NÃO declara "position" — cada
+   botão (.price-cta/.glass-btn) já é position:absolute pra se ancorar
+   nas coordenadas certas sobre a imagem; um position:relative aqui
+   sobrescreveria isso pela ordem de cascata (bug já visto antes nesta
+   mesma classe) e tiraria o botão do lugar. position:absolute já serve
+   igualmente bem de contexto de posicionamento pro ::before/::after. */
+.glow-btn{ overflow: hidden; }
+.glow-btn::before{
+  content: "";
+  position: absolute;
+  inset: -100%;
+  background: conic-gradient(from 0deg, transparent 80%, #00f2fe 90%, #ffffff 100%);
+  animation: spin-led 3s linear infinite;
+  pointer-events: none;
+}
+.glow-btn::after{
+  content: "";
+  position: absolute;
+  inset: 2px;
+  border-radius: 48px;
+  background: rgba(255, 255, 255, 0.9);
+  z-index: 1;
+  pointer-events: none;
+}
+.glow-btn__label{
+  position: relative;
+  z-index: 2;
+  font-weight: 600;
+  color: #1a1a1a;
+}
+.glow-btn:hover::before{ animation-duration: 1.6s; }
+@keyframes spin-led{
+  0%{ transform: rotate(0deg); }
+  100%{ transform: rotate(360deg); }
+}
+
+/* ---------- Botão "UGC Manager" --------------------------------------------
+   Container transparente — o miolo esbranquiçado vem do ::after do
+   .glow-btn acima, não de um background aqui. Centralizado em relação à
+   coluna de texto "UGC Manager" via left medido + translateX(-50%) (ver
+   comentário no index.html). Pra trocar o texto, edite o data-pt/data-en
+   direto no index.html. */
+.glass-btn{
+  position: absolute;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 24px;
+  border-radius: 50px;
+  background: transparent;
+  text-decoration: none;
+  white-space: nowrap; /* nunca quebra em 2 linhas — largura é automática */
+  font-family: "Poppins", "Segoe UI", sans-serif;
+  font-size: clamp(.68rem, 1.15vw, .85rem);
+  letter-spacing: .01em;
+  transform: translateX(-50%);
+  transition: transform .2s ease;
+}
+.glass-btn:hover, .glass-btn:focus-visible{
+  transform: translateX(-50%) translateY(-2px);
+}
+
+/* ---------- Botão flutuante do WhatsApp ------------------------------------
+   Fica invisível (opacity 0 + pointer-events off, sem afetar o layout) até
+   o script.js adicionar .is-visible, o que só acontece depois que o
+   usuário rola a página para além da capa (ver initWhatsappVisibility). */
+.whatsapp-float{
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #25d366;
+  color: #fff;
+  padding: 12px 20px;
+  border-radius: 999px;
+  text-decoration: none;
+  font-family: "Poppins", "Segoe UI", sans-serif;
+  font-weight: 600;
+  font-size: .92rem;
+  box-shadow: 0 8px 22px -8px rgba(0,0,0,.45);
+  opacity: 0;
+  transform: translateY(12px);
+  pointer-events: none;
+  transition: opacity .3s ease, transform .3s ease, box-shadow .2s ease;
+}
+.whatsapp-float.is-visible{
+  opacity: 1;
+  transform: none;
+  pointer-events: auto;
+  animation: wa-pulse 2.6s ease-in-out infinite;
+}
+.whatsapp-float svg{ width: 22px; height: 22px; flex-shrink: 0; }
+.whatsapp-float:hover, .whatsapp-float:focus-visible{
+  transform: scale(1.05);
+  box-shadow: 0 10px 26px -6px rgba(0,0,0,.5);
+}
+@keyframes wa-pulse{
+  0%, 100%{ box-shadow: 0 8px 22px -8px rgba(0,0,0,.45), 0 0 0 0 rgba(37,211,102,.45); }
+  50%{ box-shadow: 0 8px 22px -8px rgba(0,0,0,.45), 0 0 0 10px rgba(37,211,102,0); }
+}
+@media (max-width: 480px){
+  .whatsapp-float span{ display: none; }
+  .whatsapp-float{ padding: 14px; }
+}
+
+/* ---------- Prova social — métricas soltas, sem caixa/cartão ---------------
+   Nada de fundo fechado, borda ou sombra de "painel" — os números flutuam
+   direto sobre o fundo fluido da página. Cada .stat entra com scroll
+   reveal (translateY 30px→0 / opacity 0→1, disparado só quando a seção
+   entra na viewport — ver initStatsAnimation no script.js) e, depois de
+   visível, ganha um balanço vertical contínuo e suave (--float-delay
+   escalona o início de cada card pra não ficarem todos sincronizados). */
+.stats-banner{
+  width: 100%;
+  padding: 36px 24px;
+  /* funde com o sálvia (#bfcfcc) da seção de Marcas acima e da imagem de
+     Cases de Sucesso logo abaixo, nas duas bordas — camada de base por
+     trás dos brilhos decorativos, pra não cortar seco pro creme. */
+  background:
+    radial-gradient(60% 140% at 15% 0%, rgba(159,175,144,.35), transparent 60%),
+    radial-gradient(60% 140% at 85% 100%, rgba(166,70,4,.12), transparent 60%),
+    linear-gradient(to bottom,
+      #bfcfcc 0,
+      #ECEBE6 120px,
+      #ECEBE6 calc(100% - 120px),
+      #bfcfcc 100%
+    );
+}
+.stats-banner__grid{
+  max-width: 1040px;
+  margin-inline: auto;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 32px 24px;
+}
+.stat{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 6px;
+  padding: 8px 12px;
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity .6s ease, transform .6s ease;
+}
+.stat--visible{ opacity: 1; transform: translateY(0); }
+/* só começa a flutuar DEPOIS que a entrada (transition acima) termina —
+   ver initStatsAnimation no script.js, que adiciona esta classe um
+   instante depois de .stat--visible. Evita o "pulo" de trocar de
+   transition pra animation no meio do movimento de entrada. */
+.stat--floating{
+  animation: stat-float 3.6s ease-in-out var(--float-delay, 0s) infinite;
+}
+@keyframes stat-float{
+  0%, 100%{ transform: translateY(0); }
+  50%{ transform: translateY(-8px); }
+}
+.stat__value{
+  display: inline-block;
+  font-family: "Baloo 2", "Poppins", sans-serif;
+  font-weight: 800;
+  font-size: clamp(1.5rem, 3vw, 2.2rem);
+  color: #a64604;
+  line-height: 1;
+  cursor: default;
+  transition: transform .25s ease, text-shadow .25s ease;
+}
+.stat:hover .stat__value{
+  transform: scale(1.12);
+  text-shadow: 0 4px 18px rgba(166,70,4,.4);
+}
+.stat__label{
+  font-family: "Poppins", "Segoe UI", sans-serif;
+  font-size: .82rem;
+  font-weight: 600;
+  color: #333;
+  max-width: 22ch;
+}
+@media (max-width: 760px){
+  .stats-banner__grid{ grid-template-columns: repeat(2, 1fr); row-gap: 28px; }
+}
+
+/* ---------- Depoimentos aprovados — esteira horizontal (marquee) ----------
+   Fica DENTRO do .section-wrap de Feedbacks, como overlay real (mesmo
+   sistema de .video-slot/.link-slot), ocupando a área cinza vazia à
+   esquerda do título "últimos feedbacks das marcas parceiras" — nunca
+   sobrepõe a arte do Figma. left/top/width/height inline no index.html
+   travam essa área; overflow:hidden aqui corta a esteira nas bordas.
+   Loop infinito: script.js renderiza a lista de cards aprovados DUAS
+   vezes seguidas na track — a animação anda exatamente metade da
+   largura total (translateX(-50%)), então quando a 1ª cópia sai o
+   espectador já está vendo a 2ª cópia idêntica no mesmo lugar, sem
+   costura visível. */
+.testimonials-marquee{
+  position: absolute;
+  overflow: hidden;
+}
+.testimonials-marquee__track{
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  height: 100%;
+  width: max-content;
+  animation: testimonials-scroll 28s linear infinite;
+}
+/* pausa pra ler — mouse (:hover) e toque (:active, já que touch não tem
+   :hover de verdade na maioria dos navegadores mobile) */
+.testimonials-marquee:hover .testimonials-marquee__track,
+.testimonials-marquee:active .testimonials-marquee__track{
+  animation-play-state: paused;
+}
+@keyframes testimonials-scroll{
+  from{ transform: translateX(0); }
+  to{ transform: translateX(-50%); }
+}
+
+.testimonial-card{
+  position: relative;
+  flex-shrink: 0;
+  width: 300px;
+  min-height: 220px;
+  background: #fff;
+  border-radius: 12px;
+  padding: 18px;
+  box-shadow: 0 4px 15px rgba(0,0,0,.06);
+  display: flex;
+  flex-direction: column;
+}
+/* "author-box" — topo do card: foto/logo redonda à esquerda + nome/
+   empresa empilhados à direita. Sem chance de sobrepor porque nenhum
+   dos dois é position:absolute (os dois participam do flex normalmente). */
+.testimonial-card__header{
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+.testimonial-card__logo{
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+  background: #f2f2f2;
+}
+/* "author-details" — nome em cima, empresa embaixo, cada um travado em
+   position:static (nada aqui deve herdar/ficar posicionado por cima do
+   outro). display:flex + flex-direction:column é o que garante o
+   empilhamento; o !important nos filhos é só reforço defensivo. */
+.testimonial-card__meta{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2px;
+  position: relative;
+  min-width: 0; /* deixa o texto quebrar/truncar em vez de espremer o card */
+}
+.testimonial-card__meta strong{
+  display: block;
+  margin: 0;
+  padding: 0;
+  font-weight: 600;
+  font-size: .9rem;
+  line-height: 1.2;
+  color: #1a1a1a;
+  position: static !important;
+}
+.testimonial-card__meta span{
+  display: block;
+  margin: 0;
+  padding: 0;
+  font-size: .8rem;
+  line-height: 1.2;
+  color: #b85d19;
+  font-weight: 600;
+  position: static !important;
+}
+/* Avaliação — estrelas alinhadas à esquerda, logo abaixo do topo. */
+.testimonial-card__stars{ display: flex; gap: 3px; margin-bottom: 10px; }
+.testimonial-card__stars span{ font-size: 1.1rem; color: #e0e0e0; line-height: 1; }
+.testimonial-card__stars span.is-on{ color: #f0b429; }
+/* Corpo — texto do depoimento, ocupando o restante do card. */
+.testimonial-card__text{
+  flex: 1;
+  margin: 0;
+  font-family: "Poppins", "Segoe UI", sans-serif;
+  font-size: .9rem;
+  line-height: 1.4;
+  color: #4a4a4a;
+  display: -webkit-box;
+  -webkit-line-clamp: 5;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+/* Print de resultado (imagem) ou vídeo curto — script.js decide a tag
+   (<img> ou <video>) com base em item.videoKind, vindo do MIME real
+   detectado no upload (server.js). Mesmo bloco visual pros dois tipos. */
+.testimonial-card__media{
+  width: 100%;
+  height: 100px;
+  margin-top: 10px;
+  object-fit: cover;
+  border-radius: 8px;
+  background: #f2f2f2;
+}
+@media (prefers-reduced-motion: reduce){
+  .testimonials-marquee__track{ animation: none; }
+}
+
+/* ---------- FAQ — acordeão ------------------------------------------------- */
+.faq{
+  /* combo-funil (imagem de cima) já termina em #eeeeee, quase idêntico
+     ao creme daqui — ainda assim funde os primeiros 80px pra garantir
+     zero emenda perceptível. Embaixo já é o mesmo #ECEBE6 do final-cta,
+     sem precisar de mistura. */
+  background: linear-gradient(to bottom, #eeeeee 0, #ECEBE6 80px, #ECEBE6 100%);
+  padding: 48px 20px;
+}
+.faq__container{
+  max-width: 780px;
+  margin-inline: auto;
+}
+.faq__title{
+  font-family: "Baloo 2", "Poppins", sans-serif;
+  font-weight: 800;
+  text-transform: uppercase;
+  font-size: clamp(1.6rem, 3vw, 2.2rem);
+  color: #333;
+  text-align: center;
+  margin: 0 0 32px;
+}
+.faq__category{
+  font-family: "Baloo 2", "Poppins", sans-serif;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .03em;
+  font-size: .85rem;
+  color: #a64604;
+  margin: 34px 4px 12px;
+}
+.faq__category:first-of-type{ margin-top: 0; }
+.faq__item{
+  background: #fff;
+  border-radius: 14px;
+  margin-bottom: 14px;
+  overflow: hidden;
+  box-shadow: 0 8px 20px -16px rgba(0,0,0,.3);
+}
+.faq__question{
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  background: none;
+  border: none;
+  padding: 18px 22px;
+  text-align: left;
+  font-family: "Poppins", "Segoe UI", sans-serif;
+  font-weight: 600;
+  font-size: .98rem;
+  color: #333;
+  cursor: pointer;
+}
+.faq__question:hover{ background: rgba(152,171,128,.1); }
+.faq__chevron{
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  color: #98ab80;
+  transition: transform .3s ease;
+}
+.faq__item.open .faq__chevron{ transform: rotate(180deg); }
+.faq__answer{
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height .35s ease;
+}
+.faq__answer p{
+  margin: 0;
+  padding: 0 22px 20px;
+  font-family: "Poppins", "Segoe UI", sans-serif;
+  font-size: .92rem;
+  line-height: 1.6;
+  color: #4a4a4a;
+}
+/* CTAs especiais dentro da resposta de "Gestão de Criadores" (categoria 4) */
+.faq__cta-row{
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 0 22px 22px;
+}
+.faq__cta{
+  display: inline-block;
+  margin: 0;
+  padding: 10px 20px;
+  background: #9FAF90;
+  color: #fff;
+  font-family: "Poppins", "Segoe UI", sans-serif;
+  font-weight: 700;
+  font-size: .88rem;
+  text-decoration: none;
+  border-radius: 999px;
+  transition: transform .2s ease, box-shadow .2s ease;
+}
+.faq__cta:hover{ transform: translateY(-2px); box-shadow: 0 0 16px rgba(28,107,114,.45); }
+.faq__cta--secondary{
+  background: transparent;
+  color: #a64604;
+  border: 1px solid rgba(166,70,4,.4);
+}
+.faq__cta--secondary:hover{ background: rgba(166,70,4,.08); transform: translateY(-2px); box-shadow: 0 0 16px rgba(28,107,114,.45); }
+
+/* ---------- Pop-ups de retenção -------------------------------------------- */
+.popup-overlay{
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  background: rgba(20,20,20,.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  animation: popup-fade .2s ease;
+}
+.popup-overlay[hidden]{ display: none; }
+/* Card sólido estilo Popupsmart — creme claro opaco (não mais vidro
+   translúcido/blur), cantos bem arredondados, sombra funda e fluida
+   fazendo o card "flutuar" sobre o overlay escuro. */
+.popup-card{
+  position: relative;
+  background: #FDFBF7;
+  border-radius: 28px;
+  padding: 36px 32px 30px;
+  max-width: 420px;
+  width: 100%;
+  text-align: center;
+  box-shadow: 0 32px 64px -16px rgba(28,50,50,.28), 0 12px 24px -12px rgba(0,0,0,.16);
+  animation: popup-in .3s ease;
+}
+.popup-card h3{
+  margin: 0 0 12px;
+  font-family: "Baloo 2", "Poppins", sans-serif;
+  font-weight: 800;
+  font-size: 1.4rem;
+  color: #333;
+}
+.popup-card p{
+  margin: 0 0 22px;
+  font-family: "Poppins", "Segoe UI", sans-serif;
+  font-size: .92rem;
+  color: #4a4a4a;
+  line-height: 1.55;
+}
+.popup-close{
+  position: absolute;
+  top: 12px;
+  right: 14px;
+  width: 30px;
+  height: 30px;
+  min-width: 30px; /* trava o tamanho — <button> tem padding nativo que
+                       podia empurrar a caixa pra fora de um quadrado
+                       perfeito, e sem isso o círculo saía espichado */
+  min-height: 30px;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 50%;
+  background: rgba(0,0,0,.06);
+  color: #333;
+  font-size: 1.2rem;
+  line-height: 1;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background-color .2s ease;
+}
+.popup-close:hover{ background: rgba(0,0,0,.1); }
+@keyframes popup-fade{ from{ opacity: 0; } to{ opacity: 1; } }
+@keyframes popup-in{ from{ opacity: 0; transform: translateY(12px) scale(.97); } to{ opacity: 1; transform: none; } }
+
+/* ---------- Pop-up de captura de leads (formulário completo) --------------
+   Com o campo "objetivo" removido e os espaçamentos enxutos abaixo, o
+   formulário cabe inteiro em telas de laptop/desktop comuns sem precisar
+   rolar. max-height/overflow-y continuam como rede de segurança pra
+   telas bem baixas (notebook pequeno, celular deitado) — mas a barra de
+   rolagem nativa fica OCULTA (o scroll com toque/roda do mouse continua
+   funcionando normalmente) pra não cortar os cantos arredondados de
+   28px do card com uma barra quadrada. */
+.popup-card--lead{
+  max-width: 480px;
+  max-height: 88vh;
+  overflow-y: auto;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* Edge legado */
+  text-align: left;
+}
+.popup-card--lead::-webkit-scrollbar{ display: none; } /* Chrome/Safari/Edge */
+.lead-form__intro h3{ text-align: center; }
+.lead-form__intro p{ text-align: center; margin-bottom: 14px; }
+.lead-form{ display: flex; flex-direction: column; gap: 12px; }
+.lead-form__field{ display: flex; flex-direction: column; gap: 4px; }
+.lead-form__field label{
+  font-family: "Poppins", "Segoe UI", sans-serif;
+  font-weight: 600;
+  font-size: .8rem;
+  color: #333;
+}
+/* Inputs minimalistas: fundo branco, borda fina única (sem preenchimento
+   cinza) — o card em si já dá o contraste de fundo. */
+.lead-form__field input,
+.lead-form__field select,
+.lead-form__field textarea{
+  font-family: "Poppins", "Segoe UI", sans-serif;
+  font-size: .92rem;
+  color: #333;
+  background: #fff;
+  border: 1px solid rgba(0,0,0,.14);
+  border-radius: 10px;
+  padding: 9px 12px;
+  resize: vertical;
+}
+.lead-form__field input:focus,
+.lead-form__field select:focus,
+.lead-form__field textarea:focus{
+  outline: none;
+  border-color: #1C6B72;
+  box-shadow: 0 0 0 3px rgba(28,107,114,.2);
+}
+/* Botão minimalista — sálvia/petróleo fosco sólido, sem gradiente, texto
+   branco em negrito. Sem largura esticada — sempre do tamanho do próprio
+   texto e centralizado (align-self no pop-up flex, justify-self no grid
+   do rodapé). */
+.lead-form__submit{
+  align-self: center;
+  justify-self: center;
+  margin-top: 4px;
+  border: none;
+  background: #1C6B72;
+  color: #fff;
+  font-family: "Poppins", "Segoe UI", sans-serif;
+  font-weight: 700;
+  font-size: .95rem;
+  padding: 15px 30px;
+  border-radius: 999px;
+  cursor: pointer;
+  box-shadow: 0 6px 14px -8px rgba(0,0,0,.3);
+  transition: background-color .2s ease, transform .2s ease, box-shadow .2s ease;
+}
+.lead-form__submit:hover{ background: #17565b; transform: translateY(-2px); box-shadow: 0 0 16px rgba(28,107,114,.45); }
+.lead-form__submit:disabled{ opacity: .6; cursor: default; transform: none; }
+.lead-form__success[hidden]{ display: none; }
+.lead-form__success{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 20px 0 6px;
+  text-align: center;
+}
+.lead-form__success svg{ width: 52px; height: 52px; color: #9FAF90; }
+.lead-form__success p{
+  margin: 0;
+  font-family: "Poppins", "Segoe UI", sans-serif;
+  font-weight: 600;
+  color: #333;
+  font-size: 1rem;
+}
+
+/* ---------- Seção fixa de encerramento — "Pronto para transformar..." -----
+   Formulário completo (mesmos campos do pop-up) direto na página, pra
+   quem rola até o fim sem nunca disparar o pop-up. Reusa .lead-form —
+   só o layout vira 2 colunas em telas largas via .final-cta__form. */
+.final-cta{
+  width: 100%;
+  padding: 48px 20px;
+  /* funde com o sálvia (#bfcfcc) do rodapé (17-footer-contato.png) logo
+     abaixo, na borda de baixo — sem cortar seco pro creme. */
+  background:
+    radial-gradient(65% 140% at 20% 0%, rgba(159,175,144,.4), transparent 60%),
+    radial-gradient(65% 140% at 80% 100%, rgba(166,70,4,.14), transparent 60%),
+    linear-gradient(to bottom, #ECEBE6 0, #ECEBE6 calc(100% - 120px), #bfcfcc 100%);
+}
+.final-cta__container{
+  max-width: 720px;
+  margin-inline: auto;
+  background: rgba(255,255,255,.5);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid rgba(255,255,255,.55);
+  border-radius: 28px;
+  padding: 44px 40px;
+  box-shadow: 0 30px 60px -30px rgba(0,0,0,.35);
+}
+.final-cta__intro{ text-align: center; margin-bottom: 30px; }
+.final-cta__intro h2{
+  margin: 0 0 8px;
+  font-family: "Baloo 2", "Poppins", sans-serif;
+  font-weight: 800;
+  font-size: clamp(1.3rem, 2.6vw, 1.8rem);
+  color: #333;
+}
+.final-cta__intro p{
+  margin: 0;
+  font-family: "Poppins", "Segoe UI", sans-serif;
+  font-size: 1rem;
+  color: #4a4a4a;
+}
+.final-cta__form{
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px 20px;
+}
+.final-cta__form .lead-form__field--full,
+.final-cta__form .lead-form__submit{ grid-column: 1 / -1; }
+@media (max-width: 640px){
+  .final-cta__container{ padding: 32px 22px; }
+  .final-cta__form{ grid-template-columns: 1fr; }
+}
+
+@media (prefers-reduced-motion: reduce){
+  html{ scroll-behavior: auto; }
+  .link-slot,
+  .video-slot, .audio-slot,
+  .whatsapp-float,
+  .faq__chevron, .faq__answer, .faq__cta, .faq__cta--secondary, .lead-form__submit,
+  .glass-btn, .price-cta, .stat__value, .stat,
+  .brands-grid__badge, .brands-grid__badge img, .gallery-photo{ transition: none; }
+  .whatsapp-float, .stat--floating, .glow-btn::before{ animation: none; }
+  .video-slot:hover, .video-slot:focus-within,
+  .audio-slot:hover, .audio-slot:focus-within,
+  .brands-grid__badge:hover, .brands-grid__badge:hover img{ transform: none; }
+  .popup-overlay, .popup-card{ animation: none; }
+  .stat{ opacity: 1; transform: none; }
+  .gallery-photo{ opacity: 1; transform: none; }
+}

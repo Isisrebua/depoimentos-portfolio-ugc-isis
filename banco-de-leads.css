@@ -1,0 +1,320 @@
+/* ============================================================================
+   BANCO DE LEADS — Dashboard/SaaS independente, Glassmorphism sálvia/creme.
+   Paleta igual à do portfólio público (pra ter a mesma identidade visual):
+   creme #ECEBE6 / #f3eeea, sálvia #98ab80 / #9FAF90, terracota #a64604.
+   ========================================================================== */
+*{ box-sizing: border-box; }
+html, body{ height: 100%; }
+body{
+  margin: 0;
+  font-family: "Poppins", "Segoe UI", sans-serif;
+  color: #333;
+  background:
+    radial-gradient(circle at 8% 12%, rgba(159,175,144,.35), transparent 45%),
+    radial-gradient(circle at 92% 85%, rgba(166,70,4,.15), transparent 40%),
+    #f3eeea;
+  min-height: 100vh;
+}
+
+.app{
+  display: flex;
+  min-height: 100vh;
+}
+
+/* ---------- Sidebar ---------------------------------------------------- */
+.sidebar{
+  width: 268px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  padding: 26px 18px;
+  background: rgba(255,255,255,.4);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-right: 1px solid rgba(255,255,255,.5);
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+}
+.sidebar__brand{
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 4px 6px 14px;
+  border-bottom: 1px solid rgba(0,0,0,.08);
+}
+.sidebar__brand-icon{ font-size: 1.6rem; }
+.sidebar__brand-text{ display: flex; flex-direction: column; line-height: 1.25; }
+.sidebar__brand-text strong{ font-family: "Baloo 2", "Poppins", sans-serif; font-size: 1.05rem; color: #333; }
+.sidebar__brand-text small{ color: #6b6b6b; font-size: .72rem; }
+
+.sidebar__nav{ display: flex; flex-direction: column; gap: 4px; flex: 1; }
+.sidebar__group-label{
+  margin: 14px 8px 4px;
+  font-size: .68rem;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: #7c8a6f;
+}
+.sidebar__group-label--history{ margin-top: 22px; }
+
+.nav-item{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+  border: 1px solid transparent;
+  background: transparent;
+  border-radius: 14px;
+  padding: 10px 12px;
+  font-family: inherit;
+  font-size: .86rem;
+  font-weight: 600;
+  color: #4a4a4a;
+  cursor: pointer;
+  text-align: left;
+  transition: background-color .18s ease, border-color .18s ease, transform .18s ease;
+}
+.nav-item:hover{ background: rgba(159,175,144,.18); }
+.nav-item.is-active{
+  background: rgba(159,175,144,.32);
+  border-color: rgba(255,255,255,.6);
+  color: #333;
+  box-shadow: 0 6px 16px -10px rgba(0,0,0,.3);
+}
+.nav-item--history.is-active{ background: rgba(166,70,4,.16); }
+
+.nav-item__badge{
+  min-width: 22px;
+  text-align: center;
+  font-size: .72rem;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: rgba(0,0,0,.08);
+  color: #555;
+}
+.nav-item.is-active .nav-item__badge{ background: #98ab80; color: #fff; }
+.nav-item--history .nav-item__badge{ background: rgba(166,70,4,.15); color: #a64604; }
+.nav-item--history.is-active .nav-item__badge{ background: #a64604; color: #fff; }
+
+.sidebar__footer{
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(0,0,0,.08);
+}
+.sidebar__refresh{
+  border: 1px solid rgba(255,255,255,.5);
+  background: rgba(255,255,255,.5);
+  border-radius: 12px;
+  padding: 9px 12px;
+  font-family: inherit;
+  font-weight: 700;
+  font-size: .82rem;
+  color: #333;
+  cursor: pointer;
+  transition: background-color .18s ease;
+}
+.sidebar__refresh:hover{ background: rgba(255,255,255,.75); }
+.sidebar__footer small{ color: #8a8a8a; font-size: .7rem; }
+
+/* ---------- Conteúdo principal ------------------------------------------ */
+.content{
+  flex: 1;
+  min-width: 0;
+  padding: 34px 40px 60px;
+}
+.content__header h1{
+  margin: 0 0 4px;
+  font-family: "Baloo 2", "Poppins", sans-serif;
+  font-size: 1.6rem;
+  color: #333;
+}
+.content__subtitle{ margin: 0 0 20px; color: #6b6b6b; font-size: .9rem; }
+
+.info-banner[hidden]{ display: none; }
+.info-banner{
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(236, 235, 230, 0.75);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255,255,255,.5);
+  border-radius: 16px;
+  padding: 12px 18px;
+  margin-bottom: 22px;
+  font-size: .86rem;
+  font-weight: 600;
+  color: #4a4a4a;
+  box-shadow: 0 10px 24px -16px rgba(0,0,0,.3);
+}
+
+.empty-state{
+  color: #8a8a8a;
+  font-size: .92rem;
+  padding: 30px 4px;
+  text-align: center;
+}
+
+/* ---------- Lista/cards de leads ---------------------------------------- */
+.lead-list{
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 16px;
+}
+
+.lead-card{
+  background: rgba(255,255,255,.55);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid rgba(255,255,255,.55);
+  border-radius: 20px;
+  padding: 18px 18px 16px;
+  box-shadow: 0 20px 40px -28px rgba(0,0,0,.35);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.lead-card__header{
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 10px;
+}
+.lead-card__header h3{ margin: 0; font-size: 1.02rem; color: #333; }
+.lead-card__company{ margin: 2px 0 0; font-size: .8rem; color: #6b6b6b; }
+
+.lead-card__tags{ display: flex; flex-direction: column; align-items: flex-end; gap: 6px; flex-shrink: 0; }
+.tag{
+  font-size: .66rem;
+  font-weight: 700;
+  letter-spacing: .02em;
+  text-transform: uppercase;
+  padding: 4px 9px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+.tag--source{ background: rgba(159,175,144,.28); color: #4f5c42; }
+.tag--recurrent{ background: rgba(166,70,4,.16); color: #a64604; }
+
+.lead-card__contacts{ display: flex; flex-wrap: wrap; gap: 8px; }
+.contact-pill{
+  font-size: .78rem;
+  font-weight: 600;
+  color: #333;
+  text-decoration: none;
+  background: rgba(0,0,0,.05);
+  border: 1px solid rgba(0,0,0,.06);
+  border-radius: 999px;
+  padding: 6px 12px;
+  transition: background-color .18s ease;
+}
+.contact-pill:hover{ background: rgba(0,0,0,.1); }
+.contact-pill--wa{ background: rgba(37,211,102,.14); border-color: rgba(37,211,102,.3); color: #1e7a45; }
+.contact-pill--wa:hover{ background: rgba(37,211,102,.24); }
+
+.lead-answers{ font-size: .8rem; }
+.lead-answers summary{
+  cursor: pointer;
+  font-weight: 700;
+  color: #7c8a6f;
+  list-style: none;
+}
+.lead-answers summary::-webkit-details-marker{ display: none; }
+.lead-answers summary::before{ content: "▸ "; }
+.lead-answers[open] summary::before{ content: "▾ "; }
+.lead-answers__row{
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 5px 0;
+  border-bottom: 1px dashed rgba(0,0,0,.08);
+  color: #4a4a4a;
+}
+.lead-answers__row:last-child{ border-bottom: none; }
+.lead-answers__row span{ color: #7c7c7c; }
+
+.lead-card__footer{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding-top: 6px;
+  border-top: 1px solid rgba(0,0,0,.06);
+}
+.lead-card__date{ font-size: .74rem; color: #8a8a8a; }
+
+.lead-card__action{
+  border: 1px solid rgba(255,255,255,.35);
+  background: linear-gradient(135deg, #a64604, #8a9a72);
+  color: #fff;
+  font-family: inherit;
+  font-weight: 700;
+  font-size: .78rem;
+  padding: 8px 14px;
+  border-radius: 999px;
+  cursor: pointer;
+  box-shadow: 0 8px 18px -10px rgba(166,70,4,.5);
+  transition: transform .18s ease, box-shadow .18s ease;
+}
+.lead-card__action:hover{ transform: translateY(-1px); box-shadow: 0 12px 22px -10px rgba(166,70,4,.55); }
+.lead-card__action--ghost{
+  background: transparent;
+  color: #8a8a8a;
+  box-shadow: none;
+  border: 1px solid rgba(0,0,0,.12);
+}
+.lead-card__action--ghost:hover{ background: rgba(0,0,0,.05); color: #555; }
+
+/* ---------- Aba "Depoimentos" -------------------------------------------- */
+.sidebar__group-label--depoimentos{ margin-top: 22px; }
+.nav-item--depoimentos.is-active{ background: rgba(240,180,41,.22); }
+.nav-item--depoimentos .nav-item__badge{ background: rgba(240,180,41,.25); color: #8a6300; }
+.nav-item--depoimentos.is-active .nav-item__badge{ background: #f0b429; color: #fff; }
+
+.depo-stars{ display: inline-flex; gap: 2px; }
+.depo-star{ font-size: 1.05rem; color: #e0e0e0; line-height: 1; }
+.depo-star--on{ color: #f0b429; }
+
+.depo-card__text{
+  margin: 0;
+  font-size: .88rem;
+  font-style: italic;
+  color: #4a4a4a;
+  line-height: 1.55;
+}
+
+.tag--depo-pendente{ background: rgba(240,180,41,.2); color: #8a6300; }
+.tag--depo-aprovado{ background: rgba(159,175,144,.28); color: #4f5c42; }
+.tag--depo-oculto{ background: rgba(0,0,0,.08); color: #777; }
+
+.depo-card__actions{ display: flex; gap: 8px; }
+
+/* ---------- Responsivo --------------------------------------------------- */
+@media (max-width: 860px){
+  .app{ flex-direction: column; }
+  .sidebar{
+    width: 100%;
+    height: auto;
+    position: static;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  .sidebar__nav{ flex-direction: row; flex-wrap: wrap; }
+  .sidebar__group-label{ width: 100%; }
+  .sidebar__footer{ border-top: none; flex-direction: row; align-items: center; justify-content: space-between; width: 100%; }
+  .content{ padding: 24px 18px 40px; }
+}
+
+@media (prefers-reduced-motion: reduce){
+  .nav-item, .sidebar__refresh, .lead-card__action, .contact-pill{ transition: none; }
+}

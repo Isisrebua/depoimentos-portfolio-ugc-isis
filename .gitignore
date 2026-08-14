@@ -1,0 +1,19 @@
+node_modules/
+
+# Dados de runtime — gerados pelo server.js, não fazem parte do código-fonte.
+# No deploy a aplicação recria leads.json/depoimentos.json vazios e a pasta
+# uploads/ sozinha (ver server.js). Lembre-se: no plano grátis do Render o
+# disco é efêmero, então mesmo commitando isso o conteúdo não sobrevive a
+# um redeploy — não é uma forma real de persistência, só polui o repositório.
+leads.json
+depoimentos.json
+uploads/
+
+# Vídeos de Cases de Sucesso — 6 arquivos .mov, ~560MB no total, 3 deles
+# sozinhos já passam do limite de 100MB por arquivo do GitHub (bloqueio
+# automático do push). Hospede em outro lugar (YouTube não-listado, Vimeo,
+# Cloudinary etc.) e troque o /api/videos por essas URLs quando for a vez —
+# não é isso que está bloqueando o depoimento.html hoje.
+videos/
+
+server.log

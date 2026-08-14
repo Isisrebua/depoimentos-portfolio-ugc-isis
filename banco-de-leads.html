@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Banco de Leads — Isis Rebuá UGC</title>
+<!--
+  SISTEMA INDEPENDENTE. Não faz parte da interface pública do portfólio
+  (index.html) — é um app à parte, pensado pra rodar em uma aba separada
+  só pra você (Isis) acompanhar os leads. Consome a mesma API local que
+  qualquer outro site (Bio Site, UGC Manager) pode chamar — ver server.js
+  (rotas /api/leads) e lead-connector.js (snippet pronto pra colar nos
+  outros sites).
+-->
+<link rel="stylesheet" href="banco-de-leads.css">
+</head>
+<body>
+<div class="app">
+
+  <aside class="sidebar">
+    <div class="sidebar__brand">
+      <span class="sidebar__brand-icon">🗂️</span>
+      <div class="sidebar__brand-text">
+        <strong>Banco de Leads</strong>
+        <small>Isis Rebuá UGC</small>
+      </div>
+    </div>
+
+    <nav class="sidebar__nav">
+      <p class="sidebar__group-label">Canais / Novos Leads</p>
+      <button class="nav-item is-active" type="button" data-view="overview">
+        <span class="nav-item__label">Visão Geral</span>
+        <span class="nav-item__badge" id="badge-overview">0</span>
+      </button>
+      <button class="nav-item" type="button" data-view="portfolio-ugc">
+        <span class="nav-item__label">Portfólio UGC</span>
+        <span class="nav-item__badge" id="badge-portfolio-ugc">0</span>
+      </button>
+      <button class="nav-item" type="button" data-view="bio-site">
+        <span class="nav-item__label">Bio Site</span>
+        <span class="nav-item__badge" id="badge-bio-site">0</span>
+      </button>
+      <button class="nav-item" type="button" data-view="ugc-manager">
+        <span class="nav-item__label">UGC Manager</span>
+        <span class="nav-item__badge" id="badge-ugc-manager">0</span>
+      </button>
+
+      <p class="sidebar__group-label sidebar__group-label--history">Histórico de Prospecção</p>
+      <button class="nav-item nav-item--history" type="button" data-view="abordados">
+        <span class="nav-item__label">💬 Leads Abordados</span>
+        <span class="nav-item__badge" id="badge-abordados">0</span>
+      </button>
+
+      <p class="sidebar__group-label sidebar__group-label--depoimentos">Prova Social</p>
+      <button class="nav-item nav-item--depoimentos" type="button" data-view="depoimentos">
+        <span class="nav-item__label">⭐ Depoimentos</span>
+        <span class="nav-item__badge" id="badge-depoimentos">0</span>
+      </button>
+    </nav>
+
+    <div class="sidebar__footer">
+      <button id="refresh-btn" class="sidebar__refresh" type="button">⟳ Atualizar</button>
+      <small id="last-updated">Carregando…</small>
+    </div>
+  </aside>
+
+  <main class="content">
+    <header class="content__header">
+      <h1 id="view-title">Visão Geral</h1>
+      <p id="view-subtitle" class="content__subtitle"></p>
+    </header>
+
+    <div id="abordados-banner" class="info-banner" hidden>
+      <span>ℹ️ Leads passados para o CRM central.</span>
+    </div>
+
+    <div id="lead-list" class="lead-list"></div>
+    <p id="empty-state" class="empty-state" hidden></p>
+  </main>
+
+</div>
+
+<script src="banco-de-leads.js"></script>
+</body>
+</html>

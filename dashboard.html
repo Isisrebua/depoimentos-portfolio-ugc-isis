@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Painel interno — Isis Rebuá UGC</title>
+<link rel="stylesheet" href="dashboard.css">
+</head>
+<body>
+
+<!-- Portão de senha — NÃO é segurança de verdade (é JS de cliente, dá pra
+     ver a senha no código-fonte). Serve só pra afastar visitante casual
+     que ache a URL por acaso; a página também tem <meta name="robots"
+     content="noindex"> pra não cair em buscadores e não tem link nenhum
+     apontando pra ela a partir do site principal. -->
+<div id="dash-lock" class="dash-lock">
+  <form id="dash-lock-form" class="dash-lock__card">
+    <p class="dash-lock__icon">🔒</p>
+    <h1>Painel interno</h1>
+    <p class="dash-lock__hint">Uso restrito — dados salvos só neste navegador.</p>
+    <input type="password" id="dash-password" placeholder="Senha" autocomplete="current-password" required>
+    <button type="submit">Entrar</button>
+    <p class="dash-lock__error" id="dash-lock-error" hidden>Senha incorreta.</p>
+  </form>
+</div>
+
+<div id="dash-content" class="dash" hidden>
+  <header class="dash__header">
+    <div>
+      <h1>Painel de Analytics</h1>
+      <p class="dash__subtitle">Comportamento dos visitantes do portfólio — dados deste navegador</p>
+    </div>
+    <div class="dash__actions">
+      <button type="button" id="dash-export" class="dash__btn">⬇ Exportar leads (CSV)</button>
+      <button type="button" id="dash-clear" class="dash__btn dash__btn--danger">🗑 Limpar dados</button>
+    </div>
+  </header>
+
+  <p class="dash__disclaimer">
+    ⚠️ Estes números vêm do <code>localStorage</code> deste navegador — cada
+    dispositivo/navegador guarda o próprio histórico. Não é um analytics
+    central agregando todos os visitantes do site (isso exigiria um
+    servidor/banco de dados); é útil pra acompanhar o seu próprio teste do
+    site, ou o comportamento capturado sempre que este painel e as visitas
+    acontecem no mesmo navegador.
+  </p>
+
+  <section class="dash__grid">
+    <div class="dash-card">
+      <p class="dash-card__label">Total de visualizações</p>
+      <p class="dash-card__value" id="stat-pageviews">—</p>
+    </div>
+    <div class="dash-card">
+      <p class="dash-card__label">Rolagem média de abandono</p>
+      <p class="dash-card__value" id="stat-avg-scroll">—</p>
+    </div>
+    <div class="dash-card">
+      <p class="dash-card__label">Seção mais vista</p>
+      <p class="dash-card__value" id="stat-top-section">—</p>
+    </div>
+    <div class="dash-card">
+      <p class="dash-card__label">Vídeo mais reproduzido</p>
+      <p class="dash-card__value" id="stat-top-video">—</p>
+    </div>
+  </section>
+
+  <section class="dash-panel">
+    <h2>Seções mais visualizadas</h2>
+    <div class="bar-list" id="section-bars"></div>
+  </section>
+
+  <section class="dash-panel">
+    <h2>Últimos pontos de abandono (rolagem)</h2>
+    <div class="bar-list" id="scroll-bars"></div>
+  </section>
+
+  <section class="dash-panel">
+    <h2>Desempenho dos vídeos</h2>
+    <div class="table-wrap">
+      <table id="video-table">
+        <thead>
+          <tr><th>Vídeo</th><th>Reproduções</th><th>Tempo médio assistido</th></tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="dash-panel">
+    <h2>Leads capturados</h2>
+    <div class="table-wrap">
+      <table id="leads-table">
+        <thead>
+          <tr>
+            <th>Data</th><th>Nome</th><th>Empresa</th><th>E-mail</th>
+            <th>WhatsApp</th><th>Já usou UGC?</th><th>Mensagem</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </section>
+</div>
+
+<script src="dashboard.js"></script>
+</body>
+</html>
