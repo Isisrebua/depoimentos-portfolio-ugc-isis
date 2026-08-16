@@ -117,7 +117,8 @@ html, body{
    quebrar nada — Firefox continua com os controles nativos completos. */
 video::-webkit-media-controls-fullscreen-button,
 video::-webkit-media-controls-overflow-button,
-video::-internal-media-controls-overflow-button{
+video::-internal-media-controls-overflow-button,
+video::-webkit-media-controls-toggle-closed-captions-button{
   display: none !important;
 }
 
