@@ -276,27 +276,43 @@
   // Atributos padrão de todo <video> que recebe um src real — player
   // limpo (sem download/fullscreen/AirPlay/PiP), carregamento instantâneo
   // do primeiro frame (preload="metadata") e autoplay mobile sem sair de
-  // tela cheia sozinho (playsinline).
+  // tela cheia sozinho (playsinline). "controls" NASCE AUSENTE de propósito
+  // — a capa some com a barra nativa (cronômetro/som/expandir) até o
+  // primeiro clique; o botão de play desenhado em CSS (.video-slot__play)
+  // faz esse papel visual enquanto isso.
   function applyCleanVideoAttrs(video, url) {
     video.src = url;
     video.loop = true;
     video.playsInline = true;
     video.preload = "metadata";
-    video.controls = true;
     video.setAttribute("controlsList", "nodownload nofullscreen noremoteplayback");
     video.disablePictureInPicture = true;
     var slot = video.closest(".video-slot");
-    if (slot) slot.classList.add("has-src"); // esconde o ícone ▶ do estado vazio
+    if (slot) slot.classList.add("has-src"); // esconde o ícone ▶ do estado vazio (placeholder antigo)
 
-    // Selo de visualizações (▶ 100 mil) some enquanto o vídeo toca — evita
-    // ficar por cima da barra de controles nativa — e volta ao pausar/
-    // terminar. loop:true faz "ended" nunca disparar de verdade aqui, mas
-    // o listener fica por segurança caso o loop seja desligado no futuro.
-    var badge = slot && slot.querySelector(".metric-badge");
-    if (badge) {
-      video.addEventListener("play", function () { badge.classList.add("is-hidden"); });
-      video.addEventListener("pause", function () { badge.classList.remove("is-hidden"); });
-      video.addEventListener("ended", function () { badge.classList.remove("is-hidden"); });
+    // Clicar em qualquer ponto do card (vídeo, ícone de play ou selo de
+    // métricas — os dois últimos são pointer-events:none, então o clique
+    // atravessa até aqui) liga os controles nativos e dá o play. Só faz
+    // isso na PRIMEIRA vez: depois que "controls" existe, o próprio
+    // navegador assume o play/pause por cima do vídeo — se a gente
+    // continuasse chamando .play() em todo clique, um clique pra PAUSAR
+    // pelos controles nativos seria imediatamente desfeito por essa
+    // função, e o vídeo nunca pausaria de verdade.
+    if (slot) {
+      slot.addEventListener("click", function () {
+        if (video.hasAttribute("controls")) return;
+        video.setAttribute("controls", "");
+        video.play().catch(function () {}); // navegador pode recusar autoplay com som — ignora silenciosamente
+      });
+    }
+
+    // .is-playing no container esconde o play central e o selo de
+    // métricas juntos (CSS) enquanto o vídeo toca, e traz os dois de
+    // volta ao pausar/terminar — nunca ficam por cima da barra nativa.
+    if (slot) {
+      video.addEventListener("play", function () { slot.classList.add("is-playing"); });
+      video.addEventListener("pause", function () { slot.classList.remove("is-playing"); });
+      video.addEventListener("ended", function () { slot.classList.remove("is-playing"); });
     }
   }
 

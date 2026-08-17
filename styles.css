@@ -92,6 +92,7 @@ html, body{
   box-shadow: 0 10px 24px -14px rgba(0,0,0,.5);
   transition: transform .3s ease, box-shadow .3s ease;
 }
+.video-slot.has-src{ cursor: pointer; } /* só os slots com vídeo real (Cases de Sucesso) convidam ao clique */
 
 .video-slot video,
 .audio-slot video{
@@ -206,10 +207,9 @@ video::-webkit-media-controls-toggle-closed-captions-button{
    Vive DENTRO de .video-slot (é filho direto do <video> no HTML), como
    overlay de canto — não precisa de left/top/width/height inline porque
    é posicionado em px fixos relativos ao próprio .video-slot (que já é
-   position:absolute, servindo de contexto pro filho). Some sozinho
-   enquanto o vídeo toca (classe .is-hidden, ligada pelo evento "play" em
-   script.js) e volta ao pausar/terminar — assim nunca fica por cima da
-   barra de controles nativa do navegador. */
+   position:absolute, servindo de contexto pro filho). Some junto com o
+   botão de play — ver .is-playing embaixo — assim que o vídeo começa a
+   tocar, e nunca fica por cima da barra de controles nativa. */
 .metric-badge{
   position: absolute;
   z-index: 2;
@@ -227,7 +227,56 @@ video::-webkit-media-controls-toggle-closed-captions-button{
   pointer-events: none;
   transition: opacity .2s ease;
 }
-.metric-badge.is-hidden{ opacity: 0; }
+
+/* ---------- Botão de play central (Cases de Sucesso) ----------------------
+   A capa nasce SEM o atributo "controls" — sem isso o vídeo carregaria já
+   com a barra nativa (cronômetro/som/expandir) visível por cima da
+   miniatura, poluindo o visual. Este ícone substitui essa barra até o
+   primeiro clique: script.js só adiciona "controls" (e chama .play()) na
+   hora do clique — depois disso os controles nativos assumem o play/pause
+   normalmente. Puramente decorativo (pointer-events:none) — quem recebe o
+   clique de verdade é o .video-slot inteiro. */
+.video-slot__play{
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 2;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: rgba(0,0,0,.4);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  pointer-events: none;
+  transition: all .3s ease;
+}
+.video-slot__play::after{
+  content: "";
+  width: 0;
+  height: 0;
+  margin-left: 3px; /* recentraliza opticamente — o triângulo é assimétrico */
+  border-style: solid;
+  border-width: 8px 0 8px 14px;
+  border-color: transparent transparent transparent #fff;
+}
+.video-slot:hover .video-slot__play{
+  background: rgba(0,0,0,.55);
+  transform: translate(-50%, -50%) scale(1.08);
+}
+
+/* Enquanto o vídeo toca (classe ligada pelos eventos play/pause/ended do
+   <video> em script.js), o play central e o selo de métricas somem —
+   nunca ficam por cima da barra de controles nativa que aparece após o
+   primeiro clique. */
+.video-slot.is-playing .video-slot__play,
+.video-slot.is-playing .metric-badge{
+  opacity: 0;
+  pointer-events: none;
+}
 
 /* ---------- Galeria de fotos — reconstrução 100% HTML/CSS -----------------
    Antes era 1 PNG achatado com as 12 fotos coladas juntas (grid inteiro
