@@ -210,24 +210,39 @@ async function updateDepoimentoStatus(id, status) {
    ========================================================================== */
 const NTFY_URL = 'https://ntfy.sh/isis-ugc-depoimentolead';
 
-function notifyNtfy(item) {
-  const stars = '★'.repeat(item.rating) + '☆'.repeat(5 - item.rating);
-  const body = [
-    'Novo depoimento recebido!',
-    'Nome: ' + item.responsibleName,
-    'Marca: ' + item.company,
-    'Nota: ' + stars + ' (' + item.rating + '/5)',
-    '',
-    item.text,
-  ].join('\n');
+async function notifyNtfy(item) {
+  const body = 'Novo Depoimento Recebido!\n\n' +
+    'Nome: ' + item.responsibleName + '\n' +
+    'Marca: ' + item.company + '\n' +
+    'Nota: ' + item.rating + ' estrelas\n' +
+    'Depoimento: ' + item.text;
 
-  fetch(NTFY_URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'text/plain; charset=utf-8' },
-    body: body,
-  }).catch(function (err) {
-    console.error('ntfy: falha ao notificar', err.message);
-  });
+  console.log('Disparando notificação para ntfy.sh...');
+  try {
+    const res = await fetch(NTFY_URL, {
+      method: 'POST',
+      headers: {
+        // "Title" fica em ASCII puro de propósito: o fetch nativo do Node
+        // rejeita (TypeError "ByteString") qualquer header com caractere
+        // fora do Latin-1 — um 🌟 literal aqui quebraria ESTA chamada toda
+        // vez. A tag "star" abaixo já resolve isso: o próprio app/painel
+        // do ntfy reconhece "star" como nome de emoji e mostra ⭐ sozinho,
+        // sem precisar do caractere cru no header.
+        'Title': 'Novo Depoimento UGC!',
+        'Priority': 'high',
+        'Tags': 'star,memo',
+        'Content-Type': 'text/plain; charset=utf-8',
+      },
+      body: body,
+    });
+    if (res.ok) {
+      console.log('ntfy enviado com sucesso:', res.status);
+    } else {
+      console.error('Erro ntfy:', await res.text());
+    }
+  } catch (err) {
+    console.error('Erro ntfy:', err.message);
+  }
 }
 
 // Aceita data:<mime>;base64,<...> (é assim que depoimento.html manda o
