@@ -1,5 +1,10 @@
 node_modules/
 
+# Segredos reais (URL + chave do Supabase) — nunca vão pro GitHub. Use
+# .env.example como modelo; no Render, essas mesmas variáveis são
+# configuradas na aba "Environment" do serviço, não em arquivo.
+.env
+
 # Dados de runtime — gerados pelo server.js, não fazem parte do código-fonte.
 # No deploy a aplicação recria leads.json/depoimentos.json vazios e a pasta
 # uploads/ sozinha (ver server.js). Lembre-se: no plano grátis do Render o

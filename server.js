@@ -1,6 +1,8 @@
+require('dotenv').config();
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
+const { createClient } = require('@supabase/supabase-js');
 
 const root = __dirname;
 // process.env.PORT — quem hospeda (Render, Railway etc.) injeta essa
@@ -8,19 +10,31 @@ const root = __dirname;
 // sendo o padrão só pro ambiente local, onde essa variável não existe.
 const port = process.env.PORT || 5757;
 const leadsFile = path.join(root, 'leads.json');
-const depoimentosFile = path.join(root, 'depoimentos.json');
 const uploadsDir = path.join(root, 'uploads');
 const videosDir = path.join(root, 'videos');
 fs.mkdirSync(uploadsDir, { recursive: true });
 fs.mkdirSync(videosDir, { recursive: true });
 
-// Num deploy novo (Render, Railway etc.) estes arquivos ainda não existem
-// no disco — cria os dois vazios ("[]") na primeira subida, pra GET
-// /api/leads e GET /api/depoimentos nunca caírem em erro de arquivo
-// ausente antes do primeiro POST de verdade.
-[leadsFile, depoimentosFile].forEach(function (file) {
-  if (!fs.existsSync(file)) fs.writeFileSync(file, '[]');
-});
+// Num deploy novo (Render, Railway etc.) este arquivo ainda não existe no
+// disco — cria vazio ("[]") na primeira subida, pra GET /api/leads nunca
+// cair em erro de arquivo ausente antes do primeiro POST de verdade.
+// (Depoimentos não usam mais arquivo local — ver bloco SUPABASE abaixo.)
+if (!fs.existsSync(leadsFile)) fs.writeFileSync(leadsFile, '[]');
+
+/* ============================================================================
+   SUPABASE — banco de dados na nuvem pros depoimentos (substitui o antigo
+   depoimentos.json). Resolve o problema do disco efêmero do Render: antes,
+   qualquer depoimento enviado sumia no próximo redeploy/reinício; agora
+   fica salvo permanentemente no Postgres do Supabase. SUPABASE_URL e
+   SUPABASE_KEY vêm de variáveis de ambiente (.env local, ou o painel
+   "Environment" do Render em produção) — NUNCA ficam hardcoded aqui, pra
+   não vazar no GitHub. Ver supabase/schema.sql pra criar a tabela (passo
+   manual único, uma vez só, no SQL Editor do Supabase).
+   ========================================================================== */
+if (!process.env.SUPABASE_URL || !process.env.SUPABASE_KEY) {
+  console.warn('AVISO: SUPABASE_URL/SUPABASE_KEY não configuradas — rotas de depoimentos vão falhar. Veja .env.example.');
+}
+const supabase = createClient(process.env.SUPABASE_URL || '', process.env.SUPABASE_KEY || '');
 
 // Extensões aceitas pra GET /api/videos — qualquer arquivo com nome real
 // (sem precisar renomear pra case-1.mp4 etc.) que caia numa dessas conta.
@@ -132,22 +146,84 @@ function upsertLead(incoming) {
 /* ============================================================================
    DEPOIMENTOS — Sistema próprio de coleta e exibição (estilo TrustUGC).
    Fluxo: marca preenche depoimento.html → POST /api/depoimentos (status
-   sempre nasce "pendente") → aparece na aba "Depoimentos" do
-   banco-de-leads.html pra Isis Aprovar/Ocultar → só os "aprovado" saem em
-   GET /api/depoimentos?status=aprovado, que é o que o widget público do
-   index.html consome. Fica em arquivo separado (depoimentos.json), sem
-   misturar com leads.json.
+   sempre nasce "pendente", salvo na tabela "depoimentos" do Supabase) →
+   aparece na aba "Depoimentos" do banco-de-leads.html pra Isis Aprovar/
+   Ocultar → só os "aprovado" saem em GET /api/depoimentos?status=aprovado,
+   que é o que o widget público do index.html consome.
+
+   As colunas no Supabase são snake_case (responsible_name, testimonial_text
+   etc. — convenção do Postgres); mapDepoimentoRow() traduz pra o mesmo
+   formato camelCase que o front-end (script.js, banco-de-leads.js) sempre
+   usou, então NENHUM código de front-end precisou mudar nessa migração.
    ========================================================================== */
-function readDepoimentos() {
-  try {
-    return JSON.parse(fs.readFileSync(depoimentosFile, 'utf8'));
-  } catch (e) {
-    return [];
-  }
+function mapDepoimentoRow(row) {
+  return {
+    id: row.id,
+    responsibleName: row.responsible_name,
+    company: row.company,
+    rating: row.rating,
+    text: row.testimonial_text,
+    logoUrl: row.logo_url || '',
+    videoUrl: row.video_url || '',
+    videoKind: row.video_kind,
+    status: row.status,
+    createdAt: row.created_at,
+    statusUpdatedAt: row.status_updated_at,
+  };
 }
 
-function writeDepoimentos(items) {
-  fs.writeFileSync(depoimentosFile, JSON.stringify(items, null, 2));
+async function listDepoimentos(statusFilter) {
+  let query = supabase.from('depoimentos').select('*').order('created_at', { ascending: false });
+  if (statusFilter) query = query.eq('status', statusFilter);
+  const { data, error } = await query;
+  if (error) throw error;
+  return data.map(mapDepoimentoRow);
+}
+
+async function updateDepoimentoStatus(id, status) {
+  const { data, error } = await supabase
+    .from('depoimentos')
+    .update({ status: status, status_updated_at: new Date().toISOString() })
+    .eq('id', id)
+    .select()
+    .maybeSingle();
+  if (error) throw error;
+  return data ? mapDepoimentoRow(data) : null;
+}
+
+/* ============================================================================
+   NOTIFICAÇÃO NO CELULAR — ntfy.sh
+   Toda vez que um depoimento novo é salvo, dispara um POST pro tópico
+   ntfy.sh/isis-ugc-depoimentolead com nome/marca/nota/texto. É fire-and-
+   -forget: roda depois da resposta 201 já ter sido mandada pro navegador
+   do cliente, então se o ntfy estiver fora do ar isso NUNCA atrasa nem
+   quebra o envio do depoimento — só perde a notificação daquela vez.
+   Aviso de privacidade: tópicos do ntfy.sh são públicos por padrão —
+   qualquer pessoa que souber o nome exato do tópico pode se inscrever e
+   ver essas notificações (nome, marca, nota, texto do depoimento). ntfy é
+   simples de usar exatamente por isso; se isso virar um problema depois,
+   dá pra trocar por um servidor ntfy próprio com autenticação.
+   ========================================================================== */
+const NTFY_URL = 'https://ntfy.sh/isis-ugc-depoimentolead';
+
+function notifyNtfy(item) {
+  const stars = '★'.repeat(item.rating) + '☆'.repeat(5 - item.rating);
+  const body = [
+    'Novo depoimento recebido!',
+    'Nome: ' + item.responsibleName,
+    'Marca: ' + item.company,
+    'Nota: ' + stars + ' (' + item.rating + '/5)',
+    '',
+    item.text,
+  ].join('\n');
+
+  fetch(NTFY_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain; charset=utf-8' },
+    body: body,
+  }).catch(function (err) {
+    console.error('ntfy: falha ao notificar', err.message);
+  });
 }
 
 // Aceita data:<mime>;base64,<...> (é assim que depoimento.html manda o
@@ -177,8 +253,13 @@ function saveBase64File(dataUri, prefix) {
   return { url: 'uploads/' + fileName, mediaKind: mediaKind };
 }
 
-function createDepoimento(incoming) {
-  const items = readDepoimentos();
+// Uploads (logo/vídeo) continuam gravados em uploads/, no disco local —
+// isso NÃO mudou nesta migração. No Render (disco efêmero), o TEXTO do
+// depoimento agora sobrevive a um redeploy (está no Supabase), mas o
+// arquivo de logo/print/vídeo anexado ainda pode sumir. Se isso virar
+// problema, o próximo passo natural é mover esses arquivos pro Supabase
+// Storage também — fica de fora do pedido de hoje, que era só o banco.
+async function createDepoimento(incoming) {
   const rating = Math.min(5, Math.max(1, parseInt(incoming.rating, 10) || 5));
 
   // "logoFile" é sempre imagem (accept="image/*" no form). "videoFile"
@@ -198,22 +279,23 @@ function createDepoimento(incoming) {
     if (saved) { videoUrl = saved.url; videoKind = saved.mediaKind; }
   }
 
-  const item = {
-    id: String(Date.now()) + Math.random().toString(36).slice(2, 8),
-    responsibleName: String(incoming.responsibleName || '').trim(),
-    company: String(incoming.company || '').trim(),
-    rating: rating,
-    text: String(incoming.text || '').trim(),
-    logoUrl: logoUrl,
-    videoUrl: videoUrl,
-    videoKind: videoKind, // 'image' | 'video' | null (null = sem mídia, ou registro antigo antes desse campo existir)
-    status: 'pendente', // 'pendente' | 'aprovado' | 'oculto'
-    createdAt: new Date().toISOString(),
-    statusUpdatedAt: null,
-  };
-  items.push(item);
-  writeDepoimentos(items);
-  return item;
+  const { data, error } = await supabase
+    .from('depoimentos')
+    .insert({
+      responsible_name: String(incoming.responsibleName || '').trim(),
+      company: String(incoming.company || '').trim(),
+      rating: rating,
+      testimonial_text: String(incoming.text || '').trim(),
+      logo_url: logoUrl,
+      video_url: videoUrl,
+      video_kind: videoKind, // 'image' | 'video' | null
+      status: 'pendente', // 'pendente' | 'aprovado' | 'oculto'
+    })
+    .select()
+    .single();
+
+  if (error) throw error;
+  return mapDepoimentoRow(data);
 }
 
 // 35MB — dá espaço pro depoimento com upload de logo (até 8MB) + vídeo
@@ -353,9 +435,9 @@ function handleApi(req, res, urlPath) {
     const query = new URL(req.url, 'http://localhost').searchParams;
     const statusFilter = query.get('status');
     if (statusFilter !== 'aprovado' && !requireCrmAuth(req, res)) return true;
-    const all = readDepoimentos();
-    const filtered = statusFilter ? all.filter(function (d) { return d.status === statusFilter; }) : all;
-    sendJson(res, 200, filtered);
+    listDepoimentos(statusFilter)
+      .then(function (items) { sendJson(res, 200, items); })
+      .catch(function (err) { sendJson(res, 500, { error: 'Falha ao consultar o Supabase: ' + err.message }); });
     return true;
   }
 
@@ -366,8 +448,12 @@ function handleApi(req, res, urlPath) {
         sendJson(res, 400, { error: 'Faltam campos: responsibleName, company e text são obrigatórios' });
         return;
       }
-      const item = createDepoimento(data);
-      sendJson(res, 201, item);
+      createDepoimento(data)
+        .then(function (item) {
+          sendJson(res, 201, item);
+          notifyNtfy(item); // fire-and-forget — não atrasa nem quebra a resposta já enviada
+        })
+        .catch(function (err) { sendJson(res, 500, { error: 'Falha ao salvar no Supabase: ' + err.message }); });
     });
     return true;
   }
@@ -377,13 +463,12 @@ function handleApi(req, res, urlPath) {
     if (!requireCrmAuth(req, res)) return true;
     readJsonBody(req, function (err, data) {
       if (err || !data.status) { sendJson(res, 400, { error: 'Body precisa de { status }' }); return; }
-      const items = readDepoimentos();
-      const item = items.find(function (d) { return d.id === depoStatusMatch[1]; });
-      if (!item) { sendJson(res, 404, { error: 'Depoimento não encontrado' }); return; }
-      item.status = data.status;
-      item.statusUpdatedAt = new Date().toISOString();
-      writeDepoimentos(items);
-      sendJson(res, 200, item);
+      updateDepoimentoStatus(depoStatusMatch[1], data.status)
+        .then(function (item) {
+          if (!item) { sendJson(res, 404, { error: 'Depoimento não encontrado' }); return; }
+          sendJson(res, 200, item);
+        })
+        .catch(function (err) { sendJson(res, 500, { error: 'Falha ao atualizar no Supabase: ' + err.message }); });
     });
     return true;
   }
