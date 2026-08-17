@@ -287,6 +287,17 @@
     video.disablePictureInPicture = true;
     var slot = video.closest(".video-slot");
     if (slot) slot.classList.add("has-src"); // esconde o ícone ▶ do estado vazio
+
+    // Selo de visualizações (▶ 100 mil) some enquanto o vídeo toca — evita
+    // ficar por cima da barra de controles nativa — e volta ao pausar/
+    // terminar. loop:true faz "ended" nunca disparar de verdade aqui, mas
+    // o listener fica por segurança caso o loop seja desligado no futuro.
+    var badge = slot && slot.querySelector(".metric-badge");
+    if (badge) {
+      video.addEventListener("play", function () { badge.classList.add("is-hidden"); });
+      video.addEventListener("pause", function () { badge.classList.remove("is-hidden"); });
+      video.addEventListener("ended", function () { badge.classList.remove("is-hidden"); });
+    }
   }
 
   /* ==========================================================================

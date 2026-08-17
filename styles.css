@@ -202,20 +202,32 @@ video::-webkit-media-controls-toggle-closed-captions-button{
   transform: translateY(-2px);
 }
 
-/* ---------- Selo de métricas (Cases de Sucesso) — sempre acima do vídeo -- */
+/* ---------- Selo de métricas (Cases de Sucesso) ---------------------------
+   Vive DENTRO de .video-slot (é filho direto do <video> no HTML), como
+   overlay de canto — não precisa de left/top/width/height inline porque
+   é posicionado em px fixos relativos ao próprio .video-slot (que já é
+   position:absolute, servindo de contexto pro filho). Some sozinho
+   enquanto o vídeo toca (classe .is-hidden, ligada pelo evento "play" em
+   script.js) e volta ao pausar/terminar — assim nunca fica por cima da
+   barra de controles nativa do navegador. */
 .metric-badge{
   position: absolute;
   z-index: 2;
+  bottom: 12px;
+  left: 12px;
   display: flex;
   align-items: center;
+  background: rgba(0,0,0,.6);
   color: #fff;
   font-family: "Poppins", "Segoe UI", sans-serif;
   font-weight: 600;
-  font-size: clamp(.68rem, 1.1vw, .85rem);
-  text-shadow: 0 1px 6px rgba(0,0,0,.8);
+  font-size: .85rem;
+  padding: 4px 8px;
+  border-radius: 6px;
   pointer-events: none;
-  padding-inline: 4px;
+  transition: opacity .2s ease;
 }
+.metric-badge.is-hidden{ opacity: 0; }
 
 /* ---------- Galeria de fotos — reconstrução 100% HTML/CSS -----------------
    Antes era 1 PNG achatado com as 12 fotos coladas juntas (grid inteiro
