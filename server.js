@@ -157,18 +157,22 @@ function upsertLead(incoming) {
    usou, então NENHUM código de front-end precisou mudar nessa migração.
    ========================================================================== */
 function mapDepoimentoRow(row) {
+  // Nomes de coluna confirmados na tabela real do Supabase (a tabela foi
+  // criada com nomes em português, diferente do que supabase/schema.sql
+  // sugeria originalmente) — "|| null"/"|| ''" cobre o caso de alguma
+  // coluna opcional (video_kind, status_updated_at) não existir ainda.
   return {
     id: row.id,
-    responsibleName: row.responsible_name,
-    company: row.company,
-    rating: row.rating,
-    text: row.testimonial_text,
+    responsibleName: row.nome,
+    company: row.empresa,
+    rating: row.nota,
+    text: row.depoimento,
     logoUrl: row.logo_url || '',
     videoUrl: row.video_url || '',
-    videoKind: row.video_kind,
+    videoKind: row.video_kind || null, // se a coluna não existir no banco, fica null — script.js já tem fallback por extensão do arquivo
     status: row.status,
     createdAt: row.created_at,
-    statusUpdatedAt: row.status_updated_at,
+    statusUpdatedAt: row.status_updated_at || null,
   };
 }
 
@@ -176,18 +180,18 @@ async function listDepoimentos(statusFilter) {
   let query = supabase.from('depoimentos').select('*').order('created_at', { ascending: false });
   if (statusFilter) query = query.eq('status', statusFilter);
   const { data, error } = await query;
-  if (error) throw error;
+  if (error) { console.error('Supabase (listDepoimentos):', error); throw error; }
   return data.map(mapDepoimentoRow);
 }
 
 async function updateDepoimentoStatus(id, status) {
   const { data, error } = await supabase
     .from('depoimentos')
-    .update({ status: status, status_updated_at: new Date().toISOString() })
+    .update({ status: status })
     .eq('id', id)
     .select()
     .maybeSingle();
-  if (error) throw error;
+  if (error) { console.error('Supabase (updateDepoimentoStatus):', error); throw error; }
   return data ? mapDepoimentoRow(data) : null;
 }
 
@@ -263,38 +267,40 @@ async function createDepoimento(incoming) {
   const rating = Math.min(5, Math.max(1, parseInt(incoming.rating, 10) || 5));
 
   // "logoFile" é sempre imagem (accept="image/*" no form). "videoFile"
-  // agora aceita imagem OU vídeo (print de resultado ou vídeo curto) —
-  // por isso guarda "videoKind" junto, pro script.js saber se deve
-  // montar <img> ou <video> no card do portfólio sem ter que adivinhar
-  // pela extensão do arquivo.
+  // agora aceita imagem OU vídeo (print de resultado ou vídeo curto) — a
+  // tabela atual não tem coluna pra guardar o tipo, então script.js
+  // reconstitui imagem-vs-vídeo pela extensão do arquivo (mediaKindFromUrl).
   let logoUrl = String(incoming.logoUrl || '').trim();
   if (incoming.logoFile) {
     const saved = saveBase64File(incoming.logoFile, 'logo');
     if (saved) logoUrl = saved.url;
   }
   let videoUrl = String(incoming.videoUrl || '').trim();
-  let videoKind = null;
   if (incoming.videoFile) {
     const saved = saveBase64File(incoming.videoFile, 'video');
-    if (saved) { videoUrl = saved.url; videoKind = saved.mediaKind; }
+    if (saved) videoUrl = saved.url;
   }
 
+  // Nomes de coluna confirmados na tabela real do Supabase (criada com
+  // nomes em português — diferente do supabase/schema.sql original).
+  // "video_kind" fica de fora do insert: a coluna não existe na tabela
+  // atual, e script.js já sabe reconstituir imagem-vs-vídeo pela extensão
+  // do arquivo (mediaKindFromUrl) quando esse campo vem null da API.
   const { data, error } = await supabase
     .from('depoimentos')
     .insert({
-      responsible_name: String(incoming.responsibleName || '').trim(),
-      company: String(incoming.company || '').trim(),
-      rating: rating,
-      testimonial_text: String(incoming.text || '').trim(),
+      nome: String(incoming.responsibleName || '').trim(),
+      empresa: String(incoming.company || '').trim(),
+      nota: rating,
+      depoimento: String(incoming.text || '').trim(),
       logo_url: logoUrl,
       video_url: videoUrl,
-      video_kind: videoKind, // 'image' | 'video' | null
       status: 'pendente', // 'pendente' | 'aprovado' | 'oculto'
     })
     .select()
     .single();
 
-  if (error) throw error;
+  if (error) { console.error('Supabase (createDepoimento):', error); throw error; }
   return mapDepoimentoRow(data);
 }
 
