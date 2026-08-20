@@ -31,10 +31,24 @@ if (!fs.existsSync(leadsFile)) fs.writeFileSync(leadsFile, '[]');
    não vazar no GitHub. Ver supabase/schema.sql pra criar a tabela (passo
    manual único, uma vez só, no SQL Editor do Supabase).
    ========================================================================== */
-if (!process.env.SUPABASE_URL || !process.env.SUPABASE_KEY) {
-  console.warn('AVISO: SUPABASE_URL/SUPABASE_KEY não configuradas — rotas de depoimentos vão falhar. Veja .env.example.');
+// createClient() lança um erro SÍNCRONO ("supabaseUrl is required") se a
+// URL vier vazia — sem essa guarda, faltar a variável de ambiente derruba
+// o processo inteiro na inicialização (era exatamente a causa do 502 Bad
+// Gateway no Render: variável ausente lá -> crash no boot -> a aplicação
+// nunca chega a escutar a porta -> o proxy do Render não acha ninguém do
+// outro lado). Agora, faltando a variável, "supabase" fica null e cada
+// rota que precisar dele falha sozinha com um erro 500 claro — o resto do
+// site (portfólio, depoimento.html, leads) continua no ar normalmente.
+let supabase = null;
+if (process.env.SUPABASE_URL && process.env.SUPABASE_KEY) {
+  try {
+    supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY);
+  } catch (e) {
+    console.error('Falha ao inicializar o cliente Supabase:', e.message);
+  }
+} else {
+  console.warn('AVISO: SUPABASE_URL/SUPABASE_KEY não configuradas — rotas de depoimentos vão responder erro 500 até isso ser corrigido no painel do Render. Veja .env.example.');
 }
-const supabase = createClient(process.env.SUPABASE_URL || '', process.env.SUPABASE_KEY || '');
 
 // Extensões aceitas pra GET /api/videos — qualquer arquivo com nome real
 // (sem precisar renomear pra case-1.mp4 etc.) que caia numa dessas conta.
@@ -177,6 +191,7 @@ function mapDepoimentoRow(row) {
 }
 
 async function listDepoimentos(statusFilter) {
+  if (!supabase) throw new Error('Supabase não configurado (SUPABASE_URL/SUPABASE_KEY ausentes no ambiente do servidor)');
   let query = supabase.from('depoimentos').select('*').order('created_at', { ascending: false });
   if (statusFilter) query = query.eq('status', statusFilter);
   const { data, error } = await query;
@@ -185,6 +200,7 @@ async function listDepoimentos(statusFilter) {
 }
 
 async function updateDepoimentoStatus(id, status) {
+  if (!supabase) throw new Error('Supabase não configurado (SUPABASE_URL/SUPABASE_KEY ausentes no ambiente do servidor)');
   const { data, error } = await supabase
     .from('depoimentos')
     .update({ status: status })
@@ -279,6 +295,7 @@ function saveBase64File(dataUri, prefix) {
 // problema, o próximo passo natural é mover esses arquivos pro Supabase
 // Storage também — fica de fora do pedido de hoje, que era só o banco.
 async function createDepoimento(incoming) {
+  if (!supabase) throw new Error('Supabase não configurado (SUPABASE_URL/SUPABASE_KEY ausentes no ambiente do servidor)');
   const rating = Math.min(5, Math.max(1, parseInt(incoming.rating, 10) || 5));
 
   // "logoFile" é sempre imagem (accept="image/*" no form). "videoFile"
