@@ -400,6 +400,21 @@ function requireCrmAuth(req, res) {
 }
 
 function handleApi(req, res, urlPath) {
+  // Já roda dentro do try/catch do handler principal (qualquer exceção
+  // síncrona aqui dentro já seria pega lá), mas envolve de novo aqui —
+  // deixa explícito que as rotas de /api (incluindo /api/depoimentos) são
+  // tratadas com try/catch de propósito, e dá uma mensagem de erro mais
+  // específica (JSON, não texto puro) se algo inesperado acontecer.
+  try {
+    return handleApiInner(req, res, urlPath);
+  } catch (err) {
+    console.error('Erro não tratado numa rota de API:', err);
+    if (!res.headersSent) sendJson(res, 500, { error: 'Erro interno do servidor' });
+    return true;
+  }
+}
+
+function handleApiInner(req, res, urlPath) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PATCH, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -524,39 +539,90 @@ const CLEAN_ROUTES = {
   '/admin': 'banco-de-leads.html',
 };
 
+function safeSend500(res) {
+  // último recurso — se a resposta já tiver começado (headers já
+  // mandados), não dá mais pra mudar o status; só ignora nesse caso em
+  // vez de lançar um segundo erro por cima do primeiro.
+  if (res.headersSent) return;
+  try {
+    res.writeHead(500, { 'Content-Type': 'text/plain; charset=utf-8' });
+    res.end('Erro interno do servidor');
+  } catch (e) { /* nada mais a fazer */ }
+}
+
 http.createServer((req, res) => {
-  let urlPath = decodeURIComponent(req.url.split('?')[0]);
-
-  if (urlPath.startsWith('/api/')) {
-    if (handleApi(req, res, urlPath)) return;
-    sendJson(res, 404, { error: 'Rota de API não encontrada' });
-    return;
-  }
-
-  if (urlPath === '/' || urlPath.endsWith('/')) urlPath += 'index.html';
-  else if (CLEAN_ROUTES[urlPath]) urlPath = '/' + CLEAN_ROUTES[urlPath];
-
-  // painel do CRM (direto ou via /crm, /admin) pede a senha antes de
-  // servir o HTML — sem isso o navegador nem chegaria a mostrar o prompt,
-  // já que a página abriria livre pra qualquer um com o link.
-  if (urlPath === '/banco-de-leads.html' && !requireCrmAuth(req, res)) return;
-
-  let filePath = path.join(root, urlPath);
-  fs.readFile(filePath, (err, data) => {
-    if (err) {
-      res.writeHead(404);
-      res.end('Not found');
+  // TODA a lógica de uma requisição fica dentro deste try — é a causa
+  // raiz do 502 que se repetia: decodeURIComponent() lança uma exceção
+  // SÍNCRONA ("URI malformed") pra qualquer URL com % mal-formado (bots/
+  // scanners mandam isso o tempo todo). Sem este try/catch, essa exceção
+  // não tratada dentro do callback do http.createServer derruba o
+  // processo Node INTEIRO — e o Render passa a devolver 502 pra QUALQUER
+  // rota (inclusive /avaliar e /crm, que nem tocam nisso) até o container
+  // reiniciar sozinho. Reproduzi local: um GET malformado matava o
+  // processo e a rota seguinte, totalmente normal, já vinha com conexão
+  // recusada.
+  try {
+    let urlPath;
+    try {
+      urlPath = decodeURIComponent(req.url.split('?')[0]);
+    } catch (e) {
+      res.writeHead(400, { 'Content-Type': 'text/plain; charset=utf-8' });
+      res.end('URL malformada');
       return;
     }
-    const ext = path.extname(filePath);
-    // no-store: os mesmos nomes de arquivo (styles.css, index.html, os
-    // PNGs de assets/portfolio/) são sobrescritos várias vezes ao longo
-    // do projeto — sem isso, o navegador pode segurar uma versão em
-    // cache e mostrar um CSS/imagem antigo mesmo depois do servidor já
-    // estar com o arquivo novo (só um refresh comum não resolve nesse
-    // caso, precisa de hard refresh). Ambiente local de poucos
-    // visitantes — o custo de nunca cachear é irrelevante aqui.
-    res.writeHead(200, { 'Content-Type': mime[ext] || 'application/octet-stream', 'Cache-Control': 'no-store' });
-    res.end(data);
-  });
+
+    if (urlPath.startsWith('/api/')) {
+      if (handleApi(req, res, urlPath)) return;
+      sendJson(res, 404, { error: 'Rota de API não encontrada' });
+      return;
+    }
+
+    if (urlPath === '/' || urlPath.endsWith('/')) urlPath += 'index.html';
+    else if (CLEAN_ROUTES[urlPath]) urlPath = '/' + CLEAN_ROUTES[urlPath];
+
+    // painel do CRM (direto ou via /crm, /admin) pede a senha antes de
+    // servir o HTML — sem isso o navegador nem chegaria a mostrar o
+    // prompt, já que a página abriria livre pra qualquer um com o link.
+    if (urlPath === '/banco-de-leads.html' && !requireCrmAuth(req, res)) return;
+
+    let filePath = path.join(root, urlPath);
+    fs.readFile(filePath, (err, data) => {
+      try {
+        if (err) {
+          res.writeHead(404);
+          res.end('Not found');
+          return;
+        }
+        const ext = path.extname(filePath);
+        // no-store: os mesmos nomes de arquivo (styles.css, index.html, os
+        // PNGs de assets/portfolio/) são sobrescritos várias vezes ao
+        // longo do projeto — sem isso, o navegador pode segurar uma
+        // versão em cache e mostrar um CSS/imagem antigo mesmo depois do
+        // servidor já estar com o arquivo novo (só um refresh comum não
+        // resolve nesse caso, precisa de hard refresh). Ambiente local de
+        // poucos visitantes — o custo de nunca cachear é irrelevante aqui.
+        res.writeHead(200, { 'Content-Type': mime[ext] || 'application/octet-stream', 'Cache-Control': 'no-store' });
+        res.end(data);
+      } catch (err2) {
+        console.error('Erro ao servir arquivo estático:', err2);
+        safeSend500(res);
+      }
+    });
+  } catch (err) {
+    console.error('Erro não tratado numa requisição:', err);
+    safeSend500(res);
+  }
 }).listen(port, () => console.log(`Serving ${root} at http://localhost:${port}`));
+
+// Rede de segurança de último recurso: se QUALQUER coisa (inclusive um
+// bug futuro, ou dentro de uma lib de terceiros) escapar de todo o
+// try/catch acima e virar uma exceção assíncrona não capturada, registra
+// no log em vez de deixar o processo Node inteiro morrer. Isso NÃO
+// substitui tratar os erros nos lugares certos (por isso os try/catch
+// acima existem) — é só a última trava antes de um 502.
+process.on('uncaughtException', function (err) {
+  console.error('uncaughtException — processo continua no ar:', err);
+});
+process.on('unhandledRejection', function (reason) {
+  console.error('unhandledRejection — processo continua no ar:', reason);
+});
