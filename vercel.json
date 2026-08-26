@@ -1,0 +1,14 @@
+{
+  "rewrites": [
+    { "source": "/avaliar", "destination": "/depoimento.html" },
+    { "source": "/feedback", "destination": "/depoimento.html" },
+    { "source": "/crm", "destination": "/banco-de-leads.html" },
+    { "source": "/admin", "destination": "/banco-de-leads.html" }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [{ "key": "Cache-Control", "value": "no-store" }]
+    }
+  ]
+}

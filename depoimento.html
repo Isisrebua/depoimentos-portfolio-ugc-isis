@@ -7,8 +7,10 @@
 <!--
   Página pública independente — não faz parte do index.html. Link pra
   compartilhar com marcas/clientes depois de fechar um trabalho, pra
-  coletar depoimento. Envia pra POST /api/depoimentos (server.js), que
-  salva em depoimentos.json com status "pendente". Só aparece no
+  coletar depoimento. Logo/vídeo (se houver) sobem direto do navegador pro
+  Supabase Storage (bucket "depoimentos-uploads") — só então o formulário
+  faz POST /api/depoimentos com texto + URLs, que grava na tabela
+  "depoimentos" do Supabase com status "pendente". Só aparece no
   portfólio depois que Isis aprovar na aba "Depoimentos" do
   banco-de-leads.html.
 -->
@@ -211,16 +213,39 @@
   var MAX_LOGO_MB = 8;
   var MAX_MEDIA_MB = 15; // segundo campo aceita imagem OU vídeo — mesmo teto pros dois
 
-  // Lê um <input type="file"> como data URI base64 — é assim que o
-  // arquivo vira texto pra caber num JSON comum (server.js não tem
-  // parser de multipart/form-data; o server decodifica esse base64 e
-  // grava o arquivo de verdade na pasta uploads/, ver server.js).
-  function fileToBase64(file) {
-    return new Promise(function (resolve, reject) {
-      var reader = new FileReader();
-      reader.onload = function () { resolve(reader.result); };
-      reader.onerror = reject;
-      reader.readAsDataURL(file);
+  var EXT_BY_MIME = {
+    "image/jpeg": ".jpg", "image/png": ".png", "image/webp": ".webp", "image/gif": ".gif", "image/svg+xml": ".svg",
+    "video/mp4": ".mp4", "video/webm": ".webm", "video/quicktime": ".mov",
+  };
+
+  function extFor(file) {
+    var fromName = /\.[a-z0-9]+$/i.exec(file.name || "");
+    if (fromName) return fromName[0].toLowerCase();
+    return EXT_BY_MIME[file.type] || "";
+  }
+
+  var configPromise = fetch("/api/public-config").then(function (res) { return res.json(); });
+
+  // Sobe o arquivo direto do navegador pro Supabase Storage (bucket
+  // público "depoimentos-uploads") e devolve a URL pública pronta. Isso
+  // evita mandar o arquivo em base64 dentro do corpo de /api/depoimentos
+  // — a Vercel limita o corpo de uma função serverless a 4.5MB, o que
+  // inviabilizaria vídeo. A chave usada aqui (supabaseAnonKey) é pública
+  // por natureza, protegida pelas policies de RLS do bucket.
+  function uploadToStorage(config, file, prefix) {
+    var path = prefix + "-" + Date.now() + "-" + Math.random().toString(36).slice(2, 8) + extFor(file);
+    var url = config.supabaseUrl + "/storage/v1/object/" + config.storageBucket + "/" + path;
+    return fetch(url, {
+      method: "POST",
+      headers: {
+        "Authorization": "Bearer " + config.supabaseAnonKey,
+        "apikey": config.supabaseAnonKey,
+        "Content-Type": file.type || "application/octet-stream",
+      },
+      body: file,
+    }).then(function (res) {
+      if (!res.ok) throw new Error("Falha ao enviar arquivo pro Storage");
+      return config.supabaseUrl + "/storage/v1/object/public/" + config.storageBucket + "/" + path;
     });
   }
 
@@ -241,19 +266,23 @@
     }
 
     var data = Object.fromEntries(new FormData(form).entries());
-    delete data.logoFile; // esses dois vieram do FormData como File objects — substituídos abaixo pelo base64 real
+    delete data.logoFile; // esses dois vieram do FormData como File objects — substituídos abaixo pelas URLs do Storage
     delete data.videoFile;
 
     submitBtn.disabled = true;
     submitBtn.textContent = "Enviando…";
 
-    Promise.all([
-      logoFile ? fileToBase64(logoFile) : Promise.resolve(null),
-      videoFile ? fileToBase64(videoFile) : Promise.resolve(null),
-    ])
-      .then(function (results) {
-        if (results[0]) data.logoFile = results[0];
-        if (results[1]) data.videoFile = results[1];
+    configPromise
+      .then(function (config) {
+        if (!config.supabaseUrl || !config.supabaseAnonKey) throw new Error("Supabase não configurado no servidor");
+        return Promise.all([
+          logoFile ? uploadToStorage(config, logoFile, "logo") : Promise.resolve(null),
+          videoFile ? uploadToStorage(config, videoFile, "video") : Promise.resolve(null),
+        ]);
+      })
+      .then(function (urls) {
+        if (urls[0]) data.logoUrl = urls[0];
+        if (urls[1]) data.videoUrl = urls[1];
 
         return fetch("/api/depoimentos", {
           method: "POST",

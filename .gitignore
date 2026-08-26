@@ -5,11 +5,10 @@ node_modules/
 # configuradas na aba "Environment" do serviço, não em arquivo.
 .env
 
-# Dados de runtime — gerados pelo server.js, não fazem parte do código-fonte.
-# No deploy a aplicação recria leads.json/depoimentos.json vazios e a pasta
-# uploads/ sozinha (ver server.js). Lembre-se: no plano grátis do Render o
-# disco é efêmero, então mesmo commitando isso o conteúdo não sobrevive a
-# um redeploy — não é uma forma real de persistência, só polui o repositório.
+# leads.json/depoimentos.json/uploads/ não existem mais — leads e
+# depoimentos (com logo/vídeo) vivem no Supabase (ver lib/leads.js,
+# lib/depoimentos.js, supabase/migration-vercel.sql). Entradas mantidas
+# como histórico caso algum arquivo velho ainda esteja no disco local.
 leads.json
 depoimentos.json
 uploads/

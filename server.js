@@ -1,55 +1,26 @@
-// trigger deploy Render
+// Servidor local/Render — serve os arquivos estáticos (portfólio,
+// depoimento.html, banco-de-leads.html) e expõe as mesmas rotas /api/*
+// que, na Vercel, viram funções serverless separadas em api/*.js. A lógica
+// de negócio (leads, depoimentos, auth do CRM) fica em lib/*.js e é
+// compartilhada pelos dois ambientes — aqui só existe o roteamento HTTP
+// bruto (sem framework) e o serviço de arquivos estáticos.
 require('dotenv').config();
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
-const { createClient } = require('@supabase/supabase-js');
+
+const { applyCors, readJsonBody, sendJson } = require('./lib/http');
+const { requireCrmAuth } = require('./lib/crm-auth');
+const { listLeads, upsertLead, setLeadStatus } = require('./lib/leads');
+const { listDepoimentos, createDepoimento, updateDepoimentoStatus } = require('./lib/depoimentos');
+const { notifyNtfy } = require('./lib/ntfy');
 
 const root = __dirname;
 // process.env.PORT — quem hospeda (Render, Railway etc.) injeta essa
 // variável com a porta real que o processo deve escutar; 5757 continua
 // sendo o padrão só pro ambiente local, onde essa variável não existe.
 const port = process.env.PORT || 5757;
-const leadsFile = path.join(root, 'leads.json');
-const uploadsDir = path.join(root, 'uploads');
 const videosDir = path.join(root, 'videos');
-fs.mkdirSync(uploadsDir, { recursive: true });
-fs.mkdirSync(videosDir, { recursive: true });
-
-// Num deploy novo (Render, Railway etc.) este arquivo ainda não existe no
-// disco — cria vazio ("[]") na primeira subida, pra GET /api/leads nunca
-// cair em erro de arquivo ausente antes do primeiro POST de verdade.
-// (Depoimentos não usam mais arquivo local — ver bloco SUPABASE abaixo.)
-if (!fs.existsSync(leadsFile)) fs.writeFileSync(leadsFile, '[]');
-
-/* ============================================================================
-   SUPABASE — banco de dados na nuvem pros depoimentos (substitui o antigo
-   depoimentos.json). Resolve o problema do disco efêmero do Render: antes,
-   qualquer depoimento enviado sumia no próximo redeploy/reinício; agora
-   fica salvo permanentemente no Postgres do Supabase. SUPABASE_URL e
-   SUPABASE_KEY vêm de variáveis de ambiente (.env local, ou o painel
-   "Environment" do Render em produção) — NUNCA ficam hardcoded aqui, pra
-   não vazar no GitHub. Ver supabase/schema.sql pra criar a tabela (passo
-   manual único, uma vez só, no SQL Editor do Supabase).
-   ========================================================================== */
-// createClient() lança um erro SÍNCRONO ("supabaseUrl is required") se a
-// URL vier vazia — sem essa guarda, faltar a variável de ambiente derruba
-// o processo inteiro na inicialização (era exatamente a causa do 502 Bad
-// Gateway no Render: variável ausente lá -> crash no boot -> a aplicação
-// nunca chega a escutar a porta -> o proxy do Render não acha ninguém do
-// outro lado). Agora, faltando a variável, "supabase" fica null e cada
-// rota que precisar dele falha sozinha com um erro 500 claro — o resto do
-// site (portfólio, depoimento.html, leads) continua no ar normalmente.
-let supabase = null;
-if (process.env.SUPABASE_URL && process.env.SUPABASE_KEY) {
-  try {
-    supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY);
-  } catch (e) {
-    console.error('Falha ao inicializar o cliente Supabase:', e.message);
-  }
-} else {
-  console.warn('AVISO: SUPABASE_URL/SUPABASE_KEY não configuradas — rotas de depoimentos vão responder erro 500 até isso ser corrigido no painel do Render. Veja .env.example.');
-}
 
 // Extensões aceitas pra GET /api/videos — qualquer arquivo com nome real
 // (sem precisar renomear pra case-1.mp4 etc.) que caia numa dessas conta.
@@ -69,343 +40,7 @@ const mime = {
   '.mov': 'video/quicktime',
 };
 
-/* ============================================================================
-   BANCO DE LEADS — API local (arquivo leads.json ao lado deste server.js)
-   Isto é o backend compartilhado que qualquer site (Portfólio UGC, Bio Site,
-   UGC Manager) pode chamar via fetch() pra registrar um lead novo. Enquanto
-   os três sites rodarem apontando pra este mesmo servidor, os leads caem
-   todos no mesmo lugar. Se cada site for hospedado em domínio separado no
-   futuro, esta API precisa estar acessível publicamente (ex: hospedada
-   junto com o Portfólio) e os outros sites devem apontar o fetch() pra essa
-   URL pública — o CORS abaixo já libera chamadas de qualquer origem.
-   ========================================================================== */
-
-function readLeads() {
-  try {
-    return JSON.parse(fs.readFileSync(leadsFile, 'utf8'));
-  } catch (e) {
-    return [];
-  }
-}
-
-function writeLeads(leads) {
-  fs.writeFileSync(leadsFile, JSON.stringify(leads, null, 2));
-}
-
-function normEmail(s) { return String(s || '').trim().toLowerCase(); }
-function normPhone(s) { return String(s || '').replace(/\D/g, ''); }
-function normHandle(s) { return String(s || '').trim().replace(/^@/, '').toLowerCase(); }
-
-// Acha um lead já existente com o mesmo e-mail, WhatsApp OU Instagram —
-// essa é a checagem "OU", não "E": basta 1 dos 3 bater pra unificar.
-function findExistingLead(leads, incoming) {
-  const email = normEmail(incoming.email);
-  const whatsapp = normPhone(incoming.whatsapp);
-  const instagram = normHandle(incoming.instagram);
-  return leads.find(function (l) {
-    return (email && normEmail(l.email) === email) ||
-      (whatsapp && normPhone(l.whatsapp) === whatsapp) ||
-      (instagram && normHandle(l.instagram) === instagram);
-  });
-}
-
-const KNOWN_FIELDS = ['name', 'company', 'email', 'whatsapp', 'instagram', 'source'];
-
-function upsertLead(incoming) {
-  const leads = readLeads();
-  const now = new Date().toISOString();
-  const extra = {};
-  Object.keys(incoming).forEach(function (k) {
-    if (KNOWN_FIELDS.indexOf(k) === -1) extra[k] = incoming[k];
-  });
-  const submission = { source: incoming.source || 'desconhecido', submittedAt: now, answers: extra };
-
-  const existing = findExistingLead(leads, incoming);
-  if (existing) {
-    // Unifica na ficha existente — atualiza só os campos que vieram
-    // preenchidos desta vez, nunca cria um segundo card. O canal (source)
-    // também é atualizado pro mais recente, pra ficha aparecer na aba do
-    // canal por onde a pessoa acabou de te procurar de novo.
-    ['name', 'company', 'email', 'whatsapp', 'instagram'].forEach(function (f) {
-      if (incoming[f]) existing[f] = incoming[f];
-    });
-    if (incoming.source) existing.source = incoming.source;
-    existing.isRecurrent = true;
-    existing.history = existing.history || [];
-    existing.history.push(submission);
-    existing.lastSubmittedAt = now;
-    writeLeads(leads);
-    return existing;
-  }
-
-  const lead = {
-    id: String(Date.now()) + Math.random().toString(36).slice(2, 8),
-    name: incoming.name || '',
-    company: incoming.company || '',
-    email: incoming.email || '',
-    whatsapp: incoming.whatsapp || '',
-    instagram: incoming.instagram || '',
-    source: incoming.source || 'desconhecido',
-    status: 'novo', // 'novo' | 'abordado'
-    isRecurrent: false,
-    createdAt: now,
-    lastSubmittedAt: now,
-    statusUpdatedAt: null,
-    history: [submission],
-  };
-  leads.push(lead);
-  writeLeads(leads);
-  return lead;
-}
-
-/* ============================================================================
-   DEPOIMENTOS — Sistema próprio de coleta e exibição (estilo TrustUGC).
-   Fluxo: marca preenche depoimento.html → POST /api/depoimentos (status
-   sempre nasce "pendente", salvo na tabela "depoimentos" do Supabase) →
-   aparece na aba "Depoimentos" do banco-de-leads.html pra Isis Aprovar/
-   Ocultar → só os "aprovado" saem em GET /api/depoimentos?status=aprovado,
-   que é o que o widget público do index.html consome.
-
-   As colunas no Supabase são snake_case (responsible_name, testimonial_text
-   etc. — convenção do Postgres); mapDepoimentoRow() traduz pra o mesmo
-   formato camelCase que o front-end (script.js, banco-de-leads.js) sempre
-   usou, então NENHUM código de front-end precisou mudar nessa migração.
-   ========================================================================== */
-function mapDepoimentoRow(row) {
-  // Nomes de coluna confirmados na tabela real do Supabase (a tabela foi
-  // criada com nomes em português, diferente do que supabase/schema.sql
-  // sugeria originalmente) — "|| null"/"|| ''" cobre o caso de alguma
-  // coluna opcional (video_kind, status_updated_at) não existir ainda.
-  return {
-    id: row.id,
-    responsibleName: row.nome,
-    company: row.empresa,
-    rating: row.nota,
-    text: row.depoimento,
-    logoUrl: row.logo_url || '',
-    videoUrl: row.video_url || '',
-    videoKind: row.video_kind || null, // se a coluna não existir no banco, fica null — script.js já tem fallback por extensão do arquivo
-    status: row.status,
-    createdAt: row.created_at,
-    statusUpdatedAt: row.status_updated_at || null,
-  };
-}
-
-async function listDepoimentos(statusFilter) {
-  if (!supabase) throw new Error('Supabase não configurado (SUPABASE_URL/SUPABASE_KEY ausentes no ambiente do servidor)');
-  let query = supabase.from('depoimentos').select('*').order('created_at', { ascending: false });
-  if (statusFilter) query = query.eq('status', statusFilter);
-  const { data, error } = await query;
-  if (error) { console.error('Supabase (listDepoimentos):', error); throw error; }
-  return data.map(mapDepoimentoRow);
-}
-
-async function updateDepoimentoStatus(id, status) {
-  if (!supabase) throw new Error('Supabase não configurado (SUPABASE_URL/SUPABASE_KEY ausentes no ambiente do servidor)');
-  const { data, error } = await supabase
-    .from('depoimentos')
-    .update({ status: status })
-    .eq('id', id)
-    .select()
-    .maybeSingle();
-  if (error) { console.error('Supabase (updateDepoimentoStatus):', error); throw error; }
-  return data ? mapDepoimentoRow(data) : null;
-}
-
-/* ============================================================================
-   NOTIFICAÇÃO NO CELULAR — ntfy.sh
-   Toda vez que um depoimento novo é salvo, dispara um POST pro tópico
-   ntfy.sh/isis-ugc-depoimentolead com nome/marca/nota/texto. É fire-and-
-   -forget: roda depois da resposta 201 já ter sido mandada pro navegador
-   do cliente, então se o ntfy estiver fora do ar isso NUNCA atrasa nem
-   quebra o envio do depoimento — só perde a notificação daquela vez.
-   Aviso de privacidade: tópicos do ntfy.sh são públicos por padrão —
-   qualquer pessoa que souber o nome exato do tópico pode se inscrever e
-   ver essas notificações (nome, marca, nota, texto do depoimento). ntfy é
-   simples de usar exatamente por isso; se isso virar um problema depois,
-   dá pra trocar por um servidor ntfy próprio com autenticação.
-   ========================================================================== */
-const NTFY_URL = 'https://ntfy.sh/isis-ugc-depoimentolead';
-
-async function notifyNtfy(item) {
-  const body = 'Novo Depoimento Recebido!\n\n' +
-    'Nome: ' + item.responsibleName + '\n' +
-    'Marca: ' + item.company + '\n' +
-    'Nota: ' + item.rating + ' estrelas\n' +
-    'Depoimento: ' + item.text;
-
-  console.log('Disparando notificação para ntfy.sh...');
-  try {
-    const res = await fetch(NTFY_URL, {
-      method: 'POST',
-      headers: {
-        // "Title" fica em ASCII puro de propósito: o fetch nativo do Node
-        // rejeita (TypeError "ByteString") qualquer header com caractere
-        // fora do Latin-1 — um 🌟 literal aqui quebraria ESTA chamada toda
-        // vez. A tag "star" abaixo já resolve isso: o próprio app/painel
-        // do ntfy reconhece "star" como nome de emoji e mostra ⭐ sozinho,
-        // sem precisar do caractere cru no header.
-        'Title': 'Novo Depoimento UGC!',
-        'Priority': 'high',
-        'Tags': 'star,memo',
-        'Content-Type': 'text/plain; charset=utf-8',
-      },
-      body: body,
-    });
-    if (res.ok) {
-      console.log('ntfy enviado com sucesso:', res.status);
-    } else {
-      console.error('Erro ntfy:', await res.text());
-    }
-  } catch (err) {
-    console.error('Erro ntfy:', err.message);
-  }
-}
-
-// Aceita data:<mime>;base64,<...> (é assim que depoimento.html manda o
-// arquivo — FileReader.readAsDataURL no navegador, sem precisar de
-// parser de multipart/form-data aqui). Decodifica e grava um arquivo de
-// verdade em uploads/, com nome único; devolve o caminho relativo
-// ("uploads/xxxx.jpg") que já funciona direto como src/href, porque o
-// servidor serve qualquer arquivo do projeto por caminho (ver embaixo).
-const EXT_BY_MIME = {
-  'image/jpeg': '.jpg', 'image/png': '.png', 'image/webp': '.webp', 'image/gif': '.gif', 'image/svg+xml': '.svg',
-  'video/mp4': '.mp4', 'video/webm': '.webm', 'video/quicktime': '.mov',
-};
-
-// Devolve { url, mediaKind } — mediaKind vem do MIME real (o prefixo
-// "data:<mime>;base64," não mente, ao contrário de confiar só na
-// extensão do nome do arquivo depois). "image" ou "video"; null se o
-// tipo não for reconhecido (arquivo é ignorado, não grava lixo).
-function saveBase64File(dataUri, prefix) {
-  const match = /^data:([^;]+);base64,(.+)$/.exec(dataUri);
-  if (!match) return null;
-  const mimeType = match[1];
-  const ext = EXT_BY_MIME[mimeType] || '';
-  if (!ext) return null; // tipo de arquivo não reconhecido — ignora em vez de gravar algo sem extensão
-  const fileName = prefix + '-' + Date.now() + '-' + Math.random().toString(36).slice(2, 8) + ext;
-  fs.writeFileSync(path.join(uploadsDir, fileName), Buffer.from(match[2], 'base64'));
-  const mediaKind = mimeType.indexOf('video/') === 0 ? 'video' : mimeType.indexOf('image/') === 0 ? 'image' : null;
-  return { url: 'uploads/' + fileName, mediaKind: mediaKind };
-}
-
-// Uploads (logo/vídeo) continuam gravados em uploads/, no disco local —
-// isso NÃO mudou nesta migração. No Render (disco efêmero), o TEXTO do
-// depoimento agora sobrevive a um redeploy (está no Supabase), mas o
-// arquivo de logo/print/vídeo anexado ainda pode sumir. Se isso virar
-// problema, o próximo passo natural é mover esses arquivos pro Supabase
-// Storage também — fica de fora do pedido de hoje, que era só o banco.
-async function createDepoimento(incoming) {
-  if (!supabase) throw new Error('Supabase não configurado (SUPABASE_URL/SUPABASE_KEY ausentes no ambiente do servidor)');
-  const rating = Math.min(5, Math.max(1, parseInt(incoming.rating, 10) || 5));
-
-  // "logoFile" é sempre imagem (accept="image/*" no form). "videoFile"
-  // agora aceita imagem OU vídeo (print de resultado ou vídeo curto) — a
-  // tabela atual não tem coluna pra guardar o tipo, então script.js
-  // reconstitui imagem-vs-vídeo pela extensão do arquivo (mediaKindFromUrl).
-  let logoUrl = String(incoming.logoUrl || '').trim();
-  if (incoming.logoFile) {
-    const saved = saveBase64File(incoming.logoFile, 'logo');
-    if (saved) logoUrl = saved.url;
-  }
-  let videoUrl = String(incoming.videoUrl || '').trim();
-  if (incoming.videoFile) {
-    const saved = saveBase64File(incoming.videoFile, 'video');
-    if (saved) videoUrl = saved.url;
-  }
-
-  // Nomes de coluna confirmados na tabela real do Supabase (criada com
-  // nomes em português — diferente do supabase/schema.sql original).
-  // "video_kind" fica de fora do insert: a coluna não existe na tabela
-  // atual, e script.js já sabe reconstituir imagem-vs-vídeo pela extensão
-  // do arquivo (mediaKindFromUrl) quando esse campo vem null da API.
-  const { data, error } = await supabase
-    .from('depoimentos')
-    .insert({
-      nome: String(incoming.responsibleName || '').trim(),
-      empresa: String(incoming.company || '').trim(),
-      nota: rating,
-      depoimento: String(incoming.text || '').trim(),
-      logo_url: logoUrl,
-      video_url: videoUrl,
-      status: 'pendente', // 'pendente' | 'aprovado' | 'oculto'
-    })
-    .select()
-    .single();
-
-  if (error) { console.error('Supabase (createDepoimento):', error); throw error; }
-  return mapDepoimentoRow(data);
-}
-
-// 35MB — dá espaço pro depoimento com upload de logo (até 8MB) + vídeo
-// (até 15MB) já em base64 (que infla o tamanho original em ~33%), com
-// folga. Leads (só texto) nunca chegam perto disso.
-const MAX_BODY_BYTES = 35 * 1024 * 1024;
-
-function readJsonBody(req, cb) {
-  let body = '';
-  req.on('data', function (chunk) {
-    body += chunk;
-    if (body.length > MAX_BODY_BYTES) req.destroy(); // trava payload absurdo
-  });
-  req.on('end', function () {
-    try {
-      cb(null, body ? JSON.parse(body) : {});
-    } catch (e) {
-      cb(e);
-    }
-  });
-}
-
-function sendJson(res, status, obj) {
-  const payload = JSON.stringify(obj);
-  res.writeHead(status, {
-    'Content-Type': 'application/json; charset=utf-8',
-    'Access-Control-Allow-Origin': '*',
-  });
-  res.end(payload);
-}
-
-/* ============================================================================
-   SENHA DO CRM — protege o painel (banco-de-leads.html, rotas /crm e /admin)
-   e as rotas de API que só o CRM usa: listar TODOS os leads/depoimentos
-   (visão completa, com pendente/oculto) e aprovar/ocultar/mudar status.
-   Fica de fora: POST /api/leads e POST /api/depoimentos (formulários
-   públicos de captura precisam continuar abertos pra qualquer visitante) e
-   GET /api/depoimentos?status=aprovado (é o que o widget público do
-   index.html consome).
-   Autenticação HTTP Basic — o navegador mostra o prompt nativo de usuário/
-   senha sozinho ao acessar /crm; depois de digitar 1x, ele guarda a
-   credencial pra aquela aba/origem e já manda automaticamente nas chamadas
-   fetch() seguintes (mesma origem), sem precisar de tela de login própria
-   nem de cookie/sessão. Usuário pode ser qualquer texto — só a senha conta.
-   ========================================================================== */
-const CRM_PASSWORD = 'Lucyrebua2@';
-
-function hasCrmAuth(req) {
-  const header = req.headers['authorization'] || '';
-  if (!header.startsWith('Basic ')) return false;
-  const decoded = Buffer.from(header.slice(6), 'base64').toString('utf8');
-  const pass = decoded.slice(decoded.indexOf(':') + 1);
-  return pass === CRM_PASSWORD;
-}
-
-function requireCrmAuth(req, res) {
-  if (hasCrmAuth(req)) return true;
-  res.writeHead(401, {
-    'WWW-Authenticate': 'Basic realm="CRM Isis Rebua", charset="UTF-8"',
-    'Content-Type': 'text/plain; charset=utf-8',
-  });
-  res.end('Acesso restrito — senha do CRM necessária.');
-  return false;
-}
-
 function handleApi(req, res, urlPath) {
-  // Já roda dentro do try/catch do handler principal (qualquer exceção
-  // síncrona aqui dentro já seria pega lá), mas envolve de novo aqui —
-  // deixa explícito que as rotas de /api (incluindo /api/depoimentos) são
-  // tratadas com try/catch de propósito, e dá uma mensagem de erro mais
-  // específica (JSON, não texto puro) se algo inesperado acontecer.
   try {
     return handleApiInner(req, res, urlPath);
   } catch (err) {
@@ -416,19 +51,23 @@ function handleApi(req, res, urlPath) {
 }
 
 function handleApiInner(req, res, urlPath) {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PATCH, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  if (applyCors(req, res)) return true;
 
-  if (req.method === 'OPTIONS') {
-    res.writeHead(204);
-    res.end();
+  if (urlPath === '/api/public-config' && req.method === 'GET') {
+    res.setHeader('Cache-Control', 'public, max-age=3600');
+    sendJson(res, 200, {
+      supabaseUrl: process.env.SUPABASE_URL || '',
+      supabaseAnonKey: process.env.SUPABASE_KEY || '',
+      storageBucket: 'depoimentos-uploads',
+    });
     return true;
   }
 
   if (urlPath === '/api/leads' && req.method === 'GET') {
     if (!requireCrmAuth(req, res)) return true; // lista completa — só o CRM
-    sendJson(res, 200, readLeads());
+    listLeads()
+      .then(function (items) { sendJson(res, 200, items); })
+      .catch(function (err) { sendJson(res, 500, { error: 'Falha ao consultar o Supabase: ' + err.message }); });
     return true;
   }
 
@@ -439,8 +78,9 @@ function handleApiInner(req, res, urlPath) {
         sendJson(res, 400, { error: 'Faltam campos: name + (email ou whatsapp ou instagram)' });
         return;
       }
-      const lead = upsertLead(data);
-      sendJson(res, 201, lead);
+      upsertLead(data)
+        .then(function (lead) { sendJson(res, 201, lead); })
+        .catch(function (err) { sendJson(res, 500, { error: 'Falha ao salvar no Supabase: ' + err.message }); });
     });
     return true;
   }
@@ -450,13 +90,12 @@ function handleApiInner(req, res, urlPath) {
     if (!requireCrmAuth(req, res)) return true;
     readJsonBody(req, function (err, data) {
       if (err || !data.status) { sendJson(res, 400, { error: 'Body precisa de { status }' }); return; }
-      const leads = readLeads();
-      const lead = leads.find(function (l) { return l.id === statusMatch[1]; });
-      if (!lead) { sendJson(res, 404, { error: 'Lead não encontrado' }); return; }
-      lead.status = data.status;
-      lead.statusUpdatedAt = new Date().toISOString();
-      writeLeads(leads);
-      sendJson(res, 200, lead);
+      setLeadStatus(statusMatch[1], data.status)
+        .then(function (lead) {
+          if (!lead) { sendJson(res, 404, { error: 'Lead não encontrado' }); return; }
+          sendJson(res, 200, lead);
+        })
+        .catch(function (err) { sendJson(res, 500, { error: 'Falha ao atualizar no Supabase: ' + err.message }); });
     });
     return true;
   }
@@ -541,9 +180,6 @@ const CLEAN_ROUTES = {
 };
 
 function safeSend500(res) {
-  // último recurso — se a resposta já tiver começado (headers já
-  // mandados), não dá mais pra mudar o status; só ignora nesse caso em
-  // vez de lançar um segundo erro por cima do primeiro.
   if (res.headersSent) return;
   try {
     res.writeHead(500, { 'Content-Type': 'text/plain; charset=utf-8' });
@@ -552,16 +188,11 @@ function safeSend500(res) {
 }
 
 http.createServer((req, res) => {
-  // TODA a lógica de uma requisição fica dentro deste try — é a causa
-  // raiz do 502 que se repetia: decodeURIComponent() lança uma exceção
-  // SÍNCRONA ("URI malformed") pra qualquer URL com % mal-formado (bots/
-  // scanners mandam isso o tempo todo). Sem este try/catch, essa exceção
-  // não tratada dentro do callback do http.createServer derruba o
-  // processo Node INTEIRO — e o Render passa a devolver 502 pra QUALQUER
-  // rota (inclusive /avaliar e /crm, que nem tocam nisso) até o container
-  // reiniciar sozinho. Reproduzi local: um GET malformado matava o
-  // processo e a rota seguinte, totalmente normal, já vinha com conexão
-  // recusada.
+  // TODA a lógica de uma requisição fica dentro deste try — decodeURIComponent()
+  // lança uma exceção SÍNCRONA ("URI malformed") pra qualquer URL com %
+  // mal-formado (bots/scanners mandam isso o tempo todo). Sem este
+  // try/catch, essa exceção não tratada dentro do callback do
+  // http.createServer derruba o processo Node inteiro.
   try {
     let urlPath;
     try {
@@ -599,9 +230,7 @@ http.createServer((req, res) => {
         // PNGs de assets/portfolio/) são sobrescritos várias vezes ao
         // longo do projeto — sem isso, o navegador pode segurar uma
         // versão em cache e mostrar um CSS/imagem antigo mesmo depois do
-        // servidor já estar com o arquivo novo (só um refresh comum não
-        // resolve nesse caso, precisa de hard refresh). Ambiente local de
-        // poucos visitantes — o custo de nunca cachear é irrelevante aqui.
+        // servidor já estar com o arquivo novo.
         res.writeHead(200, { 'Content-Type': mime[ext] || 'application/octet-stream', 'Cache-Control': 'no-store' });
         res.end(data);
       } catch (err2) {
@@ -615,12 +244,10 @@ http.createServer((req, res) => {
   }
 }).listen(port, () => console.log(`Serving ${root} at http://localhost:${port}`));
 
-// Rede de segurança de último recurso: se QUALQUER coisa (inclusive um
-// bug futuro, ou dentro de uma lib de terceiros) escapar de todo o
-// try/catch acima e virar uma exceção assíncrona não capturada, registra
-// no log em vez de deixar o processo Node inteiro morrer. Isso NÃO
-// substitui tratar os erros nos lugares certos (por isso os try/catch
-// acima existem) — é só a última trava antes de um 502.
+// Rede de segurança de último recurso: se QUALQUER coisa (inclusive um bug
+// futuro, ou dentro de uma lib de terceiros) escapar de todo o try/catch
+// acima e virar uma exceção assíncrona não capturada, registra no log em
+// vez de deixar o processo Node inteiro morrer.
 process.on('uncaughtException', function (err) {
   console.error('uncaughtException — processo continua no ar:', err);
 });
