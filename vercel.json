@@ -1,14 +1,17 @@
 {
-  "rewrites": [
-    { "source": "/avaliar", "destination": "/depoimento.html" },
-    { "source": "/feedback", "destination": "/depoimento.html" },
-    { "source": "/crm", "destination": "/banco-de-leads.html" },
-    { "source": "/admin", "destination": "/banco-de-leads.html" }
+  "version": 2,
+  "builds": [
+    { "src": "api/**/*.js", "use": "@vercel/node" },
+    { "src": "*.html", "use": "@vercel/static" },
+    { "src": "*.css", "use": "@vercel/static" },
+    { "src": "*.js", "use": "@vercel/static" },
+    { "src": "assets/**", "use": "@vercel/static" }
   ],
-  "headers": [
-    {
-      "source": "/(.*)",
-      "headers": [{ "key": "Cache-Control", "value": "no-store" }]
-    }
+  "routes": [
+    { "src": "/avaliar", "dest": "/depoimento.html" },
+    { "src": "/feedback", "dest": "/depoimento.html" },
+    { "src": "/crm", "dest": "/banco-de-leads.html" },
+    { "src": "/admin", "dest": "/banco-de-leads.html" },
+    { "src": "/(.*)", "headers": { "Cache-Control": "no-store" }, "continue": true }
   ]
 }
