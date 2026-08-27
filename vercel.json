@@ -4,7 +4,11 @@
     { "src": "*.html", "use": "@vercel/static" },
     { "src": "*.css", "use": "@vercel/static" },
     { "src": "*.js", "use": "@vercel/static" },
-    { "src": "assets/**", "use": "@vercel/static" }
+    { "src": "assets/**", "use": "@vercel/static" },
+    { "src": "api/leads.js", "use": "@vercel/node" },
+    { "src": "api/depoimentos.js", "use": "@vercel/node" },
+    { "src": "api/videos.js", "use": "@vercel/node" },
+    { "src": "api/public-config.js", "use": "@vercel/node" }
   ],
   "routes": [
     { "src": "/(.*)", "headers": { "Cache-Control": "no-store" }, "continue": true },
@@ -12,6 +16,10 @@
     { "src": "/feedback", "dest": "/depoimento.html" },
     { "src": "/crm", "dest": "/banco-de-leads.html" },
     { "src": "/admin", "dest": "/banco-de-leads.html" },
+    { "src": "/api/leads(/.*)?", "dest": "/api/leads.js" },
+    { "src": "/api/depoimentos(/.*)?", "dest": "/api/depoimentos.js" },
+    { "src": "/api/videos", "dest": "/api/videos.js" },
+    { "src": "/api/public-config", "dest": "/api/public-config.js" },
     { "handle": "filesystem" }
   ]
 }
