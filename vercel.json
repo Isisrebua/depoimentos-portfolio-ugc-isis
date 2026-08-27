@@ -8,10 +8,11 @@
     { "src": "assets/**", "use": "@vercel/static" }
   ],
   "routes": [
+    { "src": "/(.*)", "headers": { "Cache-Control": "no-store" }, "continue": true },
     { "src": "/avaliar", "dest": "/depoimento.html" },
     { "src": "/feedback", "dest": "/depoimento.html" },
     { "src": "/crm", "dest": "/banco-de-leads.html" },
     { "src": "/admin", "dest": "/banco-de-leads.html" },
-    { "src": "/(.*)", "headers": { "Cache-Control": "no-store" }, "continue": true }
+    { "handle": "filesystem" }
   ]
 }
