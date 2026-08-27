@@ -38,7 +38,10 @@
 
   var DEPO_STATUS_LABELS = { pendente: "Pendente", aprovado: "Aprovado", oculto: "Oculto" };
 
-  var state = { leads: [], depoimentos: [], view: "overview" };
+  // pendingLeadStatus/pendingDepoStatus: { id: {status, statusUpdatedAt} }
+  // pra cada mudança de status otimista ainda "em voo" (PATCH disparado,
+  // resposta do servidor ainda não chegou). Ver loadLeads/loadDepoimentos.
+  var state = { leads: [], depoimentos: [], view: "overview", pendingLeadStatus: {}, pendingDepoStatus: {} };
 
   function escapeHtml(s) {
     return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
@@ -76,17 +79,30 @@
   /* ==========================================================================
      CARREGAMENTO
      ========================================================================== */
+  // Aplica por cima de "data" (o que acabou de vir do servidor) qualquer
+  // mudança otimista ainda pendente — sem isso, o poll de 20s (que pode
+  // já estar em trânsito desde antes do clique) sobrescreve a tela com o
+  // valor antigo assim que responde, e o botão "Aprovar"/"Marcar como
+  // Abordado" parece não ter feito nada até o PATCH em si terminar.
+  function withPending(data, pendingMap) {
+    if (!Object.keys(pendingMap).length) return data;
+    return data.map(function (item) {
+      var patch = pendingMap[item.id];
+      return patch ? Object.assign({}, item, patch) : item;
+    });
+  }
+
   function loadLeads() {
     return fetch(API)
       .then(function (res) { return res.json(); })
       .then(function (data) {
-        state.leads = data;
+        state.leads = withPending(data, state.pendingLeadStatus);
         document.getElementById("last-updated").textContent =
           "Atualizado às " + new Date().toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
         render();
       })
       .catch(function () {
-        document.getElementById("last-updated").textContent = "Sem conexão com o servidor local (server.js rodando?).";
+        document.getElementById("last-updated").textContent = "Sem conexão com o servidor (API fora do ar?).";
       });
   }
 
@@ -94,7 +110,7 @@
     return fetch(DEPOIMENTOS_API)
       .then(function (res) { return res.json(); })
       .then(function (data) {
-        state.depoimentos = data;
+        state.depoimentos = withPending(data, state.pendingDepoStatus);
         render();
       })
       .catch(function () { /* mesmo erro de conexão já é reportado por loadLeads */ });
@@ -257,39 +273,63 @@
   }
 
   /* ==========================================================================
-     AÇÕES — mudar status (Novo <-> Abordado)
-     Atualização otimista: muda na tela na hora, e tenta gravar no servidor
-     em paralelo. Se a rede falhar, o próximo "Atualizar" volta a refletir
-     o estado real salvo no leads.json.
+     AÇÕES — mudar status (Novo <-> Abordado / Pendente <-> Aprovado/Oculto)
+     Atualização otimista: muda na tela IMEDIATAMENTE ao clicar, sem esperar
+     o servidor responder. Enquanto o PATCH está em voo, o id fica marcado
+     em pendingLeadStatus/pendingDepoStatus pra o poll de 20s (loadLeads/
+     loadDepoimentos) não sobrescrever essa mudança com o valor antigo que
+     ainda está no servidor — sem essa marca, um poll que responde ENTRE o
+     clique e o PATCH terminar fazia o card "voltar" pro estado anterior por
+     alguns segundos, parecendo que o clique não tinha feito nada. Se o
+     PATCH falhar de verdade (rede ou erro do servidor), desfaz a mudança
+     na tela e avisa — não fica só "esperando pra sempre" calado.
      ========================================================================== */
   function setStatus(id, status) {
     var lead = state.leads.find(function (l) { return l.id === id; });
-    if (lead) {
-      lead.status = status;
-      lead.statusUpdatedAt = new Date().toISOString();
-      render();
-    }
+    var previous = lead ? { status: lead.status, statusUpdatedAt: lead.statusUpdatedAt } : null;
+    var patch = { status: status, statusUpdatedAt: new Date().toISOString() };
+
+    state.pendingLeadStatus[id] = patch;
+    if (lead) { Object.assign(lead, patch); render(); }
+
     fetch(API + "/" + id + "/status", {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ status: status })
-    }).catch(function () { /* fica com o estado otimista; próximo refresh corrige se preciso */ });
+    })
+      .then(function (res) { if (!res.ok) throw new Error("HTTP " + res.status); })
+      .then(function () { delete state.pendingLeadStatus[id]; })
+      .catch(function () {
+        delete state.pendingLeadStatus[id];
+        var current = state.leads.find(function (l) { return l.id === id; });
+        if (current && previous) { Object.assign(current, previous); render(); }
+        document.getElementById("last-updated").textContent = "Não foi possível salvar — tente de novo.";
+      });
   }
 
-  // Mesmo padrão otimista de setStatus(), mas pra depoimentos — chamado
-  // pelos botões [Aprovar]/[Ocultar] da aba "Depoimentos".
+  // Mesmo padrão de setStatus(), mas pra depoimentos — chamado pelos
+  // botões [Aprovar]/[Ocultar] da aba "Depoimentos".
   function setDepoimentoStatus(id, status) {
     var item = state.depoimentos.find(function (d) { return d.id === id; });
-    if (item) {
-      item.status = status;
-      item.statusUpdatedAt = new Date().toISOString();
-      render();
-    }
+    var previous = item ? { status: item.status, statusUpdatedAt: item.statusUpdatedAt } : null;
+    var patch = { status: status, statusUpdatedAt: new Date().toISOString() };
+
+    state.pendingDepoStatus[id] = patch;
+    if (item) { Object.assign(item, patch); render(); }
+
     fetch(DEPOIMENTOS_API + "/" + id + "/status", {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ status: status })
-    }).catch(function () { /* fica com o estado otimista; próximo refresh corrige se preciso */ });
+    })
+      .then(function (res) { if (!res.ok) throw new Error("HTTP " + res.status); })
+      .then(function () { delete state.pendingDepoStatus[id]; })
+      .catch(function () {
+        delete state.pendingDepoStatus[id];
+        var current = state.depoimentos.find(function (d) { return d.id === id; });
+        if (current && previous) { Object.assign(current, previous); render(); }
+        document.getElementById("last-updated").textContent = "Não foi possível salvar — tente de novo.";
+      });
   }
 
   /* ==========================================================================

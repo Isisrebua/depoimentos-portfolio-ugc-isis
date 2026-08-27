@@ -208,6 +208,41 @@
   }
 
   /* ==========================================================================
+     4c-bis) SCROLL REVEAL — fade-in + subida das seções a partir da 2a aba
+     Mesmo padrão de initGalleryReveal() acima: marca os alvos com uma
+     classe "de espera" (.will-reveal, escondida via CSS) e usa
+     IntersectionObserver pra acrescentar .reveal na primeira vez que cada
+     um entra na viewport (nunca remove depois — anima uma vez só). Alvo é
+     todo [data-section-name] MENOS o Hero (data-section-name="hero"),
+     que é a primeira aba e já aparece cheia na carga da página — "a
+     partir da segunda aba" na prática.
+     ========================================================================== */
+  function initScrollReveal() {
+    var targets = Array.prototype.slice.call(document.querySelectorAll("[data-section-name]"))
+      .filter(function (el) { return el.getAttribute("data-section-name") !== "hero"; });
+    if (!targets.length) return;
+
+    targets.forEach(function (el) { el.classList.add("will-reveal"); });
+
+    if (!("IntersectionObserver" in window)) {
+      // Sem suporte a IntersectionObserver: mostra tudo direto em vez de
+      // deixar a seção escondida pra sempre (.will-reveal some via CSS).
+      targets.forEach(function (el) { el.classList.add("reveal"); });
+      return;
+    }
+
+    var revealObserver = new IntersectionObserver(function (entries, observer) {
+      entries.forEach(function (entry) {
+        if (!entry.isIntersecting) return;
+        entry.target.classList.add("reveal");
+        observer.unobserve(entry.target); // anima uma vez só, nunca de novo
+      });
+    }, { threshold: 0.15, rootMargin: "0px 0px -60px 0px" });
+
+    targets.forEach(function (el) { revealObserver.observe(el); });
+  }
+
+  /* ==========================================================================
      4d) DEPOIMENTOS — widget de prova social
      Busca só os depoimentos com status "aprovado" (server.js já filtra —
      o widget público nunca vê pendente/oculto) e monta os cards. Se não
@@ -758,6 +793,7 @@
     initFaqAccordion();
     initStatsAnimation();
     initGalleryReveal();
+    initScrollReveal();
     initCasesVideos();
     initTestimonials();
     initWhatsappVisibility();

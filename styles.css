@@ -304,6 +304,21 @@ video::-webkit-media-controls-toggle-closed-captions-button{
 }
 .gallery-photo--visible{ opacity: 1; transform: translateX(0); }
 
+/* ---------- Scroll reveal (fade-in + subida) das seções a partir da 2a ----
+   script.js (initScrollReveal) marca todo [data-section-name] (exceto o
+   Hero, que já aparece na carga) com .will-reveal e usa um
+   IntersectionObserver pra acrescentar .reveal na primeira vez que a
+   seção entra na viewport — .reveal nunca é removida depois (anima uma
+   vez só, igual .gallery-photo--visible acima). Sem JS/IntersectionObserver
+   (ou motion reduzido), a seção fica visível direto — nunca escondida
+   pra sempre. */
+.will-reveal{
+  opacity: 0;
+  transform: translateY(32px);
+  transition: opacity .7s ease, transform .7s ease;
+}
+.will-reveal.reveal{ opacity: 1; transform: translateY(0); }
+
 /* ---------- Marcas Trabalhadas — reconstrução 100% HTML/CSS ---------------
    Antes isso era um PNG achatado (título + 23 logos + texto, tudo numa
    imagem só) — impossível de traduzir e impossível de encaixar um 24º
@@ -1131,7 +1146,7 @@ video::-webkit-media-controls-toggle-closed-captions-button{
   .whatsapp-float,
   .faq__chevron, .faq__answer, .faq__cta, .faq__cta--secondary, .lead-form__submit,
   .glass-btn, .price-cta, .stat__value, .stat,
-  .brands-grid__badge, .brands-grid__badge img, .gallery-photo{ transition: none; }
+  .brands-grid__badge, .brands-grid__badge img, .gallery-photo, .will-reveal{ transition: none; }
   .whatsapp-float, .stat--floating, .glow-btn::before{ animation: none; }
   .video-slot:hover, .video-slot:focus-within,
   .audio-slot:hover, .audio-slot:focus-within,
@@ -1139,4 +1154,5 @@ video::-webkit-media-controls-toggle-closed-captions-button{
   .popup-overlay, .popup-card{ animation: none; }
   .stat{ opacity: 1; transform: none; }
   .gallery-photo{ opacity: 1; transform: none; }
+  .will-reveal{ opacity: 1; transform: none; }
 }
