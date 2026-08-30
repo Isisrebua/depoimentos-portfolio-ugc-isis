@@ -641,7 +641,38 @@
     // garante que o pop-up nasce fisicamente invisível.
     popup.style.display = "none";
 
+    // "Fechar hoje" — quando a pessoa fecha no X, clica fora ou aperta
+    // Esc, guarda no localStorage até que horas termina o dia local; os
+    // gatilhos AUTOMÁTICOS (tempo + rolagem) ficam calados até lá, na
+    // mesma sessão ou não (sobrevive a fechar a aba/navegador, já que é
+    // localStorage e não sessionStorage — "durante o dia todo", como
+    // pedido). Não afeta um clique deliberado num botão "Quero saber
+    // mais" (data-open-popup): isso é ação da pessoa, sempre abre.
+    var DISMISS_KEY = "ugc-popup-dismissed-until";
+    function isDismissedToday() {
+      try {
+        var until = Number(localStorage.getItem(DISMISS_KEY));
+        return until > 0 && Date.now() < until;
+      } catch (e) {
+        return false; // localStorage indisponível (modo privado etc.) — nunca bloqueia, só não lembra
+      }
+    }
+    function dismissUntilEndOfDay() {
+      try {
+        var endOfDay = new Date();
+        endOfDay.setHours(23, 59, 59, 999);
+        localStorage.setItem(DISMISS_KEY, String(endOfDay.getTime()));
+      } catch (e) { /* idem acima — falha em silêncio, não quebra o fechamento do pop-up */ }
+    }
+
     var alreadyShownThisLoad = false;
+    var scrollListener = null;
+    var timerId = null;
+
+    function cleanupTriggers() {
+      if (scrollListener) document.removeEventListener("scroll", scrollListener);
+      if (timerId) window.clearTimeout(timerId);
+    }
 
     function openPopup() {
       if (alreadyShownThisLoad || !popup.hidden) return;
@@ -652,44 +683,50 @@
       if (firstField) firstField.focus();
       cleanupTriggers();
     }
-    function closePopup() {
+    function closePopupAndRemember() {
       popup.hidden = true;
       popup.style.display = "none";
+      dismissUntilEndOfDay();
     }
 
     popup.querySelectorAll("[data-popup-close]").forEach(function (btn) {
-      btn.addEventListener("click", closePopup);
+      btn.addEventListener("click", closePopupAndRemember);
     });
     popup.addEventListener("click", function (e) {
-      if (e.target === popup) closePopup();
+      if (e.target === popup) closePopupAndRemember();
     });
     document.addEventListener("keydown", function (e) {
-      if (e.key === "Escape" && !popup.hidden) closePopup();
+      if (e.key === "Escape" && !popup.hidden) closePopupAndRemember();
     });
 
-    // --- gatilho 1: 20s de navegação contínua ---
-    var timerId = window.setTimeout(openPopup, 20000);
-
-    // --- gatilho 2: 60% de rolagem da página ---
-    function onScroll() {
-      var doc = document.documentElement;
-      var scrollable = doc.scrollHeight - window.innerHeight;
-      if (scrollable <= 0) return; // página cabe inteira na tela — sem scroll, esse gatilho não se aplica
-      var pct = (window.scrollY / scrollable) * 100;
-      if (pct >= 60) openPopup();
-    }
-    document.addEventListener("scroll", onScroll, { passive: true });
-
-    // --- gatilho 3: clique num botão que abra o pop-up de propósito
-    // (qualquer elemento com data-open-popup, se algum existir no HTML) ---
+    // --- gatilho manual: clique num botão que abra o pop-up de propósito
+    // (qualquer elemento com data-open-popup, se algum existir no HTML) —
+    // sempre funciona, mesmo com o automático já fechado hoje. ---
     document.querySelectorAll("[data-open-popup]").forEach(function (btn) {
       btn.addEventListener("click", openPopup);
     });
 
-    function cleanupTriggers() {
-      document.removeEventListener("scroll", onScroll);
-      window.clearTimeout(timerId);
-    }
+    if (isDismissedToday()) return; // já fechou hoje — só o gatilho manual acima fica de pé
+
+    // --- gatilho automático COMBINADO: só abre quando os DOIS já
+    // aconteceram — pelo menos 60s de navegação contínua E pelo menos
+    // 60% de rolagem da página. Antes eram dois gatilhos independentes
+    // (OR) com só 20s de espera; isso interrompia gente que tinha acabado
+    // de chegar e ainda nem tinha decidido se ia rolar a página. ---
+    var pastMinDelay = false;
+    var pastScrollThreshold = false;
+    function maybeOpen() { if (pastMinDelay && pastScrollThreshold) openPopup(); }
+
+    timerId = window.setTimeout(function () { pastMinDelay = true; maybeOpen(); }, 60000);
+
+    scrollListener = function () {
+      var doc = document.documentElement;
+      var scrollable = doc.scrollHeight - window.innerHeight;
+      if (scrollable <= 0) return; // página cabe inteira na tela — sem scroll, esse gatilho não se aplica
+      var pct = (window.scrollY / scrollable) * 100;
+      if (pct >= 60) { pastScrollThreshold = true; maybeOpen(); }
+    };
+    document.addEventListener("scroll", scrollListener, { passive: true });
   }
 
   /* ==========================================================================
