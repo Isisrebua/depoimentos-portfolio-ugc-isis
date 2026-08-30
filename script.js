@@ -222,12 +222,29 @@
       .filter(function (el) { return el.getAttribute("data-section-name") !== "hero"; });
     if (!targets.length) return;
 
-    targets.forEach(function (el) { el.classList.add("will-reveal"); });
+    // "A partir do Sobre Mim, cobrindo todo o portfólio" — mas uma seção
+    // que JÁ aparece (parcialmente) na tela antes de qualquer rolagem (o
+    // topo de "Sobre mim", logo abaixo do Hero, em telas mais baixas/
+    // largas) não pode entrar escondida: o IntersectionObserver reporta o
+    // estado atual assim que observe() roda, então ela seria "revelada"
+    // no mesmíssimo instante do carregamento — sem transição visível
+    // nenhuma, só aparecendo pronta. Só quem está de fato fora da tela no
+    // carregamento entra no esquema de esconder+animar ao rolar; o resto
+    // (normalmente só "sobre-mim", às vezes) fica visível desde já, como
+    // qualquer conteúdo acima da dobra.
+    var viewportH = window.innerHeight || document.documentElement.clientHeight;
+    var toObserve = [];
+    targets.forEach(function (el) {
+      if (el.getBoundingClientRect().top < viewportH * 0.85) return;
+      el.classList.add("will-reveal");
+      toObserve.push(el);
+    });
+    if (!toObserve.length) return;
 
     if (!("IntersectionObserver" in window)) {
       // Sem suporte a IntersectionObserver: mostra tudo direto em vez de
       // deixar a seção escondida pra sempre (.will-reveal some via CSS).
-      targets.forEach(function (el) { el.classList.add("reveal"); });
+      toObserve.forEach(function (el) { el.classList.add("reveal"); });
       return;
     }
 
@@ -239,7 +256,7 @@
       });
     }, { threshold: 0.15, rootMargin: "0px 0px -60px 0px" });
 
-    targets.forEach(function (el) { revealObserver.observe(el); });
+    toObserve.forEach(function (el) { revealObserver.observe(el); });
   }
 
   /* ==========================================================================

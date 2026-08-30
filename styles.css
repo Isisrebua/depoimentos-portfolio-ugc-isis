@@ -122,6 +122,13 @@ video::-internal-media-controls-overflow-button,
 video::-webkit-media-controls-toggle-closed-captions-button{
   display: none !important;
 }
+/* Reforço extra pedido: alguns builds do WebKit/Safari só respeitam o
+   display:none acima se a "moldura" dos controles (enclosure) também
+   estiver com overflow escondido — sem custo pros navegadores onde já
+   funcionava só com a regra de cima. */
+video::-webkit-media-controls-enclosure{
+  overflow: hidden;
+}
 
 /* ---------- Containers de áudio → gravação de tela (Feedbacks) ------------ */
 .audio-slot{
