@@ -352,47 +352,32 @@
   }
 
   /* ==========================================================================
-     4d-bis) CASES DE SUCESSO — vídeos dinâmicos da pasta videos/
-     Em vez de exigir nomes de arquivo fixos (case-1.mp4...case-6.mp4), o
-     navegador pergunta pro servidor (GET /api/videos) quais arquivos de
-     vídeo REALMENTE existem em videos/ e casa cada slot com o negócio
-     certo por PALAVRA-CHAVE no nome do arquivo (não pela ordem alfabética
-     em que a API lista) — assim o vídeo da Churrascaria sempre cai no
-     slot da Churrascaria, mesmo que o arquivo tenha sido o último a ser
-     adicionado na pasta. "Sorveteria" aparece 2x (slots 4 e 6): cada
-     passada consome o primeiro arquivo de sorveteria que ainda sobrar no
-     pool, então os dois vídeos caem um em cada slot, nunca repetidos.
-     Falta arquivo pra algum slot? Ele fica vazio (ícone ▶ do estado
-     inicial) — não quebra o layout nem os outros slots já preenchidos.
+     4d-bis) CASES DE SUCESSO — vídeos hospedados no Supabase Storage
+     Antes isso dependia de uma pasta "videos/" local (GET /api/videos
+     listava os arquivos ali) — não funciona na Vercel, que não tem essa
+     pasta (é grande demais pra caber no limite de arquivo do GitHub, por
+     isso nunca foi versionada). Os 6 vídeos (recomprimidos pra 720p/H.264,
+     ~12-24MB cada — os originais em .mov do iPhone tinham 60-110MB e
+     estouravam o limite de upload do bucket) agora vivem no bucket
+     público "depoimentos-uploads" do Supabase, mesmo bucket já usado
+     pelos anexos de depoimento — URL fixa por slot, sem precisar
+     perguntar nada ao servidor.
      ========================================================================== */
-  var CASES_SLOT_KEYWORDS = {
-    "case-1": "churrascaria",
-    "case-2": "restaurante",
-    "case-3": "loja de roupa",
-    "case-4": "sorveteria",
-    "case-5": "pousada",
-    "case-6": "sorveteria",
+  var CASES_VIDEO_URLS = {
+    "case-1": "https://baqdpatmwjxglmrpjfan.supabase.co/storage/v1/object/public/depoimentos-uploads/case-churrascaria.mp4",
+    "case-2": "https://baqdpatmwjxglmrpjfan.supabase.co/storage/v1/object/public/depoimentos-uploads/case-restaurante.mp4",
+    "case-3": "https://baqdpatmwjxglmrpjfan.supabase.co/storage/v1/object/public/depoimentos-uploads/case-loja-de-roupa.mp4",
+    "case-4": "https://baqdpatmwjxglmrpjfan.supabase.co/storage/v1/object/public/depoimentos-uploads/case-sorveteria-1.mp4",
+    "case-5": "https://baqdpatmwjxglmrpjfan.supabase.co/storage/v1/object/public/depoimentos-uploads/case-pousada.mp4",
+    "case-6": "https://baqdpatmwjxglmrpjfan.supabase.co/storage/v1/object/public/depoimentos-uploads/case-sorveteria-2.mp4",
   };
 
   function initCasesVideos() {
     var videos = document.querySelectorAll('[data-section-name="cases-de-sucesso"] .video-slot video');
-    if (!videos.length) return;
-
-    fetch("/api/videos")
-      .then(function (res) { return res.json(); })
-      .then(function (files) {
-        if (!files || !files.length) return;
-        var pool = files.slice();
-        videos.forEach(function (video) {
-          var keyword = CASES_SLOT_KEYWORDS[video.getAttribute("data-slot")];
-          if (!keyword) return;
-          var idx = pool.findIndex(function (f) { return f.name.toLowerCase().indexOf(keyword) !== -1; });
-          if (idx === -1) return;
-          var file = pool.splice(idx, 1)[0];
-          applyCleanVideoAttrs(video, file.url);
-        });
-      })
-      .catch(function () { /* API fora do ar — slots ficam vazios, sem quebrar o resto da página */ });
+    videos.forEach(function (video) {
+      var url = CASES_VIDEO_URLS[video.getAttribute("data-slot")];
+      if (url) applyCleanVideoAttrs(video, url);
+    });
   }
 
   function initTestimonials() {
