@@ -15,15 +15,30 @@
   var SOURCE_LABELS = {
     "portfolio-ugc": "Portfólio UGC",
     "bio-site": "Bio Site",
-    "ugc-manager": "UGC Manager"
+    "ugc-manager": "UGC Manager",
+    "pagina-vendas-gestao": "Gestão de Campanhas"
   };
 
-  // Rótulos amigáveis pras perguntas do formulário do Portfólio UGC.
-  // Pra somar um canal novo com perguntas próprias, só adicionar aqui.
-  var ANSWER_LABELS = { usage: "Já usou UGC antes?", goal: "Objetivo principal", message: "Mensagem" };
+  // Rótulos amigáveis pras perguntas de cada canal. Pra somar um canal
+  // novo com perguntas próprias, só adicionar aqui — nenhum campo extra
+  // que um formulário mandar precisa de coluna nova no banco: tudo que
+  // não é name/company/email/whatsapp/instagram/source cai automaticamente
+  // dentro de "answers" no histórico do lead (ver lib/leads.js), e
+  // renderAnswers() abaixo já sabe mostrar qualquer chave daí — só fica
+  // mais bonito com um rótulo aqui, mas funciona mesmo sem.
+  var ANSWER_LABELS = {
+    usage: "Já usou UGC antes?", goal: "Objetivo principal", message: "Mensagem",
+    // Pop-up da página de vendas de Gestão de Campanhas (source: "pagina-vendas-gestao"):
+    tipo_campanha: "Tipo de Campanha", experiencia_ugc: "Experiência com UGC", ideia_campanha: "Ideia da Campanha"
+  };
   var ANSWER_VALUE_LABELS = {
     usage: { "sim-ads": "Sim, já rodou Ads", "primeira-vez": "Primeira vez", "gestao-completa": "Quer Gestão Completa" },
-    goal: { cpc: "Diminuir CPC", conversao: "Aumentar conversão em Ads", "prova-social": "Criativos pra prova social", "gestao-completa": "Gestão completa de UGC" }
+    goal: { cpc: "Diminuir CPC", conversao: "Aumentar conversão em Ads", "prova-social": "Criativos pra prova social", "gestao-completa": "Gestão completa de UGC" },
+    // Se o <select> da página de vendas mandar outros valores (texto
+    // puro, outra grafia), cai tudo bem: sem mapeamento aqui, renderAnswers()
+    // mostra o valor cru como veio — nunca quebra, só fica menos bonito.
+    tipo_campanha: { ugc: "UGC", influenciadores: "Influenciadores", hibrida: "Híbrida" },
+    experiencia_ugc: { "ja-invisto": "Já invisto", "ja-testei": "Já testei", "primeira-vez": "Primeira vez" }
   };
   var SKIP_ANSWER_KEYS = ["submittedAt", "page"];
 
@@ -32,6 +47,7 @@
     "portfolio-ugc": ["Portfólio UGC", "Leads novos vindos do site do portfólio."],
     "bio-site": ["Bio Site", "Leads novos vindos do Bio Site."],
     "ugc-manager": ["UGC Manager", "Leads novos vindos do UGC Manager."],
+    "pagina-vendas-gestao": ["Gestão de Campanhas", "Leads novos vindos do pop-up da página de vendas de Gestão de Campanhas — tipo de campanha, experiência com UGC e ideia de campanha aparecem no card."],
     abordados: ["Leads Abordados", "Histórico de prospecção — leads já contatados."],
     depoimentos: ["Depoimentos", "Aprove ou oculte os depoimentos enviados por marcas/clientes. Só os aprovados aparecem no portfólio público."]
   };
@@ -126,7 +142,7 @@
   }
 
   function updateBadges() {
-    ["overview", "portfolio-ugc", "bio-site", "ugc-manager", "abordados"].forEach(function (v) {
+    ["overview", "portfolio-ugc", "bio-site", "ugc-manager", "pagina-vendas-gestao", "abordados"].forEach(function (v) {
       var el = document.getElementById("badge-" + v);
       if (el) el.textContent = leadsForView(v).length;
     });
