@@ -337,6 +337,11 @@
     video.loop = true;
     video.playsInline = true;
     video.preload = "metadata";
+    // Nasce mudo: ajuda o navegador a renderizar o frame de prévia (e
+    // evita qualquer bloqueio de política de autoplay). O som volta no
+    // primeiro clique, quando a pessoa decide assistir de verdade (ver
+    // handler abaixo) — depoimento é pra ouvir.
+    video.muted = true;
     video.setAttribute("controlsList", "nodownload nofullscreen noremoteplayback");
     video.disablePictureInPicture = true;
     var slot = video.closest(".video-slot");
@@ -354,7 +359,8 @@
       slot.addEventListener("click", function () {
         if (video.hasAttribute("controls")) return;
         video.setAttribute("controls", "");
-        video.play().catch(function () {}); // navegador pode recusar autoplay com som — ignora silenciosamente
+        video.muted = false; // clique deliberado = quer assistir com som
+        video.play().catch(function () {}); // navegador pode recusar — ignora silenciosamente
       });
     }
 
@@ -380,13 +386,18 @@
      pelos anexos de depoimento — URL fixa por slot, sem precisar
      perguntar nada ao servidor.
      ========================================================================== */
+  // O "#t=0.1" no fim de cada URL é um fragmento de mídia: manda o
+  // navegador buscar/decodificar o frame em 0,1s e pintar ele como capa
+  // (poster) automática, sem esperar o play — sem isso, com preload=
+  // "metadata" o <video> fica preto até alguém clicar. Depende do
+  // servidor aceitar Range requests (o Storage do Supabase aceita).
   var CASES_VIDEO_URLS = {
-    "case-1": "https://baqdpatmwjxglmrpjfan.supabase.co/storage/v1/object/public/depoimentos-uploads/case-churrascaria.mp4",
-    "case-2": "https://baqdpatmwjxglmrpjfan.supabase.co/storage/v1/object/public/depoimentos-uploads/case-restaurante.mp4",
-    "case-3": "https://baqdpatmwjxglmrpjfan.supabase.co/storage/v1/object/public/depoimentos-uploads/case-loja-de-roupa.mp4",
-    "case-4": "https://baqdpatmwjxglmrpjfan.supabase.co/storage/v1/object/public/depoimentos-uploads/case-sorveteria-1.mp4",
-    "case-5": "https://baqdpatmwjxglmrpjfan.supabase.co/storage/v1/object/public/depoimentos-uploads/case-pousada.mp4",
-    "case-6": "https://baqdpatmwjxglmrpjfan.supabase.co/storage/v1/object/public/depoimentos-uploads/case-sorveteria-2.mp4",
+    "case-1": "https://baqdpatmwjxglmrpjfan.supabase.co/storage/v1/object/public/depoimentos-uploads/case-churrascaria.mp4#t=0.1",
+    "case-2": "https://baqdpatmwjxglmrpjfan.supabase.co/storage/v1/object/public/depoimentos-uploads/case-restaurante.mp4#t=0.1",
+    "case-3": "https://baqdpatmwjxglmrpjfan.supabase.co/storage/v1/object/public/depoimentos-uploads/case-loja-de-roupa.mp4#t=0.1",
+    "case-4": "https://baqdpatmwjxglmrpjfan.supabase.co/storage/v1/object/public/depoimentos-uploads/case-sorveteria-1.mp4#t=0.1",
+    "case-5": "https://baqdpatmwjxglmrpjfan.supabase.co/storage/v1/object/public/depoimentos-uploads/case-pousada.mp4#t=0.1",
+    "case-6": "https://baqdpatmwjxglmrpjfan.supabase.co/storage/v1/object/public/depoimentos-uploads/case-sorveteria-2.mp4#t=0.1",
   };
 
   function initCasesVideos() {
