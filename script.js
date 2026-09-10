@@ -333,6 +333,21 @@
   // primeiro clique; o botão de play desenhado em CSS (.video-slot__play)
   // faz esse papel visual enquanto isso.
   function applyCleanVideoAttrs(video, url) {
+    // Retry de carregamento: se o <video> falhar (ex.: a página abriu
+    // enquanto o Storage do Supabase estava fora do ar durante a pausa
+    // do projeto — o erro "gruda" e não se recupera sozinho nem quando o
+    // Supabase volta), refaz a requisição do zero com video.load(),
+    // algumas vezes, com um respiro crescente entre as tentativas.
+    // Listener registrado ANTES de setar o src pra não perder o 1º erro.
+    var reloadDelays = [1500, 4000, 8000]; // 3 tentativas; depois desiste
+    var reloadTries = 0;
+    video.addEventListener("error", function () {
+      if (reloadTries >= reloadDelays.length) return;
+      window.setTimeout(function () {
+        try { video.load(); } catch (e) { /* elemento pode ter saído do DOM */ }
+      }, reloadDelays[reloadTries++]);
+    });
+
     video.src = url;
     video.loop = true;
     video.playsInline = true;
