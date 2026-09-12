@@ -407,12 +407,12 @@
   // "metadata" o <video> fica preto até alguém clicar. Depende do
   // servidor aceitar Range requests (o Storage do Supabase aceita).
   var CASES_VIDEO_URLS = {
-    "case-1": "https://baqdpatmwjxglmrpjfan.supabase.co/storage/v1/object/public/depoimentos-uploads/case-churrascaria.mp4#t=0.1",
-    "case-2": "https://baqdpatmwjxglmrpjfan.supabase.co/storage/v1/object/public/depoimentos-uploads/case-restaurante.mp4#t=0.1",
-    "case-3": "https://baqdpatmwjxglmrpjfan.supabase.co/storage/v1/object/public/depoimentos-uploads/case-loja-de-roupa.mp4#t=0.1",
-    "case-4": "https://baqdpatmwjxglmrpjfan.supabase.co/storage/v1/object/public/depoimentos-uploads/case-sorveteria-1.mp4#t=0.1",
-    "case-5": "https://baqdpatmwjxglmrpjfan.supabase.co/storage/v1/object/public/depoimentos-uploads/case-pousada.mp4#t=0.1",
-    "case-6": "https://baqdpatmwjxglmrpjfan.supabase.co/storage/v1/object/public/depoimentos-uploads/case-sorveteria-2.mp4#t=0.1",
+    "case-1": "https://epctnbqokxdnbisernrf.supabase.co/storage/v1/object/public/depoimentos-uploads/case-churrascaria.mp4#t=0.1",
+    "case-2": "https://epctnbqokxdnbisernrf.supabase.co/storage/v1/object/public/depoimentos-uploads/case-restaurante.mp4#t=0.1",
+    "case-3": "https://epctnbqokxdnbisernrf.supabase.co/storage/v1/object/public/depoimentos-uploads/case-loja-de-roupa.mp4#t=0.1",
+    "case-4": "https://epctnbqokxdnbisernrf.supabase.co/storage/v1/object/public/depoimentos-uploads/case-sorveteria-1.mp4#t=0.1",
+    "case-5": "https://epctnbqokxdnbisernrf.supabase.co/storage/v1/object/public/depoimentos-uploads/case-pousada.mp4#t=0.1",
+    "case-6": "https://epctnbqokxdnbisernrf.supabase.co/storage/v1/object/public/depoimentos-uploads/case-sorveteria-2.mp4#t=0.1",
   };
 
   function initCasesVideos() {
