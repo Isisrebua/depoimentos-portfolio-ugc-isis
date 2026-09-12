@@ -1,3 +1,9 @@
+-- ⚠️ OBSOLETO — NÃO RODE ISTO. Criava a tabela "depoimentos" (nome
+-- genérico) direto, o que colidiu com uma tabela "depoimentos" de OUTRA
+-- ferramenta sua já existente num projeto Supabase compartilhado. Use
+-- supabase/setup-new-project.sql em vez disso — cria "ugc_depoimentos"
+-- (prefixado, sem colisão). Arquivo mantido só como histórico.
+--
 -- Documentação da tabela "depoimentos" REALMENTE em uso no Supabase
 -- (colunas em português — confirmadas ao vivo, diferentes da primeira
 -- versão deste arquivo). Serve como referência/backup pra recriar a

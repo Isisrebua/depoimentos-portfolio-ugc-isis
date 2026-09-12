@@ -1,3 +1,10 @@
+-- ⚠️ OBSOLETO — NÃO RODE ISTO. Criava a tabela "leads" (nome genérico)
+-- direto, o que colidiu com uma tabela "leads" de OUTRA ferramenta sua já
+-- existente no projeto Supabase atual e quase expôs os dados dela
+-- publicamente (ver git log). Use supabase/setup-new-project.sql em vez
+-- disso — cria "ugc_leads"/"ugc_depoimentos" (prefixados, sem colisão).
+-- Arquivo mantido só como histórico de como a tabela nasceu.
+--
 -- Passo manual único, no SQL Editor do Supabase — necessário pra migração
 -- pra Vercel (Vercel não tem disco gravável fora de /tmp, então leads.json
 -- e uploads/ locais deixaram de existir; ver README.md e lib/leads.js).
