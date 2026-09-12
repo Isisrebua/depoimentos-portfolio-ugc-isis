@@ -27,6 +27,7 @@ html, body{
   margin: 0;
   padding: 0;
   width: 100%;
+  max-width: 100vw;
   overflow-x: hidden;
   background-color: #bfcfcc;
 }
@@ -208,6 +209,19 @@ video::-webkit-media-controls-enclosure{
 }
 .price-cta:hover, .price-cta:focus-visible{
   transform: translateY(-2px);
+}
+/* Em telas estreitas, o texto ("Solicite orçamento") não cabe mais entre
+   o "left:71.16%" (ver index.html) e a borda direita — o botão vazava
+   pra fora da tela e criava rolagem horizontal na página inteira. Um
+   "right" força a largura a ser só o espaço realmente disponível (com
+   quebra de linha se precisar), em vez do tamanho do texto inteiro. */
+@media (max-width: 600px){
+  .price-cta{
+    right: 4%;
+    white-space: normal;
+    text-align: center;
+    line-height: 1.2;
+  }
 }
 
 /* ---------- Selo de métricas (Cases de Sucesso) ---------------------------
@@ -1039,6 +1053,8 @@ video::-webkit-media-controls-enclosure{
 .lead-form__field input,
 .lead-form__field select,
 .lead-form__field textarea{
+  width: 100%;
+  min-width: 0; /* sem isso, um <select> pode impor a largura da opção de texto mais longa como mínimo, estourando o container */
   font-family: "Poppins", "Segoe UI", sans-serif;
   font-size: .92rem;
   color: #333;
@@ -1136,14 +1152,20 @@ video::-webkit-media-controls-enclosure{
 }
 .final-cta__form{
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  /* minmax(0, 1fr) em vez de só "1fr": uma coluna de grid sem esse "0"
+     tem largura mínima implícita = tamanho do conteúdo (max-content) —
+     se algum <select> tiver uma opção de texto longo, a coluna (e o
+     formulário inteiro) fica largo o bastante pra caber esse texto sem
+     quebrar, estourando a tela em vez de encolher o <select>. Era a
+     causa real da barra de rolagem horizontal em telas estreitas. */
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 14px 20px;
 }
 .final-cta__form .lead-form__field--full,
 .final-cta__form .lead-form__submit{ grid-column: 1 / -1; }
 @media (max-width: 640px){
   .final-cta__container{ padding: 32px 22px; }
-  .final-cta__form{ grid-template-columns: 1fr; }
+  .final-cta__form{ grid-template-columns: minmax(0, 1fr); }
 }
 
 @media (prefers-reduced-motion: reduce){
