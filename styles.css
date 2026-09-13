@@ -24,11 +24,11 @@ html{ scroll-behavior: smooth; }
    Fundo do body/html no mesmo sálvia das seções pra não sobrar nenhuma
    faixa de cor diferente visível em nenhum momento (scroll, resize). */
 html, body{
-  margin: 0;
-  padding: 0;
-  width: 100%;
-  max-width: 100%;
-  overflow-x: hidden;
+  margin: 0 !important;
+  padding: 0 !important;
+  width: 100% !important;
+  max-width: 100% !important; /* NUNCA 100vw — inclui a barra de rolagem e reintroduz o overflow (ver git log) */
+  overflow-x: hidden !important;
   background-color: #bfcfcc;
 }
 
