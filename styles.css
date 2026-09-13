@@ -32,6 +32,18 @@ html, body{
   background-color: #bfcfcc;
 }
 
+/* Rede de segurança genérica pra qualquer <img> sem classe própria
+   (badges de marca, logo de depoimento etc.) — nunca deixa uma imagem
+   sem width/height CSS definido estourar a largura do container. Não
+   conflita com .section (full-bleed de propósito, ver acima): ambos
+   pedem 100% da largura, então max-width:100% aqui é redundante pra
+   elas, não restritivo. */
+img{
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
 .page{
   width: 100%;
   background: #bfcfcc;
