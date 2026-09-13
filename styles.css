@@ -15,7 +15,17 @@
 
 *, *::before, *::after{ box-sizing: border-box; }
 
-html{ scroll-behavior: smooth; }
+/* height/overflow-y do html,body abaixo: nenhum dos dois tinha "height"
+   definida antes disso (confirmado — só background-color, margin,
+   padding, width) então isso não muda comportamento nenhum hoje; é só
+   reforço explícito pra deixar claro que SÓ o navegador controla o
+   scroll vertical — nenhum wrapper interno (#app/#root/.main-wrapper)
+   existe neste projeto pra competir com isso, é HTML/CSS estático puro. */
+html{
+  scroll-behavior: smooth;
+  height: auto !important;
+  overflow-y: scroll !important; /* reserva a barra sempre — evita "pulo" de layout quando o conteudo cruza a altura da tela */
+}
 
 /* Full-bleed de propósito: sem max-width, cada prancheta estica até a
    borda da tela em qualquer largura de monitor (em telas acima de
@@ -30,6 +40,12 @@ html, body{
   max-width: 100% !important; /* NUNCA 100vw — inclui a barra de rolagem e reintroduz o overflow (ver git log) */
   overflow-x: hidden !important;
   background-color: #bfcfcc;
+}
+
+body{
+  min-height: 100vh;
+  height: auto !important;
+  overflow-y: visible !important;
 }
 
 /* Rede de segurança genérica pra qualquer <img> sem classe própria
