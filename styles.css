@@ -25,6 +25,25 @@ html{
   scroll-behavior: smooth;
   height: auto !important;
   overflow-y: scroll !important; /* reserva a barra sempre — evita "pulo" de layout quando o conteudo cruza a altura da tela */
+  /* Chrome/Safari mobile aumentam sozinhos o tamanho de textos pequenos
+     em blocos "estreitos" (heurística de leitura chamada font boosting/
+     text autosizing) — só acontece em APARELHO REAL, nenhuma emulação
+     de DevTools reproduz isso. É a causa mais provável de texto
+     sobrepondo texto em telas pequenas de verdade mesmo quando tudo
+     parece certo no emulador: trava o tamanho exatamente no que o CSS
+     pede, sem esse ajuste automático. */
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+/* Em telas de celular de verdade (CPU/GPU bem mais fracas que um desktop
+   rodando DevTools), scroll-behavior:smooth + varios IntersectionObserver
+   (.will-reveal, video lazy-load, contador de stats) rodando junto pode
+   engasgar de um jeito que nunca aparece no emulador. Desliga o smooth
+   scroll do CSS só abaixo de 768px — o scroll em si continua normal,
+   só para de forçar a interpolação suave nativa por cima de tudo isso. */
+@media (max-width: 768px){
+  html{ scroll-behavior: auto; }
 }
 
 /* Full-bleed de propósito: sem max-width, cada prancheta estica até a
