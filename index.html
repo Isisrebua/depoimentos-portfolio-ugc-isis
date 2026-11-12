@@ -1051,7 +1051,7 @@ document.getElementById('cc').addEventListener('click',e=>{
 })();
 
 // 5 cases
-const cases=[['Churrascaria','130 mil','130k'],['Restaurante','120 mil','120k'],['Loja de roupa','262 mil','262k'],['Sorveteria','110 mil','110k'],['Pousada','105 mil','105k'],['Sorveteria','120 mil','120k']];
+const cases=[['Churrascaria','130 mil','130k'],['Restaurante','120 mil','120k'],['Loja de roupa','279 mil','279k'],['Sorveteria','110 mil','110k'],['Pousada','105 mil','105k'],['Sorveteria','120 mil','120k']];
 const casesEn={'Churrascaria':'Steakhouse','Restaurante':'Restaurant','Loja de roupa':'Clothing store','Sorveteria':'Ice cream shop','Pousada':'Guesthouse'};
 function renderCases(){
   const num=v=>parseInt(v);const idx=cases.map((c,i)=>i).sort((x,y)=>num(cases[y][1])-num(cases[x][1]));const max=num(cases[idx[0]][1]);
