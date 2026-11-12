@@ -747,6 +747,7 @@ section{padding-block:72px 24px;scroll-margin-top:40px}
 .lightbox .vid{width:min(320px,72vw);background:#000}
 .lightbox .vid::after{display:none}
 .lightbox .vid video{width:100%;height:100%;object-fit:contain;display:block}
+.lightbox .vid iframe{width:100%;height:100%;border:0;display:block}
 .lightbox .photo{max-height:80vh;max-width:90vw;border-radius:22px;box-shadow:var(--shadow)}
 .lightbox .x{position:absolute;top:calc(16px + env(safe-area-inset-top,0px));right:max(16px,env(safe-area-inset-right,0px));width:40px;height:40px;border-radius:50%;border:0;background:#fff;font-size:20px}
 
@@ -1188,9 +1189,15 @@ const VIDEOS={
   cases:['churrascaria','restaurante','loja-de-roupa','sorveteria-1','pousada','sorveteria-2'].map(n=>SB+'case-'+n+'.mp4'),
   nichos:{fitness:[],app:[],locais:[],moda:[],beleza:[],pet:[]}
 };
-const videoBox=(url,poster)=>url
-  ?`<div class="vid"><video src="${url}" poster="${poster}" controls autoplay playsinline preload="auto" controlsList="nodownload noremoteplayback" disablepictureinpicture></video></div>`
-  :`<div class="vid"><img src="${poster}" alt=""></div>`;
+// aceita link do YouTube (watch, shorts, youtu.be, embed) ou o ID de 11 caracteres
+const ytId=u=>{const m=String(u||'').match(/(?:youtu\.be\/|youtube(?:-nocookie)?\.com\/(?:watch\?(?:.*&)?v=|shorts\/|embed\/|live\/))([\w-]{11})/)||String(u||'').match(/^([\w-]{11})$/);return m?m[1]:null};
+const videoBox=(url,poster)=>{
+  const id=ytId(url);
+  if(id)return `<div class="vid"><iframe src="https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0&playsinline=1&fs=0&iv_load_policy=3" title="vídeo" allow="autoplay; encrypted-media; picture-in-picture" referrerpolicy="strict-origin-when-cross-origin"></iframe></div>`;
+  return url
+    ?`<div class="vid"><video src="${url}" poster="${poster}" controls autoplay playsinline preload="auto" controlsList="nodownload noremoteplayback" disablepictureinpicture></video></div>`
+    :`<div class="vid"><img src="${poster}" alt=""></div>`;
+};
 document.addEventListener('click',e=>{
   const c=e.target.closest('[data-case]');if(c){const i=+c.dataset.case;openLB(videoBox(VIDEOS.cases[i],A.cases[i]));return}
   const v=e.target.closest('.vcard');if(v){const it=window._vids[+v.dataset.src];openLB(videoBox(it.video,it.src));return}
