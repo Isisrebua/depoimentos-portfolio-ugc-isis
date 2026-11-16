@@ -1187,7 +1187,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!lb.hidden)closeLB(
 const SB='https://epctnbqokxdnbisernrf.supabase.co/storage/v1/object/public/depoimentos-uploads/';
 const VIDEOS={
   cases:['churrascaria','restaurante','loja-de-roupa','sorveteria-1','pousada','sorveteria-2'].map(n=>SB+'case-'+n+'.mp4'),
-  nichos:{fitness:[1,2,3,4,5,6].map(n=>SB+'nicho-fitness-0'+n+'.mp4'),app:[],locais:[],moda:[],beleza:[],pet:[]}
+  nichos:{fitness:[1,2,3,4,5,6].map(n=>SB+'nicho-fitness-0'+n+'.mp4'),app:[1,2,3,4,5,6,7].map(n=>SB+'nicho-app-0'+n+'.mp4'),locais:[],moda:[],beleza:[],pet:[]}
 };
 // aceita link do YouTube (watch, shorts, youtu.be, embed) ou o ID de 11 caracteres
 const ytId=u=>{const m=String(u||'').match(/(?:youtu\.be\/|youtube(?:-nocookie)?\.com\/(?:watch\?(?:.*&)?v=|shorts\/|embed\/|live\/))([\w-]{11})/)||String(u||'').match(/^([\w-]{11})$/);return m?m[1]:null};
