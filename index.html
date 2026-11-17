@@ -745,6 +745,7 @@ section{padding-block:72px 24px;scroll-margin-top:40px}
 .lightbox[hidden]{display:none!important}
 .lightbox .inner{max-width:min(420px,90vw);max-height:86vh;display:grid;gap:12px;justify-items:center}
 .lightbox .vid{width:min(320px,72vw);background:#000}
+@media (pointer:coarse){.lightbox .inner{max-width:92vw}.lightbox .vid{width:min(92vw,calc(86vh*.5625))}}
 .lightbox .vid::after{display:none}
 .lightbox .vid video{width:100%;height:100%;object-fit:contain;display:block}
 .lightbox .vid iframe{width:100%;height:100%;border:0;display:block}
@@ -1179,7 +1180,11 @@ document.querySelectorAll('[data-copy]').forEach(b=>b.addEventListener('click',a
 
 // lightbox
 const lb=document.getElementById('lb'),lbi=document.getElementById('lbInner');
-function openLB(html){lbi.innerHTML=html;lb.hidden=false}
+function openLB(html){lbi.innerHTML=html;lb.hidden=false;
+  const v=lbi.querySelector('video');
+  if(v){ // play explícito dentro do toque: celulares bloqueiam o autoplay com som; se bloquear, toca mudo (o botão de som fica nos controles)
+    const p=v.play();if(p&&p.catch)p.catch(()=>{v.muted=true;const q=v.play();if(q&&q.catch)q.catch(()=>{})});
+  }}
 function closeLB(){lb.hidden=true;lbi.innerHTML=''} // esvazia para parar o vídeo que estiver tocando
 lb.addEventListener('click',e=>{if(e.target===lb||e.target.closest('.x'))closeLB()});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!lb.hidden)closeLB()});
