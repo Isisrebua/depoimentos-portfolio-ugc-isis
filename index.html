@@ -1066,7 +1066,7 @@ function renderCases(){
 const nichos=[
  {k:'fitness',pt:'Fitness e bem-estar',en:'Fitness & wellness',v:[['Academia','Experiência + foco no turismo'],['Pré-treino','Storytelling'],['Whey','Problema vs solução'],['Barrinha de proteína','Lifestyle + produto'],['Consultoria','Formato série de vídeos'],['Consultoria','Formato série de vídeos']]},
  {k:'app',pt:'App e tech',en:'Apps & tech',v:[['Microfone','Criativo'],['Aplicativo','Informativo'],['Tripé','Review + venda'],['Aplicativo','Indicação'],['ManyChat','Indicação'],['MEI Digital','Informativo'],['iPad','Review']]},
- {k:'locais',pt:'Locais e serviços',en:'Places & services',v:[['Nail designer','Problema vs solução'],['Hamburgueria','Delivery'],['Pousada','Experiência'],['Nail designer','Demonstrativo'],['Hamburgueria','Delivery']]},
+ {k:'locais',pt:'Locais e serviços',en:'Places & services',v:[['Salão de beleza','Evento especial/transformação'],['Dia dos namorados',''],['Hamburgueria','Delivery'],['Nail designer','Demonstrativo'],['Pousada','Experiência']]},
  {k:'moda',pt:'Moda',en:'Fashion',v:[['Salto alto','Review'],['Moda fitness','Grupo de promoção'],['Moda praiana','Campanha final de ano'],['Choker','Ads · educar sobre o produto'],['Relógio','Campanha site'],['Corset','Ads · venda']]},
  {k:'beleza',pt:'Beleza',en:'Beauty',v:[['Skincare','Tiktok ads · lofi'],['Haircare','Problema vs solução'],['Skincare','Tiktok ads · lofi'],['Babyliss','Educacional']]},
  {k:'pet',pt:'Pet',en:'Pet',v:[['Lançamento Catarina','Tudo sobre a nova pet da sua marca'],['Comida','Problema vs solução'],['Acessório','Tiktok ads · lofi'],['Loja','Educacional']]}
@@ -1187,7 +1187,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!lb.hidden)closeLB(
 const SB='https://epctnbqokxdnbisernrf.supabase.co/storage/v1/object/public/depoimentos-uploads/';
 const VIDEOS={
   cases:['churrascaria','restaurante','loja-de-roupa','sorveteria-1','pousada','sorveteria-2'].map(n=>SB+'case-'+n+'.mp4'),
-  nichos:{fitness:[1,2,3,4,5,6].map(n=>SB+'nicho-fitness-0'+n+'.mp4'),app:[1,2,3,4,5,6,7].map(n=>SB+'nicho-app-0'+n+'.mp4'),locais:[],moda:[],beleza:[],pet:[]}
+  nichos:{fitness:[1,2,3,4,5,6].map(n=>SB+'nicho-fitness-0'+n+'.mp4'),app:[1,2,3,4,5,6,7].map(n=>SB+'nicho-app-0'+n+'.mp4'),locais:[1,2,3,4,5].map(n=>SB+'nicho-locais-0'+n+'.mp4'),moda:[],beleza:[],pet:[]}
 };
 // aceita link do YouTube (watch, shorts, youtu.be, embed) ou o ID de 11 caracteres
 const ytId=u=>{const m=String(u||'').match(/(?:youtu\.be\/|youtube(?:-nocookie)?\.com\/(?:watch\?(?:.*&)?v=|shorts\/|embed\/|live\/))([\w-]{11})/)||String(u||'').match(/^([\w-]{11})$/);return m?m[1]:null};
