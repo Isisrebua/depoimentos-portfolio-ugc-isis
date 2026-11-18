@@ -1065,14 +1065,14 @@ function renderCases(){
 
 // 6 nichos
 const nichos=[
- {k:'locais',pt:'Locais e serviços',en:'Places & services',v:[['Salão de beleza','Evento especial/transformação'],['Dia dos namorados',''],['Hamburgueria','Delivery'],['Nail designer','Demonstrativo'],['Pousada','Experiência']]},
- {k:'fitness',pt:'Fitness e bem-estar',en:'Fitness & wellness',v:[['Academia','Experiência + foco no turismo'],['Garrafa de água',''],['Pré-treino','Storytelling'],['Whey','Problema vs solução'],['Barrinha de proteína','Lifestyle + produto'],['Consultoria','Formato série de vídeos'],['Consultoria','Formato série de vídeos']]},
+ {k:'fitness',pt:'Fitness e bem-estar',en:'Fitness & wellness',v:[['Academia','Experiência + foco no turismo'],['Garrafa de água','Tráfego pago'],['Pré-treino','Storytelling'],['Whey','Problema vs solução'],['Barrinha de proteína','Lifestyle + produto'],['Consultoria','Formato série de vídeos'],['Consultoria','Formato série de vídeos']]},
  {k:'app',pt:'App e tech',en:'Apps & tech',v:[['Microfone','Criativo'],['Aplicativo','Informativo'],['Tripé','Review + venda'],['Aplicativo','Indicação'],['ManyChat','Indicação'],['MEI Digital','Informativo'],['iPad','Review']]},
+ {k:'locais',pt:'Locais e serviços',en:'Places & services',v:[['Salão de beleza','Evento especial/transformação'],['Dia dos namorados','Campanha data sazonal'],['Hamburgueria','Delivery'],['Nail designer','Demonstrativo'],['Pousada','Experiência']]},
  {k:'moda',pt:'Moda',en:'Fashion',v:[['Moda praiana','Campanha final de ano'],['Relógio','Campanha site'],['Salto alto','Review'],['Moda fitness','Grupo de promoção'],['Choker','Ads · educar sobre o produto'],['Corset','Ads · venda']]},
  {k:'beleza',pt:'Beleza',en:'Beauty',v:[['Skincare','Tiktok ads · lofi'],['Haircare','Problema vs solução'],['Skincare','Tiktok ads · lofi'],['Babyliss','Educacional']]},
  {k:'pet',pt:'Pet',en:'Pet',v:[['Lançamento Catarina','Tudo sobre a nova pet da sua marca'],['Comida','Problema vs solução'],['Acessório','Tiktok ads · lofi'],['Loja','Educacional']]}
 ];
-let curN='locais';
+let curN='fitness';
 function allVids(){return nichos.flatMap(n=>n.v.map((v,i)=>({t:v[0],f:v[1],src:A.nichos[n.k][i],video:(VIDEOS.nichos[n.k]||[])[i]||null,n:n})))}
 function renderFolders(){
   const total=allVids().length;
