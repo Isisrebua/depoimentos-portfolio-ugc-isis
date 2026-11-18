@@ -622,6 +622,11 @@ section{padding-block:72px 24px;scroll-margin-top:40px}
 .pcol{display:grid;gap:14px;min-width:0}
 .print{display:block;width:100%;padding:0;border:0;background:#fff;border-radius:18px;overflow:hidden;box-shadow:var(--shadow);cursor:zoom-in;transition:transform .3s}
 .print:hover{transform:translateY(-3px)}
+.pvid{position:relative;display:block;width:100%;padding:0;border:0;background:#fff;border-radius:18px;overflow:hidden;box-shadow:var(--shadow);cursor:pointer}
+.pvid video{display:block;width:100%;height:auto;aspect-ratio:886/186;background:#fff;pointer-events:none}
+.pvid .cb-play{position:absolute;left:50%;top:50%;translate:-50% -50%;width:38px;height:38px;background:rgba(0,0,0,.42);transition:opacity .2s}
+.pvid .cb-play::after{border-left-width:11px;border-top-width:7px;border-bottom-width:7px;margin-left:3px}
+.pvid.on .cb-play{opacity:0}
 .print img{display:block;width:100%;height:auto}
 .approved{margin-top:16px;display:grid;gap:10px}
 .wa{border-radius:18px;padding:12px 14px;max-width:420px}
@@ -906,13 +911,14 @@ footer{padding-block:40px 10px;font-size:12px;color:var(--ink-soft);text-align:c
     <div>
       <div class="prints">
         <div class="pcol">
-          <button type="button" class="print" data-print="1"><img src="assets/feedbacks/fb-1.png" alt="Print de feedback de uma marca parceira no WhatsApp" loading="lazy"></button>
-          <button type="button" class="print" data-print="2"><img src="assets/feedbacks/fb-2.png" alt="Print de feedback de uma marca parceira no WhatsApp" loading="lazy"></button>
+          <button type="button" class="print" data-print="1"><img src="assets/feedbacks/fb-1.jpg" alt="Print de feedback de uma marca parceira no WhatsApp" loading="lazy"></button>
+          <button type="button" class="print" data-print="2"><img src="assets/feedbacks/fb-2.jpg" alt="Print de feedback de uma marca parceira no WhatsApp" loading="lazy"></button>
+          <button type="button" class="pvid" id="audioFb" aria-label="Ouvir feedback em áudio de uma marca parceira"><video playsinline preload="metadata" poster="assets/feedbacks/audio.jpg" src="assets/feedbacks/audio.mp4"></video><span class="cb-play"></span></button>
         </div>
         <div class="pcol">
-          <button type="button" class="print" data-print="3"><img src="assets/feedbacks/fb-3.png" alt="Print de feedback de uma marca parceira no WhatsApp" loading="lazy"></button>
-          <button type="button" class="print" data-print="4"><img src="assets/feedbacks/fb-4.png" alt="Print de feedback de uma marca parceira no WhatsApp" loading="lazy"></button>
-          <button type="button" class="print" data-print="5"><img src="assets/feedbacks/fb-5.png" alt="Print de feedback de uma marca parceira no WhatsApp" loading="lazy"></button>
+          <button type="button" class="print" data-print="3"><img src="assets/feedbacks/fb-3.jpg" alt="Print de feedback de uma marca parceira no WhatsApp" loading="lazy"></button>
+          <button type="button" class="print" data-print="4"><img src="assets/feedbacks/fb-4.jpg" alt="Print de feedback de uma marca parceira no WhatsApp" loading="lazy"></button>
+          <button type="button" class="print" data-print="5"><img src="assets/feedbacks/fb-5.jpg" alt="Print de feedback de uma marca parceira no WhatsApp" loading="lazy"></button>
         </div>
       </div>
       <div class="approved">
@@ -1216,6 +1222,10 @@ const videoBox=(url,poster)=>{
     ?`<div class="vid"><video src="${url}" poster="${poster}" controls autoplay playsinline preload="auto" controlsList="nodownload noremoteplayback" disablepictureinpicture></video></div>`
     :`<div class="vid"><img src="${poster}" alt=""></div>`;
 };
+(function(){const b=document.getElementById('audioFb');if(!b)return;const v=b.querySelector('video');
+  b.addEventListener('click',()=>{if(v.paused){const p=v.play();if(p&&p.catch)p.catch(()=>{});}else v.pause()});
+  v.addEventListener('play',()=>b.classList.add('on'));v.addEventListener('pause',()=>b.classList.remove('on'));
+  v.addEventListener('ended',()=>{b.classList.remove('on');v.currentTime=0;v.load()})})();
 document.addEventListener('click',e=>{
   const cb=e.target.closest('[data-combo]');if(cb){const k=['topo','meio','fundo'].indexOf(cb.dataset.combo);openLB(videoBox(VIDEOS.combo[k],cb.querySelector('img').getAttribute('src')));return}
   const c=e.target.closest('[data-case]');if(c){const i=+c.dataset.case;openLB(videoBox(VIDEOS.cases[i],A.cases[i]));return}
