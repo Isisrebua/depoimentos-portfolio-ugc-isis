@@ -520,6 +520,9 @@ section{padding-block:72px 24px;scroll-margin-top:40px}
 .pk-info h3{margin:0;font-family:var(--display);font-stretch:82%;font-weight:800;font-size:clamp(22px,2.4vw,28px);letter-spacing:-.01em;color:var(--rust)}
 .pk-info ul{margin:0;padding:0;list-style:none;display:grid;gap:8px;justify-items:center}
 .pk-info li{font-size:16px;color:var(--ink);display:flex;gap:10px;align-items:center}
+.brl-note{margin:10px 0 0;font-size:14px;font-weight:600;color:var(--ink-soft);background:rgba(168,71,12,.1);border-radius:999px;padding:6px 14px;display:inline-block}
+.brl-note:empty{display:none}
+.ads>.brl-note:not(:empty){display:table;margin:-12px auto 22px}
 .pk-info li::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--rust);flex:none}
 
 
@@ -867,11 +870,12 @@ footer{padding-block:40px 10px;font-size:12px;color:var(--ink-soft);text-align:c
 
   <div class="ads">
     <div class="ads-head"><span class="eyebrow2" data-en="Paid traffic">Tráfego pago</span><h3 class="t-serif t-rust t-sm" data-en="Creatives that <em>sell.</em>">Criativos que <em>vendem.</em></h3></div>
+    <p class="brl-note" data-en="All values are in Brazilian reais (BRL, R$)."></p>
     <div class="ads-grid">
       <div class="ads-card">
         <div class="ads-top"><span class="plat">Meta Ads</span></div>
         <div class="ads-big"><b>606</b><span data-en="website purchases">compras no site</span></div>
-        <div class="ads-row"><div><b>R$ 3,71</b><span data-en="cost per purchase">custo por compra</span></div><div><b>R$ 48,9 mil</b><span data-en="in sales">em vendas</span></div><div><b>21x</b><span data-en="return on spend">retorno sobre o investido</span></div></div>
+        <div class="ads-row"><div><b data-en="R$ 3.71">R$ 3,71</b><span data-en="cost per purchase">custo por compra</span></div><div><b data-en="R$ 48.9k">R$ 48,9 mil</b><span data-en="in sales">em vendas</span></div><div><b>21x</b><span data-en="return on spend">retorno sobre o investido</span></div></div>
         <button type="button" class="ads-print" data-ad="meta"><img id="adMeta" alt="Print do Gerenciador de Anúncios da Meta"></button>
       </div>
       <div class="ads-card">
@@ -954,8 +958,8 @@ footer{padding-block:40px 10px;font-size:12px;color:var(--ink-soft);text-align:c
 
 <!-- 10 pacotes -->
 <section id="pacotes"><div class="wrap">
-  <div class="pk-head"><span class="eyebrow2" data-en="Investment">Investimento</span><h2 class="t-serif t-rust" data-en="Packages <em>with ads.</em>">Pacotes <em>com ads.</em></h2></div>
-  <div class="pc1"><div class="c"><span class="nm">Bronze</span><span class="pr">R$ 390</span><span class="sv" data-en="Save R$160">Economize R$ 160</span><ul><li>1 vídeo UGC</li><li>2 fotos</li><li>Roteiro</li><li>Gravação</li><li>Edição</li><li>Teste A/B</li><li>3 meses em Ads</li></ul><div class="cta"><a class="wa-link" data-msg="Oi Isis! Vim pelo seu portfólio e quero o pacote Bronze 🙂" href="#" target="_blank" rel="noopener" data-en="I want this one">Quero esse</a></div></div><div class="c"><span class="nm">Silver</span><span class="pr">R$ 637</span><span class="sv" data-en="Save R$388">Economize R$ 388</span><ul><li>2 vídeos UGC</li><li>3 fotos</li><li>Roteiro</li><li>Gravação</li><li>Edição</li><li>3 meses em Ads</li></ul><div class="cta"><a class="wa-link" data-msg="Oi Isis! Vim pelo seu portfólio e quero o pacote Silver 🙂" href="#" target="_blank" rel="noopener" data-en="I want this one">Quero esse</a></div></div><div class="c"><span class="nm">Gold</span><span class="pr">R$ 957</span><span class="sv" data-en="Save R$828">Economize R$ 828</span><ul><li>3 vídeos UGC</li><li>3 fotos</li><li>Roteiro</li><li>Gravação</li><li>Edição</li><li>6 meses em Ads</li></ul><div class="cta"><a class="wa-link" data-msg="Oi Isis! Vim pelo seu portfólio e quero o pacote Gold 🙂" href="#" target="_blank" rel="noopener" data-en="I want this one">Quero esse</a></div></div><div class="c hl"><span class="nm">Mensal</span><span class="pr">R$ 1.997</span><span class="sv" data-en="3 months minimum">Mínimo 3 meses</span><ul><li>8 vídeos UGC</li><li>3 fotos</li><li>Roteiro</li><li>Gravação</li><li>Edição</li><li>Uso em Ads</li></ul><div class="cta"><a class="wa-link" data-msg="Oi Isis! Vim pelo seu portfólio e quero o pacote Mensal 🙂" href="#" target="_blank" rel="noopener" data-en="I want this one">Quero esse</a></div></div></div>
+  <div class="pk-head"><span class="eyebrow2" data-en="Investment">Investimento</span><h2 class="t-serif t-rust" data-en="Packages <em>with ads.</em>">Pacotes <em>com ads.</em></h2><p class="brl-note" data-en="All prices are in Brazilian reais (BRL, R$)."></p></div>
+  <div class="pc1"><div class="c"><span class="nm">Bronze</span><span class="pr">R$ 390</span><span class="sv" data-en="Save R$160">Economize R$ 160</span><ul><li data-en="1 UGC video">1 vídeo UGC</li><li data-en="2 photos">2 fotos</li><li data-en="Script">Roteiro</li><li data-en="Filming">Gravação</li><li data-en="Editing">Edição</li><li data-en="A/B test">Teste A/B</li><li data-en="3 months of Ads">3 meses em Ads</li></ul><div class="cta"><a class="wa-link" data-msg="Oi Isis! Vim pelo seu portfólio e quero o pacote Bronze 🙂" href="#" target="_blank" rel="noopener" data-en="I want this one">Quero esse</a></div></div><div class="c"><span class="nm">Silver</span><span class="pr">R$ 637</span><span class="sv" data-en="Save R$388">Economize R$ 388</span><ul><li data-en="2 UGC videos">2 vídeos UGC</li><li data-en="3 photos">3 fotos</li><li data-en="Script">Roteiro</li><li data-en="Filming">Gravação</li><li data-en="Editing">Edição</li><li data-en="3 months of Ads">3 meses em Ads</li></ul><div class="cta"><a class="wa-link" data-msg="Oi Isis! Vim pelo seu portfólio e quero o pacote Silver 🙂" href="#" target="_blank" rel="noopener" data-en="I want this one">Quero esse</a></div></div><div class="c"><span class="nm">Gold</span><span class="pr">R$ 957</span><span class="sv" data-en="Save R$828">Economize R$ 828</span><ul><li data-en="3 UGC videos">3 vídeos UGC</li><li data-en="3 photos">3 fotos</li><li data-en="Script">Roteiro</li><li data-en="Filming">Gravação</li><li data-en="Editing">Edição</li><li data-en="6 months of Ads">6 meses em Ads</li></ul><div class="cta"><a class="wa-link" data-msg="Oi Isis! Vim pelo seu portfólio e quero o pacote Gold 🙂" href="#" target="_blank" rel="noopener" data-en="I want this one">Quero esse</a></div></div><div class="c hl"><span class="nm" data-en="Monthly">Mensal</span><span class="pr" data-en="R$ 1,997">R$ 1.997</span><span class="sv" data-en="3 months minimum">Mínimo 3 meses</span><ul><li data-en="8 UGC videos">8 vídeos UGC</li><li data-en="3 photos">3 fotos</li><li data-en="Script">Roteiro</li><li data-en="Filming">Gravação</li><li data-en="Editing">Edição</li><li data-en="Ads usage">Uso em Ads</li></ul><div class="cta"><a class="wa-link" data-msg="Oi Isis! Vim pelo seu portfólio e quero o pacote Mensal 🙂" href="#" target="_blank" rel="noopener" data-en="I want this one">Quero esse</a></div></div></div>
   <div class="pk-info"><h3 data-en="Additional info!">Informações adicionais!</h3><ul><li data-en="In-person jobs, openings and stores: request a quote">Os pacotes trabalhos presenciais, inauguração, lojas, solicitar orçamento</li><li data-en="Want to customize your package? Get in touch">Quer personalizar seu pacote? Entre em contato</li></ul></div>
 </div></section>
 
@@ -976,8 +980,9 @@ footer{padding-block:40px 10px;font-size:12px;color:var(--ink-soft);text-align:c
       <p class="cb-lines"><span data-en="1 video of 15 sec">1 vídeo de 15 seg</span><span data-en="1 video of 60 sec">1 vídeo de 60 seg</span><span data-en="1 video of 30 sec">1 vídeo de 30 seg</span></p>
       <p data-en="3 photos">3 fotos</p>
       <p data-en="All with ADS rights (6 months)">Todos com direito de Ads (6 meses)</p>
-      <span class="cb-price">R$ 750,00</span>
+      <span class="cb-price" data-en="R$ 750.00">R$ 750,00</span>
       <span class="cb-save" data-en="Save R$1,035.00">Economize R$ 1.035,00</span>
+      <p class="brl-note" data-en="All prices are in Brazilian reais (BRL, R$)."></p>
     </div>
   </div>
 </div></section>
@@ -1090,6 +1095,8 @@ const nichos=[
  {k:'beleza',pt:'Beleza',en:'Beauty',v:[['Skincare','Tiktok ads · lofi'],['Haircare','Problema vs solução'],['Skincare','Tiktok ads · lofi'],['Babyliss','Educacional']]},
  {k:'pet',pt:'Pet',en:'Pet',v:[['Lançamento Catarina','Tudo sobre a nova pet da sua marca'],['Comida','Problema vs solução'],['Acessório','Tiktok ads · lofi'],['Loja','Educacional']]}
 ];
+const TT={'Academia':'Gym','Garrafa de água':'Water bottle','Pré-treino':'Pre-workout','Whey':'Whey','Barrinha de proteína':'Protein bar','Consultoria':'Coaching','Microfone':'Microphone','Aplicativo':'App','Tripé':'Tripod','ManyChat':'ManyChat','MEI Digital':'MEI Digital','iPad':'iPad','Salão de beleza':'Beauty salon','Dia dos namorados':"Valentine's Day (Brazil)",'Hamburgueria':'Burger joint','Nail designer':'Nail designer','Pousada':'Guesthouse','Moda praiana':'Beachwear','Relógio':'Watch','Salto alto':'High heels','Moda fitness':'Fitness wear','Choker':'Choker','Corset':'Corset','Skincare':'Skincare','Haircare':'Haircare','Babyliss':'Babyliss','Lançamento Catarina':'Catarina launch','Comida':'Pet food','Acessório':'Accessory','Loja':'Store'};
+const SS={'Experiência + foco no turismo':'Experience + tourism focus','Tráfego pago':'Paid traffic','Storytelling':'Storytelling','Problema vs solução':'Problem vs solution','Lifestyle + produto':'Lifestyle + product','Formato série de vídeos':'Video series format','Criativo':'Creative','Informativo':'Informative','Review + venda':'Review + sales','Indicação':'Referral','Review':'Review','Evento especial/transformação':'Special event/transformation','Campanha data sazonal':'Seasonal date campaign','Delivery':'Delivery','Demonstrativo':'Demonstration','Experiência':'Experience','Campanha final de ano':'End-of-year campaign','Campanha site':'Website campaign','Grupo de promoção':'Promo group','Ads · educar sobre o produto':'Ads · educate about the product','Ads · venda':'Ads · sales','Tiktok ads · lofi':'TikTok ads · lo-fi','Educacional':'Educational','Tudo sobre a nova pet da sua marca':"All about your brand's new pet"};
 let curN='fitness';
 function allVids(){return nichos.flatMap(n=>n.v.map((v,i)=>({t:v[0],f:v[1],src:A.nichos[n.k][i],video:(VIDEOS.nichos[n.k]||[])[i]||null,n:n})))}
 function renderFolders(){
@@ -1101,7 +1108,7 @@ function renderFolders(){
 }
 function renderVids(){
   const vids=allVids().filter(v=>v.n.k===curN);
-  document.getElementById('vgrid').innerHTML=vids.map((v,i)=>`<div class="vitem" style="animation-delay:${Math.min(i,10)*35}ms"><button type="button" class="vcard" data-src="${i}" aria-label="assistir ${v.t}"><img src="${v.src}" alt=""><span class="bigplay"></span></button><b>${v.t}</b><span>${v.f}</span></div>`).join('');
+  document.getElementById('vgrid').innerHTML=vids.map((v,i)=>`<div class="vitem" style="animation-delay:${Math.min(i,10)*35}ms"><button type="button" class="vcard" data-src="${i}" aria-label="${T('assistir','watch')} ${T(v.t,TT[v.t]||v.t)}"><img src="${v.src}" alt=""><span class="bigplay"></span></button><b>${T(v.t,TT[v.t]||v.t)}</b><span>${T(v.f,SS[v.f]||v.f)}</span></div>`).join('');
   window._vids=vids;
 }
 document.getElementById('folders').addEventListener('click',e=>{const b=e.target.closest('.fold');if(!b)return;curN=b.dataset.k;renderFolders();renderVids()});
