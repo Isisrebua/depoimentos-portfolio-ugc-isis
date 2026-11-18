@@ -10,7 +10,7 @@
 </script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<script>(function(){var p=location.pathname.split("/").filter(Boolean).pop()||"";if(p==="sem-valores"||location.search.indexOf("valores=0")>-1)document.documentElement.classList.add("noprice")})()</script>
+<script>(function(){var p=location.pathname.split("/").filter(Boolean).pop()||"";if(p==="apresentacao"||location.search.indexOf("valores=0")>-1)document.documentElement.classList.add("noprice")})()</script>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,400..800&family=Figtree:wght@400;500;600;700;800&display=swap">
 <style>
 /* layout: uma "área de trabalho" do iOS sobre papel com grão. cada seção é um objeto nativo (janela, imessage, toggles, iphones, pastas, wallet, popup). paleta do canva da Isis, sempre clara */
@@ -531,6 +531,10 @@ section{padding-block:72px 24px;scroll-margin-top:40px}
 .pk-info li{font-size:16px;color:var(--ink);display:flex;gap:10px;align-items:center}
 .brl-note{margin:10px 0 0;font-size:14px;font-weight:600;color:var(--ink-soft);background:rgba(168,71,12,.1);border-radius:999px;padding:6px 14px;display:inline-block}
 .brl-note:empty{display:none}
+/* entrada suave dos blocos ao rolar a página */
+html.rv-on .rv{opacity:0}
+html.rv-on .rv.in{animation:rvIn .8s cubic-bezier(.2,.8,.2,1) var(--d,0s) both}
+@keyframes rvIn{from{opacity:0;translate:0 40px;scale:.97}to{opacity:1;translate:0 0;scale:1}}
 /* versão sem valores (/sem-valores): esconde pacotes, itens avulsos e preços do combo */
 .noprice #pacotes,.noprice .av-head,.noprice .av1,.noprice .cb-price,.noprice .cb-save,.noprice .cb-card .brl-note{display:none!important}
 .noprice #investimento .oa-steps{margin-bottom:30px}
@@ -1316,6 +1320,30 @@ document.getElementById('lang-pt').addEventListener('click',()=>setLang('pt'));
 document.getElementById('lang-en').addEventListener('click',()=>setLang('en'));
 let saved='pt';try{saved=localStorage.getItem('isis-lang')||'pt'}catch(e){}
 setLang(saved);
+
+// animação de entrada dos blocos ao rolar (respeita "reduzir movimento")
+(function(){
+  if(matchMedia('(prefers-reduced-motion:reduce)').matches)return;
+  const SEL=['#sobre .me-left','#sobre .me-right .blk','#marcas .ttl','#cases .cs-head','#cases .fan-wrap','#cases .ads-head','#cases .ads-card',
+    '#nichos .head','#nichos .folders','#fotos .wrap > div:first-child','#servicos .head','#cc .tile',
+    '#feedbacks .head','#feedbacks .print','#feedbacks .pvid','#feedbacks .approved > *','#feedbacks .form-card',
+    '#investimento .inv-opt > .eyebrow2','#investimento .inv-opt > h2','#investimento .oa-step','#investimento .av-head','#investimento .ac','#investimento .av-cta',
+    '#pacotes .pk-head','#pacotes .pc1 .c','#pacotes .pk-info','#combo .cb-title','#combo .cb-kick','#combo .cb-slot','#combo .cb-card',
+    '#faq .faq-t','#faq .fgroup','#contato .head','#contato .contact > *'];
+  const els=[...new Set(SEL.flatMap(s=>[...document.querySelectorAll(s)]))];
+  const idx=new Map();
+  els.forEach(el=>{const p=el.parentElement,k=idx.get(p)||0;idx.set(p,k+1);el.style.setProperty('--d',(Math.min(k,5)*0.09)+'s');el.classList.add('rv')});
+  document.documentElement.classList.add('rv-on');
+  // revela cada bloco quando ele entra na tela (checa a posição a cada rolagem)
+  let pend=els.slice(),tick=false;
+  function reveal(el){el.classList.add('in');el.addEventListener('animationend',ev=>{if(ev.target!==el)return;el.classList.remove('rv','in');el.style.removeProperty('--d')})}
+  function check(){tick=false;const vh=innerHeight;
+    pend=pend.filter(el=>{const r=el.getBoundingClientRect();if(r.top<vh*.94&&r.bottom>0){reveal(el);return false}return true});
+    if(!pend.length){removeEventListener('scroll',onScroll);removeEventListener('resize',onScroll)}}
+  function onScroll(){if(!tick){tick=true;requestAnimationFrame(check)}}
+  addEventListener('scroll',onScroll,{passive:true});addEventListener('resize',onScroll);
+  check();
+})();
 </script>
 </body>
 </html>
