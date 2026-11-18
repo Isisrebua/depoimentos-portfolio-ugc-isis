@@ -95,6 +95,7 @@ section{padding-block:72px 24px;scroll-margin-top:40px}
 .collage-c{position:relative;z-index:2;height:clamp(240px,27vw,360px);margin-top:calc(clamp(78px,20vw,290px) * -.22)}
 .ph{position:absolute;transition:translate .6s cubic-bezier(.2,.8,.2,1),box-shadow .4s;border-radius:18px;overflow:hidden;border:3px solid #9CCBDB;box-shadow:0 18px 30px -16px rgba(40,20,10,.55);background:var(--sage)}
 .ph img{width:100%;height:100%;object-fit:cover}
+#c2{object-position:50% 68%}#c1{object-position:50% 40%}
 .p1{left:0;top:16%;width:19%;height:72%;transform:rotate(-2deg)}
 .p2{left:17%;top:-6%;width:17%;height:52%;transform:rotate(4deg);z-index:2}
 .p3{left:24%;top:30%;width:18%;height:70%;transform:rotate(-5deg);z-index:3}
@@ -354,7 +355,7 @@ section{padding-block:72px 24px;scroll-margin-top:40px}
 .ph-head{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:40px;align-items:end;margin-bottom:34px}
 .ph-head .lede{justify-self:end;text-align:right;max-width:34ch}
 /* grade de fotos com entrada animada */
-.pgrid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:12px}
+.pgrid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:12px}
 .pgrid button{position:relative;border:0;padding:0;border-radius:16px;overflow:hidden;background:var(--sage);box-shadow:var(--shadow);aspect-ratio:3/4}
 .pgrid img{width:100%;height:100%;object-fit:cover;transition:transform .6s}
 .pgrid button:hover img{transform:scale(1.05)}
@@ -531,7 +532,10 @@ section{padding-block:72px 24px;scroll-margin-top:40px}
 .cb-kick{font-family:var(--display);font-stretch:75%;font-weight:800;font-size:clamp(22px,2.2vw,28px);color:var(--rust);margin:0 0 14px;text-align:center}
 .cb-vids{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:22px}
 .cb-slot{text-align:center;display:grid;gap:8px;align-content:start}
-.cb-vid{aspect-ratio:2/3;border-radius:16px;background:#232323;display:grid;place-items:center;box-shadow:0 18px 30px -18px rgba(0,0,0,.6)}
+.cb-vid{position:relative;overflow:hidden;width:100%;padding:0;border:0;cursor:pointer;aspect-ratio:2/3;border-radius:16px;background:#232323;display:grid;place-items:center;box-shadow:0 18px 30px -18px rgba(0,0,0,.6)}
+.cb-vid img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform .5s}
+.cb-vid:hover img{transform:scale(1.04)}
+.cb-vid .cb-play{position:relative;z-index:1;background:rgba(0,0,0,.28);backdrop-filter:blur(2px)}
 .cb-play{width:56px;height:56px;border-radius:50%;border:2px solid rgba(255,255,255,.8);display:grid;place-items:center}
 .cb-play::after{content:"";border-left:14px solid #fff;border-top:9px solid transparent;border-bottom:9px solid transparent;margin-left:4px}
 .cb-slot b{margin-top:8px;white-space:nowrap;font-size:clamp(14px,1.45vw,21px);font-weight:600;color:var(--ink)}
@@ -614,9 +618,11 @@ section{padding-block:72px 24px;scroll-margin-top:40px}
 
 /* ===== 8 feedbacks ===== */
 .fb{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:24px;align-items:start}
-.prints{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
-.print{aspect-ratio:9/16;border-radius:22px;border:2px dashed rgba(18,18,18,.22);display:grid;place-items:center;text-align:center;padding:14px;font-size:13px;font-weight:600;color:var(--ink-soft);background:rgba(255,255,255,.45)}
-.print b{display:block;font-size:22px;color:var(--rust)}
+.prints{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;align-items:start}
+.pcol{display:grid;gap:14px;min-width:0}
+.print{display:block;width:100%;padding:0;border:0;background:#fff;border-radius:18px;overflow:hidden;box-shadow:var(--shadow);cursor:zoom-in;transition:transform .3s}
+.print:hover{transform:translateY(-3px)}
+.print img{display:block;width:100%;height:auto}
 .approved{margin-top:16px;display:grid;gap:10px}
 .wa{border-radius:18px;padding:12px 14px;max-width:420px}
 .wa .who{display:flex;gap:10px;align-items:center;font-size:12px;color:var(--ink-soft);margin-bottom:6px}
@@ -640,7 +646,7 @@ section{padding-block:72px 24px;scroll-margin-top:40px}
 .sent b{display:block;font-size:17px;margin-bottom:4px}
 .form-card.done form{display:none}.form-card.done .sent{display:block}
 @media (max-width:900px){.fb{grid-template-columns:1fr}}
-@media (max-width:480px){.prints{grid-template-columns:repeat(2,minmax(0,1fr))}.prints .print:nth-child(3){display:none}}
+@media (max-width:480px){.prints,.pcol{gap:8px}}
 
 /* ===== 9 investimento ===== */
 .steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-bottom:22px}
@@ -899,9 +905,15 @@ footer{padding-block:40px 10px;font-size:12px;color:var(--ink-soft);text-align:c
   <div class="fb">
     <div>
       <div class="prints">
-        <div class="print"><div><b>1</b><span data-en="feedback screenshot goes here">Print do feedback aqui</span></div></div>
-        <div class="print"><div><b>2</b><span data-en="feedback screenshot goes here">Print do feedback aqui</span></div></div>
-        <div class="print"><div><b>3</b><span data-en="feedback screenshot goes here">Print do feedback aqui</span></div></div>
+        <div class="pcol">
+          <button type="button" class="print" data-print="1"><img src="assets/feedbacks/fb-1.png" alt="Print de feedback de uma marca parceira no WhatsApp" loading="lazy"></button>
+          <button type="button" class="print" data-print="2"><img src="assets/feedbacks/fb-2.png" alt="Print de feedback de uma marca parceira no WhatsApp" loading="lazy"></button>
+        </div>
+        <div class="pcol">
+          <button type="button" class="print" data-print="3"><img src="assets/feedbacks/fb-3.png" alt="Print de feedback de uma marca parceira no WhatsApp" loading="lazy"></button>
+          <button type="button" class="print" data-print="4"><img src="assets/feedbacks/fb-4.png" alt="Print de feedback de uma marca parceira no WhatsApp" loading="lazy"></button>
+          <button type="button" class="print" data-print="5"><img src="assets/feedbacks/fb-5.png" alt="Print de feedback de uma marca parceira no WhatsApp" loading="lazy"></button>
+        </div>
       </div>
       <div class="approved">
         <div class="wa glass"><div class="who"><i></i><div><b data-en="[brand name]">[Nome da marca]</b><br><span data-en="approved feedback · shows up here automatically">Feedback aprovado · aparece aqui sozinho</span></div></div><div class="msg" data-en="[example] this is where the text the brand sent through the form appears, after you approve it in the CRM <small>11:26</small>">[Exemplo] Aqui aparece o texto que a marca enviou pelo formulário, depois que você aprovar no CRM <small>11:26</small></div></div>
@@ -948,9 +960,9 @@ footer{padding-block:40px 10px;font-size:12px;color:var(--ink-soft);text-align:c
     <div>
       <p class="cb-kick" data-en="Understand this package:">Entenda esse pacote:</p>
       <div class="cb-vids">
-        <div class="cb-slot"><div class="cb-vid"><span class="cb-play"></span></div><b data-en="Top (Attraction):">Topo (Atração):</b><p data-en="Spark curiosity, trend, identification.">Gerar curiosidade, trend, identificação.</p></div>
-        <div class="cb-slot"><div class="cb-vid"><span class="cb-play"></span></div><b data-en="Middle (Education):">Meio (Educação):</b><p data-en="Show benefits, handle objections, educate about the product">Mostrar benefício, tirar objeção, educar sobre o produto</p></div>
-        <div class="cb-slot"><div class="cb-vid"><span class="cb-play"></span></div><b data-en="Bottom (Conversion):">Fundo (Conversão):</b><p data-en="Clear offer, call to action, scarcity">Oferta clara, call to action, escassez</p></div>
+        <div class="cb-slot"><button type="button" class="cb-vid" data-combo="topo" aria-label="assistir vídeo topo"><img src="assets/combo/topo.jpg" alt=""><span class="cb-play"></span></button><b data-en="Top (Attraction):">Topo (Atração):</b><p data-en="Spark curiosity, trend, identification.">Gerar curiosidade, trend, identificação.</p></div>
+        <div class="cb-slot"><button type="button" class="cb-vid" data-combo="meio" aria-label="assistir vídeo meio"><img src="assets/combo/meio.jpg" alt=""><span class="cb-play"></span></button><b data-en="Middle (Education):">Meio (Educação):</b><p data-en="Show benefits, handle objections, educate about the product">Mostrar benefício, tirar objeção, educar sobre o produto</p></div>
+        <div class="cb-slot"><button type="button" class="cb-vid" data-combo="fundo" aria-label="assistir vídeo fundo"><img src="assets/combo/fundo.jpg" alt=""><span class="cb-play"></span></button><b data-en="Bottom (Conversion):">Fundo (Conversão):</b><p data-en="Clear offer, call to action, scarcity">Oferta clara, call to action, escassez</p></div>
       </div>
     </div>
     <div class="cb-card">
@@ -1012,16 +1024,16 @@ footer{padding-block:40px 10px;font-size:12px;color:var(--ink-soft);text-align:c
 <div class="lightbox" id="lb" hidden><button class="x" type="button" aria-label="fechar">×</button><div class="inner" id="lbInner"></div></div>
 
 <script>
-const A={ "logos": [ { "name": "Creamy Skincare", "src": "assets/brands/creamy-skincare.png", "src2x": "assets/brands/creamy-skincare-2x.png" }, { "name": "Pantene", "src": "assets/brands/pantene.png", "src2x": "assets/brands/pantene-2x.png" }, { "name": "Garnier", "src": "assets/brands/garnier.png", "src2x": "assets/brands/garnier-2x.png" }, { "name": "L'Oréal Professionnel", "src": "assets/brands/loreal-professionnel.png", "src2x": "assets/brands/loreal-professionnel-2x.png" }, { "name": "Sal Grosso", "src": "assets/brands/sal-grosso.png", "src2x": "assets/brands/sal-grosso-2x.png" }, { "name": "iCe Creamy", "src": "assets/brands/ice-creamy.png", "src2x": "assets/brands/ice-creamy-2x.png" }, { "name": "La Chapa House", "src": "assets/brands/la-chapa-house.png", "src2x": "assets/brands/la-chapa-house-2x.png" }, { "name": "GTS Academia", "src": "assets/brands/gts-academia.png", "src2x": "assets/brands/gts-academia-2x.png" }, { "name": "ij", "src": "assets/brands/ij.png", "src2x": "assets/brands/ij-2x.png" }, { "name": "B Signature", "src": "assets/brands/b-signature.png", "src2x": "assets/brands/b-signature-2x.png" }, { "name": "Ki-Beirute Esfiharia", "src": "assets/brands/ki-beirute.png", "src2x": "assets/brands/ki-beirute-2x.png" }, { "name": "Solarium Ubatuba", "src": "assets/brands/solarium-ubatuba.png", "src2x": "assets/brands/solarium-ubatuba-2x.png" }, { "name": "Camilly Braga Nail Designer", "src": "assets/brands/camilly-braga.png", "src2x": "assets/brands/camilly-braga-2x.png" }, { "name": "Akikomo Sushi", "src": "assets/brands/akikomo.png", "src2x": "assets/brands/akikomo-2x.png" }, { "name": "Ohana Praiana", "src": "assets/brands/ohana-praiana.png", "src2x": "assets/brands/ohana-praiana-2x.png" }, { "name": "Litoral Pizzas e Esfihas", "src": "assets/brands/litoral-pizzas.png", "src2x": "assets/brands/litoral-pizzas-2x.png" }, { "name": "Moon Wave", "src": "assets/brands/moon-wave.png", "src2x": "assets/brands/moon-wave-2x.png" }, { "name": "De Boa Burguer", "src": "assets/brands/de-boa-burguer.png", "src2x": "assets/brands/de-boa-burguer-2x.png" }, { "name": "Amory Sorvetes", "src": "assets/brands/amory.png", "src2x": "assets/brands/amory-2x.png" }, { "name": "Mordidela Burger & Grill", "src": "assets/brands/mordidela.png", "src2x": "assets/brands/mordidela-2x.png" }, { "name": "Use Prati", "src": "assets/brands/use-prati.png", "src2x": "assets/brands/use-prati-2x.png" }, { "name": "Sushi do Miranda", "src": "assets/brands/sushi-do-miranda.png", "src2x": "assets/brands/sushi-do-miranda-2x.png" }, { "name": "Saint Germain", "src": "assets/brands/saint-germain.png", "src2x": "assets/brands/saint-germain-2x.png" }, { "name": "iLike Professional", "src": "assets/ilike.jpg" } ], "gallery": [ "assets/gallery/photo-01.jpg", "assets/gallery/photo-02.jpg", "assets/gallery/photo-03.jpg", "assets/gallery/photo-04.jpg", "assets/gallery/photo-05.jpg", "assets/gallery/photo-06.jpg", "assets/gallery/photo-07.jpg", "assets/gallery/photo-08.jpg", "assets/gallery/photo-09.jpg", "assets/gallery/photo-10.jpg", "assets/gallery/photo-11.jpg", "assets/gallery/photo-12.jpg" ], "hero": "assets/capa/hero.jpg", "about": "assets/capa/foto-4.jpg", "about2": "assets/sobre/selfie.jpg", "nichos": { "app": [ "assets/nichos/app/01.jpg", "assets/nichos/app/02.jpg", "assets/nichos/app/03.jpg", "assets/nichos/app/04.jpg", "assets/nichos/app/05.jpg", "assets/nichos/app/06.jpg", "assets/nichos/app/07.jpg" ], "moda": [ "assets/nichos/moda/01.jpg", "assets/nichos/moda/02.jpg", "assets/nichos/moda/03.jpg", "assets/nichos/moda/04.jpg", "assets/nichos/moda/05.jpg", "assets/nichos/moda/06.jpg" ], "locais": [ "assets/nichos/locais/01.jpg", "assets/nichos/locais/02.jpg", "assets/nichos/locais/03.jpg", "assets/nichos/locais/04.jpg", "assets/nichos/locais/05.jpg" ], "beleza": [ "assets/nichos/beleza/01.jpg", "assets/nichos/beleza/02.jpg", "assets/nichos/beleza/03.jpg", "assets/nichos/beleza/04.jpg" ], "pet": [ "assets/nichos/pet/01.jpg", "assets/nichos/pet/02.jpg", "assets/nichos/pet/03.jpg", "assets/nichos/pet/04.jpg" ], "fitness": [ "assets/nichos/fitness/01.jpg", "assets/nichos/fitness/07.jpg", "assets/nichos/fitness/02.jpg", "assets/nichos/fitness/03.jpg", "assets/nichos/fitness/04.jpg", "assets/nichos/fitness/05.jpg", "assets/nichos/fitness/06.jpg" ] }, "cases": [ "assets/cases/case-01.jpg", "assets/cases/case-02.jpg", "assets/cases/case-03.jpg", "assets/cases/case-04.jpg", "assets/cases/case-05.jpg", "assets/cases/case-06.jpg" ], "ads_google": "assets/ads/google.png", "ads_meta": "assets/ads/meta.png" };
+const A={ "logos": [ { "name": "Creamy Skincare", "src": "assets/brands/creamy-skincare.png", "src2x": "assets/brands/creamy-skincare-2x.png" }, { "name": "Pantene", "src": "assets/brands/pantene.png", "src2x": "assets/brands/pantene-2x.png" }, { "name": "Garnier", "src": "assets/brands/garnier.png", "src2x": "assets/brands/garnier-2x.png" }, { "name": "L'Oréal Professionnel", "src": "assets/brands/loreal-professionnel.png", "src2x": "assets/brands/loreal-professionnel-2x.png" }, { "name": "Sal Grosso", "src": "assets/brands/sal-grosso.png", "src2x": "assets/brands/sal-grosso-2x.png" }, { "name": "iCe Creamy", "src": "assets/brands/ice-creamy.png", "src2x": "assets/brands/ice-creamy-2x.png" }, { "name": "La Chapa House", "src": "assets/brands/la-chapa-house.png", "src2x": "assets/brands/la-chapa-house-2x.png" }, { "name": "GTS Academia", "src": "assets/brands/gts-academia.png", "src2x": "assets/brands/gts-academia-2x.png" }, { "name": "ij", "src": "assets/brands/ij.png", "src2x": "assets/brands/ij-2x.png" }, { "name": "B Signature", "src": "assets/brands/b-signature.png", "src2x": "assets/brands/b-signature-2x.png" }, { "name": "Ki-Beirute Esfiharia", "src": "assets/brands/ki-beirute.png", "src2x": "assets/brands/ki-beirute-2x.png" }, { "name": "Solarium Ubatuba", "src": "assets/brands/solarium-ubatuba.png", "src2x": "assets/brands/solarium-ubatuba-2x.png" }, { "name": "Camilly Braga Nail Designer", "src": "assets/brands/camilly-braga.png", "src2x": "assets/brands/camilly-braga-2x.png" }, { "name": "Akikomo Sushi", "src": "assets/brands/akikomo.png", "src2x": "assets/brands/akikomo-2x.png" }, { "name": "Ohana Praiana", "src": "assets/brands/ohana-praiana.png", "src2x": "assets/brands/ohana-praiana-2x.png" }, { "name": "Litoral Pizzas e Esfihas", "src": "assets/brands/litoral-pizzas.png", "src2x": "assets/brands/litoral-pizzas-2x.png" }, { "name": "Moon Wave", "src": "assets/brands/moon-wave.png", "src2x": "assets/brands/moon-wave-2x.png" }, { "name": "De Boa Burguer", "src": "assets/brands/de-boa-burguer.png", "src2x": "assets/brands/de-boa-burguer-2x.png" }, { "name": "Amory Sorvetes", "src": "assets/brands/amory.png", "src2x": "assets/brands/amory-2x.png" }, { "name": "Mordidela Burger & Grill", "src": "assets/brands/mordidela.png", "src2x": "assets/brands/mordidela-2x.png" }, { "name": "Use Prati", "src": "assets/brands/use-prati.png", "src2x": "assets/brands/use-prati-2x.png" }, { "name": "Sushi do Miranda", "src": "assets/brands/sushi-do-miranda.png", "src2x": "assets/brands/sushi-do-miranda-2x.png" }, { "name": "Saint Germain", "src": "assets/brands/saint-germain.png", "src2x": "assets/brands/saint-germain-2x.png" }, { "name": "iLike Professional", "src": "assets/ilike.jpg" } ], "gallery": [ "assets/gallery/photo-01.jpg", "assets/gallery/photo-02.jpg", "assets/gallery/photo-03.jpg", "assets/gallery/photo-04.jpg", "assets/gallery/photo-05.jpg", "assets/gallery/photo-06.jpg", "assets/gallery/photo-07.jpg", "assets/gallery/photo-08.jpg", "assets/gallery/photo-09.jpg", "assets/gallery/photo-10.jpg", "assets/gallery/photo-11.jpg", "assets/gallery/photo-12.jpg", "assets/gallery/photo-13.jpg", "assets/gallery/photo-14.jpg" ], "hero": "assets/capa/hero.jpg", "about": "assets/capa/foto-4.jpg", "about2": "assets/sobre/selfie.jpg", "nichos": { "app": [ "assets/nichos/app/01.jpg", "assets/nichos/app/02.jpg", "assets/nichos/app/03.jpg", "assets/nichos/app/04.jpg", "assets/nichos/app/05.jpg", "assets/nichos/app/06.jpg", "assets/nichos/app/07.jpg" ], "moda": [ "assets/nichos/moda/01.jpg", "assets/nichos/moda/02.jpg", "assets/nichos/moda/03.jpg", "assets/nichos/moda/04.jpg", "assets/nichos/moda/05.jpg", "assets/nichos/moda/06.jpg" ], "locais": [ "assets/nichos/locais/01.jpg", "assets/nichos/locais/02.jpg", "assets/nichos/locais/03.jpg", "assets/nichos/locais/04.jpg", "assets/nichos/locais/05.jpg" ], "beleza": [ "assets/nichos/beleza/01.jpg", "assets/nichos/beleza/02.jpg", "assets/nichos/beleza/03.jpg", "assets/nichos/beleza/04.jpg" ], "pet": [ "assets/nichos/pet/01.jpg", "assets/nichos/pet/02.jpg", "assets/nichos/pet/03.jpg", "assets/nichos/pet/04.jpg" ], "fitness": [ "assets/nichos/fitness/01.jpg", "assets/nichos/fitness/07.jpg", "assets/nichos/fitness/02.jpg", "assets/nichos/fitness/03.jpg", "assets/nichos/fitness/04.jpg", "assets/nichos/fitness/05.jpg", "assets/nichos/fitness/06.jpg" ] }, "cases": [ "assets/cases/case-01.jpg", "assets/cases/case-02.jpg", "assets/cases/case-03.jpg", "assets/cases/case-04.jpg", "assets/cases/case-05.jpg", "assets/cases/case-06.jpg" ], "ads_google": "assets/ads/google.png", "ads_meta": "assets/ads/meta.png" };
 const WA='5512978136588';
 let LANG='pt';
 const T=(pt,en)=>LANG==='en'?en:pt;
 
 // imagens principais
-document.getElementById('heroPhoto').src=A.hero;
+document.getElementById('heroPhoto').src='assets/capa/capa-3.jpg';
 document.getElementById('adMeta').src=A.ads_meta;document.getElementById('adGoogle').src=A.ads_google;
 document.getElementById('aboutPhoto').src=A.about2;
-[['c1',A.gallery[3]],['c2',A.gallery[0]],['c4',A.about],['c5',A.gallery[4]],['c6',A.gallery[11]]].forEach(([i,u])=>document.getElementById(i).src=u);
+[['c1','assets/capa/capa-1.jpg'],['c2','assets/capa/capa-2.jpg'],['c4','assets/capa/capa-4.jpg'],['c5','assets/capa/capa-5.jpg'],['c6',A.hero]].forEach(([i,u])=>document.getElementById(i).src=u);
 document.getElementById('popPhoto').src=A.hero;
 
 // 3 serviços (toggles)
@@ -1191,6 +1203,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!lb.hidden)closeLB(
 // vídeos reais (Supabase Storage). Nichos: preencher a URL de cada vídeo quando for enviado; sem URL, o cartão abre só a capa.
 const SB='https://epctnbqokxdnbisernrf.supabase.co/storage/v1/object/public/depoimentos-uploads/';
 const VIDEOS={
+  combo:['topo','meio','fundo'].map(n=>SB+'combo-'+n+'.mp4'),
   cases:['churrascaria','restaurante','loja-de-roupa','sorveteria-1','pousada','sorveteria-2'].map(n=>SB+'case-'+n+'.mp4'),
   nichos:{fitness:[1,7,2,3,4,5,6].map(n=>SB+'nicho-fitness-0'+n+'.mp4'),app:[1,2,3,4,5,6,7].map(n=>SB+'nicho-app-0'+n+'.mp4'),locais:[1,2,3,4,5].map(n=>SB+'nicho-locais-0'+n+'.mp4'),moda:[1,2,3,4,5,6].map(n=>SB+'nicho-moda-0'+n+'.mp4'),beleza:[1,2,3,4].map(n=>SB+'nicho-beleza-0'+n+'.mp4'),pet:[1,2,3,4].map(n=>SB+'nicho-pet-0'+n+'.mp4')}
 };
@@ -1204,9 +1217,11 @@ const videoBox=(url,poster)=>{
     :`<div class="vid"><img src="${poster}" alt=""></div>`;
 };
 document.addEventListener('click',e=>{
+  const cb=e.target.closest('[data-combo]');if(cb){const k=['topo','meio','fundo'].indexOf(cb.dataset.combo);openLB(videoBox(VIDEOS.combo[k],cb.querySelector('img').getAttribute('src')));return}
   const c=e.target.closest('[data-case]');if(c){const i=+c.dataset.case;openLB(videoBox(VIDEOS.cases[i],A.cases[i]));return}
   const v=e.target.closest('.vcard');if(v){const it=window._vids[+v.dataset.src];openLB(videoBox(it.video,it.src));return}
   const ad=e.target.closest('[data-ad]');if(ad){openLB(`<img class="photo" src="${ad.dataset.ad==='meta'?A.ads_meta:A.ads_google}" alt="" style="background:#fff">`);return}
+  const pr=e.target.closest('[data-print]');if(pr){openLB(`<img class="photo" src="${pr.querySelector('img').src}" alt="" style="background:#fff">`);return}
   const p=e.target.closest('[data-photo]');if(p){openLB(`<img class="photo" src="${A.gallery[+p.dataset.photo].replace('.jpg','-2x.jpg')}" alt="">`)}
 });
 
