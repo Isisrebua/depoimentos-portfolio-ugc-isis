@@ -396,14 +396,14 @@ section{padding-block:72px 24px;scroll-margin-top:40px}
 .oa-step .n{width:56px;height:56px;border-radius:50%;background:var(--rust);color:#fff;display:grid;place-items:center;font-family:var(--display);font-weight:800;font-size:22px;box-shadow:0 0 0 8px #F3EFE6}
 .oa-step b{display:block;margin:16px 0 6px;font-size:18px;color:var(--ink)}
 .oa-step p{font-size:14px;color:var(--ink-soft)}
-.oa-steps.proc{grid-template-columns:1fr;gap:26px;max-width:860px;margin:30px auto 56px}
-.oa-steps.proc::before{left:27px;right:auto;top:28px;bottom:28px;border-top:0;border-left:2px dashed rgba(168,71,12,.35)}
-.oa-steps.proc .oa-step{display:grid;grid-template-columns:56px minmax(0,1fr);gap:20px;align-items:start}
-.oa-steps.proc .oa-step .n{flex:none}
-.oa-steps.proc .oa-step b{margin:4px 0 6px;font-family:var(--display);font-stretch:85%;font-weight:800;font-size:clamp(20px,2.2vw,26px);text-transform:uppercase;letter-spacing:.01em;color:var(--rust)}
-.oa-steps.proc .oa-step p{font-size:15px;margin:0 0 6px}
-.oa-steps.proc .oa-step ul{margin:0;padding-left:20px;display:grid;gap:4px;font-size:15px;color:var(--ink-soft)}
-@media (max-width:860px){.oa-steps.proc::before{display:block}.oa-steps.proc .oa-step{gap:14px;grid-template-columns:44px minmax(0,1fr)}.oa-steps.proc .oa-step .n{width:44px;height:44px;font-size:18px}.oa-steps.proc::before{left:21px}}
+.oa-steps.proc{grid-template-columns:repeat(5,minmax(0,1fr));gap:18px;margin:30px 0 56px}
+.oa-steps.proc::before{left:28px;right:28px;top:27px}
+.oa-steps.proc .oa-step{display:block}
+.oa-steps.proc .oa-step b{margin:16px 0 8px;font-family:var(--display);font-stretch:85%;font-weight:800;font-size:clamp(15px,1.5vw,19px);line-height:1.15;text-transform:uppercase;letter-spacing:.01em;color:var(--rust)}
+.oa-steps.proc .oa-step p{font-size:13px;line-height:1.4;margin:0 0 6px}
+.oa-steps.proc .oa-step ul{margin:0;padding-left:16px;display:grid;gap:4px;font-size:13px;line-height:1.4;color:var(--ink-soft)}
+.oa-steps.proc .oa-step li{padding-left:0}
+@media (max-width:860px){.oa-steps.proc{grid-template-columns:1fr;gap:22px}.oa-steps.proc::before{display:none}}
 .oa-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,.9fr);gap:56px;align-items:center;max-width:960px}
 .oa-side{order:-1}
 .inv-opt{margin-bottom:24px}
@@ -1011,7 +1011,7 @@ footer{padding-block:40px 10px;font-size:12px;color:var(--ink-soft);text-align:c
         <h3 id="popTitle" data-en="Ready for your next campaign?">Pronta para a sua próxima campanha?</h3>
         <p data-en="Tell me what your brand needs. I reply within 24 business hours.">Conte o que a sua marca precisa. Eu respondo em até 24h úteis.</p>
         <div class="choices">
-          <a class="btn rust wa-link" data-msg="Oi Isis! Vim pelo seu portfólio e quero conversar sobre uma campanha 🙂" href="https://wa.me/5512978136588" target="_blank" rel="noopener" data-en="Yes, message me on WhatsApp!">Sim, chamar no WhatsApp!</a>
+          <a class="btn rust wa-link" data-msg="Oii, vim pelo seu portfólio e gostaria de conversar mais a respeito dos seus serviços!" href="https://wa.me/5512978136588" target="_blank" rel="noopener" data-en="Yes, message me on WhatsApp!">Sim, chamar no WhatsApp!</a>
           <button class="btn ghost" type="button" id="preferMail" data-en="I'd rather fill in the form">Prefiro preencher o formulário</button>
         </div>
         <label class="chk"><input type="checkbox" checked disabled><span data-en="Reply within 24 business hours">Resposta em até 24h úteis</span></label>
@@ -1057,16 +1057,16 @@ document.getElementById('popPhoto').src=A.hero;
 
 // 3 serviços (toggles)
 const services=[
- {ic:'▶',pt:'Vídeo UGC',en:'UGC video',dpt:'Criação de conteúdo estratégico para você utilizar nas redes sociais e anúncios.',den:'Strategic content for you to use on social media and ads.'},
- {ic:'▣',pt:'Fotos UGC',en:'UGC photos',dpt:'Fotos mostrando a sua marca no dia a dia: produtos, serviços, espaços e experiências. Para feed, site e anúncios.',den:'Photos showing your brand in everyday life: products, services, spaces and experiences. For feed, site and ads.'},
- {ic:'◫',pt:'Provador',en:'Try-on',dpt:'Produção de fotos e vídeos mostrando as peças no corpo, o caimento real, detalhes e formas de uso. Ótimo para deixar nos destaques do Instagram e facilitar a venda.',den:'Photos and videos showing the pieces on the body: the real fit, details and ways to wear them. Great for Instagram highlights and to make selling easier.'},
- {ic:'✦',pt:'UGC Canvas',en:'UGC Canvas',dpt:'Construo um perfil exclusivo para divulgar sua marca de forma constante e autêntica. Ideal para escalar visualizações orgânicas com vídeos recorrentes ao longo do mês.',den:'I build an exclusive profile to promote your brand in a consistent and authentic way. Ideal for scaling organic views with recurring videos throughout the month.'},
- {ic:'↻',pt:'Pacote mensal',en:'Monthly package',dpt:'Diferente do UGC Canvas, no pacote mensal (que você encontra na seção de pacotes) os vídeos são criados e entregues para a sua marca postar nas redes ou rodar tráfego.',den:'Unlike UGC Canvas, in the monthly package (found in the packages section) the videos are created and delivered for your brand to post on social media or run as ads.'},
- {ic:'◎',pt:'Gestão de campanhas UGC',en:'UGC campaign management',dpt:'Cuido de toda a operação da sua campanha UGC: curadoria de criadores, contratos, briefing e entrega dos vídeos prontos para feed e anúncios.',den:'I run your entire UGC campaign: creator curation, contracts, briefing and delivery of ready-to-use videos for feed and ads.',site:'https://gestaodecampanhasugc.vercel.app'}
+ {ic:'▶',msg:'Oi Isis! Vim pelo seu portfólio e quero criar vídeos UGC para a minha marca. Podemos conversar sobre como funciona e valores? 🙂',pt:'Vídeo UGC',en:'UGC video',dpt:'Criação de conteúdo estratégico para você utilizar nas redes sociais e anúncios.',den:'Strategic content for you to use on social media and ads.'},
+ {ic:'▣',msg:'Oi Isis! Vim pelo seu portfólio e tenho interesse em fotos UGC mostrando a minha marca no dia a dia. Pode me passar mais detalhes? 🙂',pt:'Fotos UGC',en:'UGC photos',dpt:'Fotos mostrando a sua marca no dia a dia: produtos, serviços, espaços e experiências. Para feed, site e anúncios.',den:'Photos showing your brand in everyday life: products, services, spaces and experiences. For feed, site and ads.'},
+ {ic:'◫',msg:'Oi Isis! Vim pelo seu portfólio e quero o serviço de Provador (fotos e vídeos das peças no corpo) para a minha loja. Como funciona? 🙂',pt:'Provador',en:'Try-on',dpt:'Produção de fotos e vídeos mostrando as peças no corpo, o caimento real, detalhes e formas de uso. Ótimo para deixar nos destaques do Instagram e facilitar a venda.',den:'Photos and videos showing the pieces on the body: the real fit, details and ways to wear them. Great for Instagram highlights and to make selling easier.'},
+ {ic:'✦',msg:'Oi Isis! Vim pelo seu portfólio e quero saber mais sobre o UGC Canvas, o perfil exclusivo para divulgar a minha marca. 🙂',pt:'UGC Canvas',en:'UGC Canvas',dpt:'Construo um perfil exclusivo para divulgar sua marca de forma constante e autêntica. Ideal para escalar visualizações orgânicas com vídeos recorrentes ao longo do mês.',den:'I build an exclusive profile to promote your brand in a consistent and authentic way. Ideal for scaling organic views with recurring videos throughout the month.'},
+ {ic:'↻',msg:'Oi Isis! Vim pelo seu portfólio e tenho interesse no pacote mensal de vídeos UGC. Pode me explicar como funciona? 🙂',pt:'Pacote mensal',en:'Monthly package',dpt:'Diferente do UGC Canvas, no pacote mensal (que você encontra na seção de pacotes) os vídeos são criados e entregues para a sua marca postar nas redes ou rodar tráfego.',den:'Unlike UGC Canvas, in the monthly package (found in the packages section) the videos are created and delivered for your brand to post on social media or run as ads.'},
+ {ic:'◎',msg:'Oi Isis! Vim pelo seu portfólio e quero que você cuide da gestão da minha campanha UGC. Podemos conversar? 🙂',pt:'Gestão de campanhas UGC',en:'UGC campaign management',dpt:'Cuido de toda a operação da sua campanha UGC: curadoria de criadores, contratos, briefing e entrega dos vídeos prontos para feed e anúncios.',den:'I run your entire UGC campaign: creator curation, contracts, briefing and delivery of ready-to-use videos for feed and ads.',site:'https://gestaodecampanhasugc.vercel.app'}
 ];
 function renderServices(){
   const cc=document.getElementById('cc');const open=cc.querySelector('[aria-expanded="true"]');const oi=open?+open.dataset.i:0;
-  cc.innerHTML=services.map((s,i)=>`<button type="button" class="tile" data-i="${i}" aria-expanded="${i===oi}"><div class="top"><div class="ico">${s.ic}</div><div class="sw"></div></div><h3>${T(s.pt,s.en)}</h3><p class="desc">${T(s.dpt,s.den)}</p><span class="gos"><a class="go" href="${waHref('Oi Isis! Vim pelo seu portfólio e tenho interesse em: '+s.pt)}" target="_blank" rel="noopener">${T('Pedir no WhatsApp →','Ask on WhatsApp →')}</a>${s.site?`<a class="go ghost" href="${s.site}" target="_blank" rel="noopener">${T('Entender o serviço','Learn more')}</a>`:''}</span></button>`).join('');
+  cc.innerHTML=services.map((s,i)=>`<button type="button" class="tile" data-i="${i}" aria-expanded="${i===oi}"><div class="top"><div class="ico">${s.ic}</div><div class="sw"></div></div><h3>${T(s.pt,s.en)}</h3><p class="desc">${T(s.dpt,s.den)}</p><span class="gos"><a class="go" href="${waHref(s.msg)}" target="_blank" rel="noopener">${T('Pedir no WhatsApp →','Ask on WhatsApp →')}</a>${s.site?`<a class="go ghost" href="${s.site}" target="_blank" rel="noopener">${T('Entender o serviço','Learn more')}</a>`:''}</span></button>`).join('');
 }
 document.getElementById('cc').addEventListener('click',e=>{
   if(e.target.closest('.go'))return;const b=e.target.closest('.tile');if(!b)return;

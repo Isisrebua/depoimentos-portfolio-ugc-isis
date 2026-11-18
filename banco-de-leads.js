@@ -12,6 +12,58 @@
   var DEPOIMENTOS_API = "/api/depoimentos";
   var POLL_MS = 20000; // atualização automática simples (sem websocket)
 
+  /* ==========================================================================
+     LOGIN DO CRM
+     A API exige a senha do CRM (HTTP Basic). Antes a tela dependia do prompt
+     nativo do navegador, que NÃO aparece em várias situações (celular, abas
+     embutidas, fetch em segundo plano): a API respondia 401, a lista ficava
+     vazia e os botões Aprovar/Ocultar não funcionavam. Agora o próprio CRM
+     pede a senha numa janelinha, guarda neste aparelho e manda em toda chamada.
+     ========================================================================== */
+  var PW_KEY = "crm-senha";
+  function getPw() { try { return localStorage.getItem(PW_KEY) || ""; } catch (e) { return ""; } }
+  function setPw(v) { try { if (v) localStorage.setItem(PW_KEY, v); else localStorage.removeItem(PW_KEY); } catch (e) {} }
+  function basic(pw) {
+    var bytes = new TextEncoder().encode(":" + pw), bin = "";
+    for (var i = 0; i < bytes.length; i++) bin += String.fromCharCode(bytes[i]);
+    return "Basic " + btoa(bin);
+  }
+  var loginEl = null, loginErr = null;
+  function showLogin(wrong) {
+    if (!loginEl) {
+      loginEl = document.createElement("div");
+      loginEl.style.cssText = "position:fixed;inset:0;z-index:9999;background:rgba(40,28,20,.55);backdrop-filter:blur(6px);display:grid;place-items:center;padding:20px";
+      loginEl.innerHTML = '<form style="background:#fff;border-radius:20px;padding:28px 24px;width:min(360px,100%);display:grid;gap:12px;box-shadow:0 30px 60px -20px rgba(0,0,0,.5);font-family:inherit">' +
+        '<strong style="font-size:20px">🔒 Senha do CRM</strong>' +
+        '<span style="font-size:14px;color:#6b5b50">Digite a senha para ver os leads e aprovar depoimentos.</span>' +
+        '<input type="password" autocomplete="current-password" required placeholder="Senha" style="font:inherit;padding:12px 14px;border:1.5px solid #d8cfc6;border-radius:12px">' +
+        '<span data-err style="font-size:13px;color:#b3261e;min-height:16px"></span>' +
+        '<button type="submit" style="font:inherit;font-weight:700;padding:12px;border:0;border-radius:12px;background:#A8470C;color:#fff;cursor:pointer">Entrar</button></form>';
+      document.body.appendChild(loginEl);
+      loginErr = loginEl.querySelector("[data-err]");
+      loginEl.querySelector("form").addEventListener("submit", function (e) {
+        e.preventDefault();
+        setPw(loginEl.querySelector("input").value);
+        loginEl.hidden = true;
+        loadLeads(); loadDepoimentos();
+      });
+    }
+    loginErr.textContent = wrong ? "Senha incorreta. Tente de novo." : "";
+    loginEl.hidden = false;
+    var inp = loginEl.querySelector("input"); inp.value = ""; setTimeout(function () { inp.focus(); }, 50);
+  }
+  // fetch que manda a senha; se a API disser 401, abre a janelinha de senha
+  function authFetch(url, opts) {
+    opts = opts || {};
+    opts.headers = Object.assign({}, opts.headers, { "X-CRM-Client": "1" });
+    var pw = getPw();
+    if (pw) opts.headers["Authorization"] = basic(pw);
+    return fetch(url, opts).then(function (res) {
+      if (res.status === 401) { var had = !!pw; setPw(""); showLogin(had); throw new Error("auth"); }
+      return res;
+    });
+  }
+
   var SOURCE_LABELS = {
     "portfolio-ugc": "Portfólio UGC",
     "bio-site": "Bio Site",
@@ -109,7 +161,7 @@
   }
 
   function loadLeads() {
-    return fetch(API)
+    return authFetch(API)
       .then(function (res) { return res.json(); })
       .then(function (data) {
         state.leads = withPending(data, state.pendingLeadStatus);
@@ -123,7 +175,7 @@
   }
 
   function loadDepoimentos() {
-    return fetch(DEPOIMENTOS_API)
+    return authFetch(DEPOIMENTOS_API)
       .then(function (res) { return res.json(); })
       .then(function (data) {
         state.depoimentos = withPending(data, state.pendingDepoStatus);
@@ -308,7 +360,7 @@
     state.pendingLeadStatus[id] = patch;
     if (lead) { Object.assign(lead, patch); render(); }
 
-    fetch(API + "/" + id + "/status", {
+    authFetch(API + "/" + id + "/status", {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ status: status })
@@ -326,14 +378,14 @@
   // Mesmo padrão de setStatus(), mas pra depoimentos — chamado pelos
   // botões [Aprovar]/[Ocultar] da aba "Depoimentos".
   function setDepoimentoStatus(id, status) {
-    var item = state.depoimentos.find(function (d) { return d.id === id; });
+    var item = state.depoimentos.find(function (d) { return String(d.id) === String(id); });
     var previous = item ? { status: item.status, statusUpdatedAt: item.statusUpdatedAt } : null;
     var patch = { status: status, statusUpdatedAt: new Date().toISOString() };
 
     state.pendingDepoStatus[id] = patch;
     if (item) { Object.assign(item, patch); render(); }
 
-    fetch(DEPOIMENTOS_API + "/" + id + "/status", {
+    authFetch(DEPOIMENTOS_API + "/" + id + "/status", {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ status: status })
@@ -342,7 +394,7 @@
       .then(function () { delete state.pendingDepoStatus[id]; })
       .catch(function () {
         delete state.pendingDepoStatus[id];
-        var current = state.depoimentos.find(function (d) { return d.id === id; });
+        var current = state.depoimentos.find(function (d) { return String(d.id) === String(id); });
         if (current && previous) { Object.assign(current, previous); render(); }
         document.getElementById("last-updated").textContent = "Não foi possível salvar — tente de novo.";
       });
