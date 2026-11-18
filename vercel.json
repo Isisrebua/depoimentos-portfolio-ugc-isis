@@ -12,6 +12,8 @@
   ],
   "routes": [
     { "src": "/(.*)", "headers": { "Cache-Control": "no-store" }, "continue": true },
+    { "src": "/sem-valores/", "status": 308, "headers": { "Location": "/sem-valores" } },
+    { "src": "/sem-valores", "dest": "/index.html" },
     { "src": "/avaliar", "dest": "/depoimento.html" },
     { "src": "/feedback", "dest": "/depoimento.html" },
     { "src": "/crm", "dest": "/banco-de-leads.html" },

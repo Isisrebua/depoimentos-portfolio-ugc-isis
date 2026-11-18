@@ -10,6 +10,7 @@
 </script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<script>(function(){var p=location.pathname.split("/").filter(Boolean).pop()||"";if(p==="sem-valores"||location.search.indexOf("valores=0")>-1)document.documentElement.classList.add("noprice")})()</script>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,400..800&family=Figtree:wght@400;500;600;700;800&display=swap">
 <style>
 /* layout: uma "área de trabalho" do iOS sobre papel com grão. cada seção é um objeto nativo (janela, imessage, toggles, iphones, pastas, wallet, popup). paleta do canva da Isis, sempre clara */
@@ -530,6 +531,9 @@ section{padding-block:72px 24px;scroll-margin-top:40px}
 .pk-info li{font-size:16px;color:var(--ink);display:flex;gap:10px;align-items:center}
 .brl-note{margin:10px 0 0;font-size:14px;font-weight:600;color:var(--ink-soft);background:rgba(168,71,12,.1);border-radius:999px;padding:6px 14px;display:inline-block}
 .brl-note:empty{display:none}
+/* versão sem valores (/sem-valores): esconde pacotes, itens avulsos e preços do combo */
+.noprice #pacotes,.noprice .av-head,.noprice .av1,.noprice .cb-price,.noprice .cb-save,.noprice .cb-card .brl-note{display:none!important}
+.noprice #investimento .oa-steps{margin-bottom:30px}
 .ads>.brl-note:not(:empty){display:table;margin:-12px auto 22px}
 .pk-info li::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--rust);flex:none}
 
@@ -640,6 +644,7 @@ section{padding-block:72px 24px;scroll-margin-top:40px}
 .pvid.on .cb-play{opacity:0}
 .print img{display:block;width:100%;height:auto}
 .approved{margin-top:16px;display:grid;gap:10px}
+.approved:empty{display:none}
 .wa{border-radius:18px;padding:12px 14px;max-width:420px}
 .wa .who{display:flex;gap:10px;align-items:center;font-size:12px;color:var(--ink-soft);margin-bottom:6px}
 .wa .who i{width:28px;height:28px;border-radius:50%;background:var(--sage)}
@@ -933,9 +938,7 @@ footer{padding-block:40px 10px;font-size:12px;color:var(--ink-soft);text-align:c
           <button type="button" class="print" data-print="5"><img src="assets/feedbacks/fb-5.jpg" alt="Print de feedback de uma marca parceira no WhatsApp" loading="lazy"></button>
         </div>
       </div>
-      <div class="approved">
-        <div class="wa glass"><div class="who"><i></i><div><b data-en="[brand name]">[Nome da marca]</b><br><span data-en="approved feedback · shows up here automatically">Feedback aprovado · aparece aqui sozinho</span></div></div><div class="msg" data-en="[example] this is where the text the brand sent through the form appears, after you approve it in the CRM <small>11:26</small>">[Exemplo] Aqui aparece o texto que a marca enviou pelo formulário, depois que você aprovar no CRM <small>11:26</small></div></div>
-      </div>
+      <div class="approved"></div>
     </div>
     <div class="card form-card" id="fbCard">
       <div class="winbar"><div class="dots"><i></i><i></i><i></i></div><span data-en="leave your feedback">Deixe seu feedback</span></div>
@@ -1064,9 +1067,11 @@ const services=[
  {ic:'↻',msg:'Oi Isis! Vim pelo seu portfólio e tenho interesse no pacote mensal de vídeos UGC. Pode me explicar como funciona? 🙂',pt:'Pacote mensal',en:'Monthly package',dpt:'Diferente do UGC Canvas, no pacote mensal (que você encontra na seção de pacotes) os vídeos são criados e entregues para a sua marca postar nas redes ou rodar tráfego.',den:'Unlike UGC Canvas, in the monthly package (found in the packages section) the videos are created and delivered for your brand to post on social media or run as ads.'},
  {ic:'◎',msg:'Oi Isis! Vim pelo seu portfólio e quero que você cuide da gestão da minha campanha UGC. Podemos conversar? 🙂',pt:'Gestão de campanhas UGC',en:'UGC campaign management',dpt:'Cuido de toda a operação da sua campanha UGC: curadoria de criadores, contratos, briefing e entrega dos vídeos prontos para feed e anúncios.',den:'I run your entire UGC campaign: creator curation, contracts, briefing and delivery of ready-to-use videos for feed and ads.',site:'https://gestaodecampanhasugc.vercel.app'}
 ];
+const noPrice=()=>document.documentElement.classList.contains('noprice');
+const np=t=>noPrice()?t.replace(' (que você encontra na seção de pacotes)','').replace(' (found in the packages section)',''):t;
 function renderServices(){
   const cc=document.getElementById('cc');const open=cc.querySelector('[aria-expanded="true"]');const oi=open?+open.dataset.i:0;
-  cc.innerHTML=services.map((s,i)=>`<button type="button" class="tile" data-i="${i}" aria-expanded="${i===oi}"><div class="top"><div class="ico">${s.ic}</div><div class="sw"></div></div><h3>${T(s.pt,s.en)}</h3><p class="desc">${T(s.dpt,s.den)}</p><span class="gos"><a class="go" href="${waHref(s.msg)}" target="_blank" rel="noopener">${T('Pedir no WhatsApp →','Ask on WhatsApp →')}</a>${s.site?`<a class="go ghost" href="${s.site}" target="_blank" rel="noopener">${T('Entender o serviço','Learn more')}</a>`:''}</span></button>`).join('');
+  cc.innerHTML=services.map((s,i)=>`<button type="button" class="tile" data-i="${i}" aria-expanded="${i===oi}"><div class="top"><div class="ico">${s.ic}</div><div class="sw"></div></div><h3>${T(s.pt,s.en)}</h3><p class="desc">${np(T(s.dpt,s.den))}</p><span class="gos"><a class="go" href="${waHref(s.msg)}" target="_blank" rel="noopener">${T('Pedir no WhatsApp →','Ask on WhatsApp →')}</a>${s.site?`<a class="go ghost" href="${s.site}" target="_blank" rel="noopener">${T('Entender o serviço','Learn more')}</a>`:''}</span></button>`).join('');
 }
 document.getElementById('cc').addEventListener('click',e=>{
   if(e.target.closest('.go'))return;const b=e.target.closest('.tile');if(!b)return;
